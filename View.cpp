@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "GL.hpp"
+#include "gl_errors.hpp"
 
 #include "View.hpp"
 #include "Load.hpp"
@@ -100,6 +101,9 @@ TextLine::TextLine(std::string content, float cursor_x, float cursor_y, glm::vec
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0.1, 0.2, 0.4, 0);
+	// the 2 lines below are snippet from yunfeic
+	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
@@ -122,14 +126,16 @@ TextLine::TextLine(std::string content, float cursor_x, float cursor_y, glm::vec
 	glyph_pos_ = hb_buffer_get_glyph_positions(hb_buffer_, &glyph_count_);
 }
 
+TextLine::TextLine(const TextLine &that) : TextLine(that.content_, that.cursor_x_, that.cursor_y_, that.fg_color_, that.font_size_) {}
+
 TextLine::~TextLine() {
 	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_
-	FT_Done_Face(face_);
-	face_ = nullptr;
 	hb_buffer_destroy(hb_buffer_);
 	hb_buffer_ = nullptr;
 	hb_font_destroy(font_);
 	font_ = nullptr;
+	FT_Done_Face(face_);
+	face_ = nullptr;
 	FT_Done_FreeType(ft_library_);
 	ft_library_ = nullptr;
 
@@ -141,6 +147,7 @@ TextLine::~TextLine() {
 
 void TextLine::draw() {
 	// Bind Stuff
+	GL_ERRORS();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 	glBindSampler(0, sampler_);
@@ -152,6 +159,8 @@ void TextLine::draw() {
 	glUniform1i(program->tex_uniform_, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	GL_ERRORS();
+
 	const FT_GlyphSlot glyph = face_->glyph;
 
 	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / 720;
@@ -171,9 +180,11 @@ void TextLine::draw() {
 			continue;
 		}
 
+		GL_ERRORS();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
 		             glyph->bitmap.width, glyph->bitmap.rows,
 		             0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+		GL_ERRORS();
 
 		const glm::vec2 scale_factor = get_scale_physical(); //< scale back to [-1.0f,1.0f]
 		const float vx = cursor_x + x_offset + glyph->bitmap_left * scale_factor.x;
@@ -201,6 +212,25 @@ void TextLine::draw() {
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	GL_ERRORS();
 }
 
+TextBox::TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
+                 const glm::ivec2 &position,
+                 unsigned int fontSize)
+	: position_(position), font_size_(fontSize), contents_(std::move(contents)) {
+	for (size_t i = 0; i < contents_.size(); i++) {
+		lines_.emplace_back(contents_.at(i).second,
+		                          position_.x,
+		                          position_.y + font_size_ * i,
+		                          glm::uvec4(contents_.at(i).first, 255U),
+		                          font_size_);
+	}
+}
+
+void TextBox::draw() {
+	for (auto &line : lines_) {
+		line.draw();
+	}
+}
 }

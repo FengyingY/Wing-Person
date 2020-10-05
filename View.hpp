@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <utility>
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
@@ -54,6 +56,25 @@ public:
 	 * @param font_size font size in logical pixels (like CSS pixels)
 	 */
 	TextLine(std::string content, float cursor_x, float cursor_y, glm::vec4 fg_color, unsigned font_size);
+
+	/**
+	 * copy constructor
+	 */
+	TextLine(const TextLine &that);
+
+	/**
+	 * TODO(xiaoqiao)
+	 * copy assignment not implemented yet
+	 */
+	TextLine &operator=(const TextLine &) = delete;
+
+	/**
+	 * Move constructor and assignment is deleted -- because it'll be a hassle moving OpenGL resources
+	 * @param that
+	 */
+	TextLine(TextLine &&that) = delete;
+	TextLine& operator=(TextLine &&) = delete;
+	TextLine() = delete;
 	~TextLine();
 	void update(float elapsed);
 	void draw();
@@ -61,8 +82,8 @@ public:
 private:
 
 	std::string content_;
-	const float cursor_x_;
-	const float cursor_y_;
+	float cursor_x_;
+	float cursor_y_;
 	glm::vec4 fg_color_;
 	unsigned font_size_; //< font size in "logical pixel"
 
@@ -82,6 +103,20 @@ private:
 		const auto &ctx = ViewContext::get();
 		return glm::vec2(2.0f) / glm::vec2(ctx.drawable_size_);
 	}
+};
+
+class TextBox{
+public:
+	TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
+	        const glm::ivec2 &position,
+	        unsigned int fontSize);
+	void draw();
+private:
+
+	glm::ivec2 position_;
+	unsigned font_size_;
+	std::vector<std::pair<glm::uvec3, std::string>> contents_;
+	std::vector<TextLine> lines_;
 };
 
 }
