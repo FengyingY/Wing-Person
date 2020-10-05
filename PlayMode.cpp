@@ -236,7 +236,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		my_line.draw();
 	}
-	GL_ERRORS();
+
 }
 
 glm::vec3 PlayMode::get_leg_tip_position() {
