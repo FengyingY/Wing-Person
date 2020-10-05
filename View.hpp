@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <optional>
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
@@ -40,12 +41,20 @@ public:
 	 * @param cursor_y position in window, 0 to 720. 0 means top
 	 * @param fg_color color. glm::uvec4(255,255,255,255) means white
 	 * @param font_size font size in logical pixels (like CSS pixels)
+	 * @param appear_by_letter_speed if not null, appear glyphs one by one like an animation
+	 *                               number means "how many new letters per second"
 	 */
-	TextLine(std::string content, int cursor_x, int cursor_y, glm::uvec4 fg_color, unsigned font_size) :
+	TextLine(std::string content,
+	         int cursor_x,
+	         int cursor_y,
+	         glm::uvec4 fg_color,
+	         unsigned font_size,
+	         std::optional<float> appear_by_letter_speed) :
 		TextLine{std::move(content),
 		         static_cast<float>((cursor_x - 1280 / 2) * (2.0f / 1280)),
 		         static_cast<float>(-(cursor_y - 720 / 2) * (2.0f / 720)),
-		         glm::vec4(fg_color) / 255.0f, font_size} {}
+		         glm::vec4(fg_color) / 255.0f, font_size,
+		         appear_by_letter_speed} {}
 
 	/**
 	 * Create a line of text -- the more openGL friendly version
@@ -54,8 +63,15 @@ public:
 	 * @param cursor_y position in window. Range: [-1.0f,1.0f]. -1 means bottom.
 	 * @param fg_color color, range: [0.0f, 1.0f]. 1.0 means highest brightness
 	 * @param font_size font size in logical pixels (like CSS pixels)
+	 * @param appear_by_letter_speed if not null, appear glyphs one by one like an animation
+	 *                               number means "how many new letters per second"
 	 */
-	TextLine(std::string content, float cursor_x, float cursor_y, glm::vec4 fg_color, unsigned font_size);
+	TextLine(std::string content,
+	         float cursor_x,
+	         float cursor_y,
+	         glm::vec4 fg_color,
+	         unsigned font_size,
+	         std::optional<float> appear_by_letter_speed);
 
 	/**
 	 * copy constructor
@@ -70,7 +86,6 @@ public:
 
 	/**
 	 * Move constructor and assignment is deleted -- because it'll be a hassle moving OpenGL resources
-	 * @param that
 	 */
 	TextLine(TextLine &&that) = delete;
 	TextLine& operator=(TextLine &&) = delete;
@@ -86,6 +101,9 @@ private:
 	float cursor_y_;
 	glm::vec4 fg_color_;
 	unsigned font_size_; //< font size in "logical pixel"
+	std::optional<float> appear_by_letter_speed_;
+	float total_time_elapsed_ = 0.0f;
+	unsigned int visible_glyph_count_ = 0;
 
 	static constexpr char FONT_NAME[] = "cmunorm.ttf";
 	FT_Library ft_library_ = nullptr;

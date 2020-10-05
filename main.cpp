@@ -101,9 +101,6 @@ int main(int argc, char **argv) {
 	//------------ load assets --------------
 	call_load_functions();
 
-	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
-
 	//------------ main loop ------------
 
 	//this inline function will be called whenever the window is resized,
@@ -121,6 +118,9 @@ int main(int argc, char **argv) {
 		view::ViewContext::set(window_size, drawable_size);
 	};
 	on_resize();
+
+	//------------ create game mode + make current --------------
+	Mode::set_current(std::make_shared< PlayMode >());
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {

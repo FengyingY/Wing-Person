@@ -171,6 +171,11 @@ void PlayMode::update(float elapsed) {
 		Sound::listener.set_position_right(at, right, 1.0f / 60.0f);
 	}
 
+	{
+		// update textView
+		my_line.update(elapsed);
+	}
+
 	//reset button press counters:
 	left.downs = 0;
 	right.downs = 0;
@@ -229,8 +234,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		my_text_box.draw();
 	}
 	{
-//		view::TextLine my_line("AAA", 0, 0, glm::uvec4(255), 16);
-//		view::TextLine my_line_2 = my_line;
+		my_line.draw();
 	}
 	GL_ERRORS();
 }

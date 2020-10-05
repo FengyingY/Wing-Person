@@ -82,8 +82,23 @@ void ViewContext::set(const glm::uvec2 &logicalSize, const glm::uvec2 &drawableS
 	singleton_.is_initialized = true;
 }
 
-TextLine::TextLine(std::string content, float cursor_x, float cursor_y, glm::vec4 fg_color, unsigned font_size)
-	: content_(std::move(content)), cursor_x_{cursor_x}, cursor_y_{cursor_y}, fg_color_{fg_color}, font_size_{font_size} {
+TextLine::TextLine(std::string content,
+                   float cursor_x,
+                   float cursor_y,
+                   glm::vec4 fg_color,
+                   unsigned font_size,
+                   std::optional<float> appear_by_letter_speed)
+	: content_(std::move(content)),
+	  cursor_x_{cursor_x},
+	  cursor_y_{cursor_y},
+	  fg_color_{fg_color},
+	  font_size_{font_size},
+	  appear_by_letter_speed_{appear_by_letter_speed} {
+
+	// appear_by_letter_speed must be either empty or a positive float
+	if (appear_by_letter_speed.has_value() && appear_by_letter_speed.value() <= 0.0f) {
+		throw std::invalid_argument("appear_by_letter_speed must be either empty or a positive float");
+	}
 
 	// initialize opengl resources
 	glGenBuffers(1, &vbo_);
@@ -120,9 +135,20 @@ TextLine::TextLine(std::string content, float cursor_x, float cursor_y, glm::vec
 
 	glyph_info_ = hb_buffer_get_glyph_infos(hb_buffer_, &glyph_count_);
 	glyph_pos_ = hb_buffer_get_glyph_positions(hb_buffer_, &glyph_count_);
+
+	if (appear_by_letter_speed_.has_value()) {
+		visible_glyph_count_ = 0;
+	} else {
+		visible_glyph_count_ = glyph_count_;
+	}
 }
 
-TextLine::TextLine(const TextLine &that) : TextLine(that.content_, that.cursor_x_, that.cursor_y_, that.fg_color_, that.font_size_) {}
+TextLine::TextLine(const TextLine &that) : TextLine(that.content_,
+                                                    that.cursor_x_,
+                                                    that.cursor_y_,
+                                                    that.fg_color_,
+                                                    that.font_size_,
+                                                    std::optional<float>()) {}
 
 TextLine::~TextLine() {
 	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_
@@ -139,6 +165,14 @@ TextLine::~TextLine() {
 	glDeleteSamplers(1, &sampler_);
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteTextures(1, &texture_);
+}
+
+void TextLine::update(float elapsed) {
+	if (appear_by_letter_speed_.has_value() && visible_glyph_count_ < glyph_count_) {
+		// show "appear letters one by one" animation
+		total_time_elapsed_ += elapsed;
+		visible_glyph_count_ = static_cast<unsigned>(total_time_elapsed_ * appear_by_letter_speed_.value());
+	}
 }
 
 void TextLine::draw() {
@@ -161,7 +195,7 @@ void TextLine::draw() {
 
 	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / 720;
 
-	for (size_t i = 0; i < glyph_count_; ++i) {
+	for (size_t i = 0; i < visible_glyph_count_; ++i) {
 		hb_codepoint_t glyphid = glyph_info_[i].codepoint;
 		float x_offset = glyph_pos_[i].x_offset / 64.0;
 		float y_offset = glyph_pos_[i].y_offset / 64.0;
@@ -211,16 +245,18 @@ void TextLine::draw() {
 	GL_ERRORS();
 }
 
+
 TextBox::TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
                  const glm::ivec2 &position,
                  unsigned int fontSize)
 	: position_(position), font_size_(fontSize), contents_(std::move(contents)) {
 	for (size_t i = 0; i < contents_.size(); i++) {
 		lines_.emplace_back(contents_.at(i).second,
-		                          position_.x,
-		                          position_.y + font_size_ * i,
-		                          glm::uvec4(contents_.at(i).first, 255U),
-		                          font_size_);
+		                    position_.x,
+		                    position_.y + font_size_ * i,
+		                    glm::uvec4(contents_.at(i).first, 255U),
+		                    font_size_,
+		                    std::nullopt);
 	}
 }
 
