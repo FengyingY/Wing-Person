@@ -232,7 +232,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 //		view::TextLine my_line("AAA", 0, 0, glm::uvec4(255), 16);
 //		view::TextLine my_line_2 = my_line;
 	}
-	GL_ERRORS();
+
 }
 
 glm::vec3 PlayMode::get_leg_tip_position() {
