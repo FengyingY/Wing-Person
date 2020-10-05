@@ -100,10 +100,6 @@ TextLine::TextLine(std::string content, float cursor_x, float cursor_y, glm::vec
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor(0.1, 0.2, 0.4, 0);
-	// the 2 lines below are snippet from yunfeic
-	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
