@@ -228,14 +228,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		float ofs = 2.0f / drawable_size.y;
 		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
-			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::vec3(H, 0.0f, 0.0f),  glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
 	GL_ERRORS();
 		
 	hb_buffer_t *buf;
     buf = hb_buffer_create();
-    hb_buffer_add_utf8(buf, "abcdefg hijklmn opqrst uvwxyz", -1, 0, -1);
+    hb_buffer_add_utf8(buf, "abcdeffig hijklmn opqrst uvwxyz VA ", -1, 0, -1);
 	hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
 	hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
 	hb_buffer_set_language(buf, hb_language_from_string("en", -1));
@@ -245,7 +245,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	FT_Init_FreeType(&ft_library);
 
 	size_t index = 0;
-	FT_New_Face(ft_library, "/usr/share/fonts/truetype/ubuntu/Ubuntu-L.ttf", index, &face);
+	FT_New_Face(ft_library, "/Users/xuxiaoqiao/Library/Fonts/cmunorm.ttf", index, &face);
 	FT_Set_Char_Size(face, 0, 1000, 0, 0);
 	hb_font_t *font = hb_ft_font_create(face, NULL);
 
@@ -344,8 +344,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		float y_advance = glyph_pos[i].y_advance / 64.0;
 
 
-		if(FT_Load_Char(face, glyphid, FT_LOAD_RENDER) != 0)
+		if(FT_Load_Glyph(face, glyphid, FT_LOAD_DEFAULT) != 0)
             continue;
+
+		if (FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL) != 0) {
+			continue;
+		}
 
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
