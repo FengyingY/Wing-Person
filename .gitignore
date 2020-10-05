@@ -10,3 +10,7 @@ dist/freetype-test.*
 scenes/show-meshes*
 scenes/show-scene*
 *.blend[0-9]
+.idea/
+cmake-build-*/
+CMakeLists.txt
+hb_example.cpp

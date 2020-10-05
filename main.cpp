@@ -1,3 +1,6 @@
+// For view related contexts
+#include "View.hpp"
+
 //Mode.hpp declares the "Mode::current" static member variable, which is used to decide where event-handling, updating, and drawing events go:
 #include "Mode.hpp"
 
@@ -57,7 +60,7 @@ int main(int argc, char **argv) {
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		1280, 720, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
-		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
+//		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
 	);
 
@@ -115,6 +118,7 @@ int main(int argc, char **argv) {
 		SDL_GL_GetDrawableSize(window, &w, &h);
 		drawable_size = glm::uvec2(w, h);
 		glViewport(0, 0, drawable_size.x, drawable_size.y);
+		view::ViewContext::set(window_size, drawable_size);
 	};
 	on_resize();
 

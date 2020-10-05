@@ -7,14 +7,11 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
+#include "View.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <random>
-
-#include <hb.h>
-#include <hb-ft.h>
-#include <freetype/freetype.h>
 
 GLuint hexapod_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
@@ -62,10 +59,6 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
-
-	//start music loop playing:
-	// (note: position will be over-ridden in update())
-	leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
 }
 
 PlayMode::~PlayMode() {
@@ -150,12 +143,8 @@ void PlayMode::update(float elapsed) {
 		glm::vec3(0.0f, 0.0f, 1.0f)
 	);
 
-	//move sound to follow leg tip position:
-	leg_tip_loop->set_position(get_leg_tip_position(), 1.0f / 60.0f);
-
 	//move camera:
 	{
-
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
 		glm::vec2 move = glm::vec2(0.0f);
@@ -231,159 +220,11 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			glm::vec3(H, 0.0f, 0.0f),  glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
-	GL_ERRORS();
-		
-	hb_buffer_t *buf;
-    buf = hb_buffer_create();
-    hb_buffer_add_utf8(buf, "abcdeffig hijklmn opqrst uvwxyz VA ", -1, 0, -1);
-	hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
-	hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
-	hb_buffer_set_language(buf, hb_language_from_string("en", -1));
-
-	FT_Library  ft_library;
-	FT_Face face;
-	FT_Init_FreeType(&ft_library);
-
-	size_t index = 0;
-	FT_New_Face(ft_library, "/Users/xuxiaoqiao/Library/Fonts/cmunorm.ttf", index, &face);
-	FT_Set_Char_Size(face, 0, 1000, 0, 0);
-	hb_font_t *font = hb_ft_font_create(face, NULL);
-
-	hb_shape(font, buf, NULL, 0);
-
-	unsigned int glyph_count;
-	hb_glyph_info_t *glyph_info    = hb_buffer_get_glyph_infos(buf, &glyph_count);
-	hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);
-
-	float cursor_x = -1.0f;
-	float cursor_y = 0.0f;
-	
-	float sx = 2.0 / 1280;
-	float sy = 2.0 / 720;
-	GLuint texture{0}, sampler{0};
-    GLuint vbo{0}, vao{0};
-    GLuint vs{0}, fs{0}, program{0};
-	const char *VERTEX_SHADER = ""
-        "#version 410 core\n"
-        "in vec4 in_Position;\n"
-        "out vec2 texCoords;\n"
-        "void main(void) {\n"
-        "    gl_Position = vec4(in_Position.xy, 0, 1);\n"
-        "    texCoords = in_Position.zw;\n"
-        "}\n";
-
-
-	const char *FRAGMENT_SHADER = ""
-        "#version 410 core\n"
-        "precision highp float;\n"
-        "uniform sampler2D tex;\n"
-        "uniform vec4 color;\n"
-        "in vec2 texCoords;\n"
-        "out vec4 fragColor;\n"
-        "void main(void) {\n"
-        "    fragColor = vec4(1, 1, 1, texture(tex, texCoords).r) * color;\n"
-        "}\n";
-
-	// Initialize our texture and VBOs
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
-    glGenTextures(1, &texture);
-    glGenSamplers(1, &sampler);
-    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-    // Initialize shader
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &VERTEX_SHADER, 0);
-    glCompileShader(vs);
-
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &FRAGMENT_SHADER, 0);
-    glCompileShader(fs);
-
-    program = glCreateProgram();
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-
-    // Set some initialize GL state
-    glEnable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.1, 0.2, 0.4, 0);
-
-    // Get shader uniforms
-    glUseProgram(program);
-    glBindAttribLocation(program, 0, "in_Position");
-    GLuint texUniform = glGetUniformLocation(program, "tex");
-    GLuint colorUniform = glGetUniformLocation(program, "color");
-	
-	// Bind Stuff
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBindSampler(0, sampler);
-	glBindVertexArray(vao);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glUseProgram(program);
-	glUniform4f(colorUniform, 1, 1, 1, 1);
-	glUniform1i(texUniform, 0);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	const FT_GlyphSlot glyph = face->glyph;
-
-	for (size_t i = 0; i < glyph_count; ++i) {
-		hb_codepoint_t glyphid = glyph_info[i].codepoint;
-		float x_offset = glyph_pos[i].x_offset / 64.0;
-		float y_offset = glyph_pos[i].y_offset / 64.0;
-		float x_advance = glyph_pos[i].x_advance / 64.0;
-		float y_advance = glyph_pos[i].y_advance / 64.0;
-
-
-		if(FT_Load_Glyph(face, glyphid, FT_LOAD_DEFAULT) != 0)
-            continue;
-
-		if (FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL) != 0) {
-			continue;
-		}
-
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
-                     glyph->bitmap.width, glyph->bitmap.rows,
-                     0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
-
-        const float vx = cursor_x + x_offset + glyph->bitmap_left * sx;
-        const float vy = cursor_y + y_offset + glyph->bitmap_top * sy;
-        const float w = glyph->bitmap.width * sx;
-        const float h = glyph->bitmap.rows * sy;
-
-        struct {
-            float x, y, s, t;
-        } data[6] = {
-            {vx    , vy    , 0, 0},
-            {vx    , vy - h, 0, 1},
-            {vx + w, vy    , 1, 0},
-            {vx + w, vy    , 1, 0},
-            {vx    , vy - h, 0, 1},
-            {vx + w, vy - h, 1, 1}
-        };
-
-        glBufferData(GL_ARRAY_BUFFER, 24*sizeof(float), data, GL_DYNAMIC_DRAW);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		cursor_x += x_advance * sx;
-		cursor_y += y_advance * sy;
+	{
+		view::TextLine my_text_box("Hello, VAWIII, ffi", 0, 0, glm::uvec4(255), 128);
+		my_text_box.draw();
 	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-	hb_buffer_destroy(buf);
-    hb_font_destroy(font);
+	GL_ERRORS();
 }
 
 glm::vec3 PlayMode::get_leg_tip_position() {

@@ -108,6 +108,7 @@ GAME_NAMES =
 	Sound
 	load_wav
 	load_opus
+	View
 	;
 
 COMMON_NAMES =
