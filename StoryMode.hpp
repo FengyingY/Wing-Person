@@ -63,6 +63,8 @@ struct StoryMode : Mode {
 
 	bool show_next_line();
 
+	std::shared_ptr< Sound::PlayingSample > music_loop;
+
 private:
 	void setCurrentBranch(const Story::Branch &new_branch);
 

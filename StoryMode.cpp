@@ -5,6 +5,7 @@
 #include "DrawLines.hpp"
 #include "Mesh.hpp"
 #include "Load.hpp"
+#include "Sound.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 
@@ -78,11 +79,16 @@ Load<Story> jill_story(LoadTagDefault, []() -> Story * {
 	return ret;
 });
 
+Load< Sound::Sample > past_sadness_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("past-sadness-by-kevin-macleod-from-filmmusic-io.wav"));
+});
 
 StoryMode::StoryMode() : story(*jill_story) {
 	// set the timer and print the first line
 	setCurrentBranch(story.stories.at("Opening"));
 	timer_left = 1.0; // 1s per line
+
+	music_loop = Sound::loop_3D(*past_sadness_sample, 1.0f, glm::vec3(0, 0, 0));
 
 	show_next_line();
 }
