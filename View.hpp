@@ -206,7 +206,7 @@ public:
 	}
 	void MoveDown() {
 		if (options_shown_ && !options_.empty()) {
-			SetOptionFocus(std::min<int>(option_focus_ + 1, options_.size() - 1));
+			SetOptionFocus(std::min<int>(option_focus_ + 1, (int)options_.size() - 1));
 		}
 	}
 
