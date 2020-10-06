@@ -86,35 +86,39 @@ Load< Sound::Sample > past_sadness_sample(LoadTagDefault, []() -> Sound::Sample 
 StoryMode::StoryMode() : story(*jill_story) {
 	// set the timer and print the first line
 	setCurrentBranch(story.stories.at("Opening"));
-	timer_left = 1.0; // 1s per line
 
 	music_loop = Sound::loop_3D(*past_sadness_sample, 1.0f, glm::vec3(0, 0, 0));
 
-	show_next_line();
 }
 
 StoryMode::~StoryMode() {
 }
 
 bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-	if (option) {
-		int key = evt.key.keysym.sym - SDLK_1;
-		if (key >= 0 && unsigned(key) < current.next_branch_names.size()) {
-			setCurrentBranch(story.stories.at(current.next_branch_names.at(key)));
-			option = false;
+
+	if (evt.type == SDL_KEYDOWN) {
+		SDL_Keycode keyCode = evt.key.keysym.sym;
+		if (keyCode == SDLK_UP) {
+			main_dialog->MoveUp();
 			return true;
+		} else if (keyCode == SDLK_DOWN) {
+			main_dialog->MoveDown();
+			return true;
+		} else if (keyCode == SDLK_RETURN) {
+			std::optional<int> next_branch = main_dialog->Enter();
+			if (next_branch.has_value()) {
+				setCurrentBranch(story.stories.at(current.next_branch_names.at(next_branch.value())));
+				return true;
+			} else {
+				return false;
+			}
 		}
-		return false;
 	}
 	return false;
 }
 
 void StoryMode::update(float elapsed) {
-	timer_left -= elapsed;
-	if (timer_left <= 0) {
-		show_next_line();
-	}
-	my_text_box.update(elapsed);
+	main_dialog->update(elapsed);
 }
 
 void StoryMode::draw(glm::uvec2 const &drawable_size) {
@@ -125,7 +129,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
 	{
-		my_text_box.draw();
+		main_dialog->draw();
 	}
 	GL_ERRORS();
 }
@@ -137,7 +141,6 @@ bool StoryMode::show_next_line() {
 		Story::Line current_line = current.lines.at(current.line_idx);
 		std::string to_show = story.characters.at(current_line.character_idx).first + " " + current_line.line;
 		// reset timer - TODO set it according to the length of the sentence
-		timer_left = 1.0;
 		// go to next line
 		current.line_idx += 1;
 
@@ -163,16 +166,11 @@ bool StoryMode::show_next_line() {
 void StoryMode::setCurrentBranch(const Story::Branch &new_branch) {
 	current = new_branch;
 	option = true;
-	std::vector<std::pair<glm::uvec4, std::string>> contents_;
+	std::vector<std::pair<glm::uvec4, std::string>> prompts;
 	for (const auto &line : current.lines) {
 		glm::uvec4 color = glm::uvec4(story.characters.at(line.character_idx).second * 255.0f);
 		std::string to_show = story.characters.at(line.character_idx).first + " " + line.line;
-		contents_.emplace_back(color, to_show);
+		prompts.emplace_back(color, to_show);
 	}
-
-	for (size_t i = 0; i < current.option_lines.size(); ++i) {
-		std::string option = " " + std::to_string(i+1) + " " + current.option_lines[i];
-		contents_.emplace_back(glm::uvec4(255), option);
-	}
-	my_text_box.set_contents(contents_, std::make_optional(50.0f));
+	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);
 }

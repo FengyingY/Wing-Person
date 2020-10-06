@@ -53,13 +53,15 @@ public:
 	         glm::uvec4 fg_color,
 	         unsigned font_size,
 	         std::optional<float> animation_speed,
-	         bool visibility) :
+	         bool visibility,
+	         std::string font_face = "cmunorm.ttf") :
 		TextLine{std::move(content),
 		         static_cast<float>(cursor_x * (2.0f / ViewContext::get().logical_size_.x) - 1.0f),
 		         static_cast<float>(-(cursor_y * (2.0f / ViewContext::get().logical_size_.y) - 1.0f)),
 		         glm::vec4(fg_color) / 255.0f, font_size,
 		         animation_speed,
-		         visibility} {}
+		         visibility,
+		         font_face} {}
 
 	/**
 	 * Create a line of text -- the more openGL friendly version
@@ -78,7 +80,8 @@ public:
 	         glm::vec4 fg_color,
 	         unsigned font_size,
 	         std::optional<float> animation_speed,
-	         bool visibility);
+	         bool visibility,
+	         std::string font_face = "cmunorm.ttf");
 
 	/**
 	 * copy constructor
@@ -132,7 +135,10 @@ private:
 	/// callback_ called once when appear_by_letter_speed_.has_value() and all the glyphs are shown.
 	std::optional<std::function<void()>> callback_ = std::nullopt;
 
-	static constexpr char FONT_NAME[] = "cmunorm.ttf";
+	std::string font_face_;
+
+	glm::vec2 scale_factor_;
+
 	FT_Library ft_library_ = nullptr;
 	FT_Face face_ = nullptr;
 	hb_buffer_t *hb_buffer_ = nullptr;
@@ -160,12 +166,77 @@ public:
 	void draw();
 	void set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed);
 	int get_height() const { return static_cast<int>(font_size_ * contents_.size()); }
+	void set_callback(std::optional<std::function<void()>> cb) {
+		callback_ = cb;
+		if (lines_.empty()) {
+			return;
+		}
+		lines_.at(lines_.size() - 1)->setAnimationCallback(cb);
+	}
 private:
+	// called when all letters displayed
+	// precondition: animation_speed_ is not null
+	std::optional<std::function<void()>> callback_;
 	glm::ivec2 position_;
 	unsigned font_size_;
 	std::vector<std::pair<glm::uvec4, std::string>> contents_;
-	std::vector<TextLine> lines_;
+	std::vector<std::shared_ptr<TextLine>> lines_;
 	std::optional<float> animation_speed_;
+};
+
+class Dialog {
+public:
+	Dialog(std::vector<std::pair<glm::uvec4, std::string>> prompts, std::vector<std::string> options);
+	void draw() {
+		prompt_box_->draw();
+		for (auto&[choice, text] : option_lines_) {
+			choice->draw();
+			text->draw();
+		}
+	}
+	void update(float elapsed) {
+		prompt_box_->update(elapsed);
+	}
+
+	void MoveUp() {
+		if (options_shown_ && !options_.empty()) {
+			SetOptionFocus(std::max<int>(option_focus_ - 1, 0));
+		}
+	}
+	void MoveDown() {
+		if (options_shown_ && !options_.empty()) {
+			SetOptionFocus(std::min<int>(option_focus_ + 1, options_.size() - 1));
+		}
+	}
+
+	std::optional<int> Enter() {
+		if (options_shown_ && !options_.empty()) {
+			return std::make_optional(option_focus_);
+		} else {
+			return std::nullopt;
+		}
+	}
+
+
+private:
+	void SetOptionFocus(int new_index) {
+		if (option_focus_ != new_index) {
+			option_lines_.at(option_focus_).first->setText("[ ]", std::nullopt);
+			option_lines_.at(new_index).first->setText("[x]", std::nullopt);
+			option_focus_ = new_index;
+		}
+	}
+
+	std::vector<std::pair<glm::uvec4, std::string>> prompt_;
+	std::vector<std::string> options_;
+	int option_focus_ = 0;
+
+	bool options_shown_ = true;
+
+	std::shared_ptr<TextBox> prompt_box_;
+	std::vector<std::pair<std::shared_ptr<TextLine>, std::shared_ptr<TextLine>>> option_lines_;
+	static constexpr unsigned PADDING_LEFT = 16;
+	static constexpr unsigned PADDING_TOP = 16;
 };
 
 }

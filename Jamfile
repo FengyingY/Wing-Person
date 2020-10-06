@@ -142,7 +142,7 @@ SHOW_SCENE_NAMES =
 
 
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
-Objects 
+Objects
 	$(GAME_NAMES:S=.cpp)
 	$(COMMON_NAMES:S=.cpp)
 	$(SHOW_MESHES_NAMES:S=.cpp)

@@ -89,19 +89,22 @@ TextLine::TextLine(std::string content,
                    glm::vec4 fg_color,
                    unsigned font_size,
                    std::optional<float> animation_speed,
-                   bool visibility)
+                   bool visibility,
+                   std::string font_face)
 	: visibility_{visibility},
 	  content_(std::move(content)),
 	  cursor_x_{cursor_x},
 	  cursor_y_{cursor_y},
 	  fg_color_{fg_color},
 	  font_size_{font_size},
-	  animation_speed_{animation_speed} {
+	  animation_speed_{animation_speed},
+	  font_face_{font_face}{
 
 	// appear_by_letter_speed must be either empty or a positive float
 	if (animation_speed.has_value() && animation_speed.value() <= 0.0f) {
 		throw std::invalid_argument("appear_by_letter_speed must be either empty or a positive float");
 	}
+	scale_factor_ = get_scale_physical();
 
 	// initialize opengl resources
 	glGenBuffers(1, &vbo_);
@@ -121,7 +124,7 @@ TextLine::TextLine(std::string content,
 
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
-	const std::string font_path = data_path(FONT_NAME);
+	const std::string font_path = data_path(font_face_);
 	error = FT_New_Face(ft_library_, font_path.c_str(), 0, &face_);
 	if (error != 0) { throw std::runtime_error("Error initializing font face"); }
 	error = FT_Set_Pixel_Sizes(face_, 0, ViewContext::compute_physical_px(font_size_));
@@ -161,12 +164,15 @@ TextLine::TextLine(const TextLine &that) : TextLine(that.content_,
                                                     that.fg_color_,
                                                     that.font_size_,
                                                     that.animation_speed_,
-                                                    that.visibility_) {
+                                                    that.visibility_,
+                                                    that.font_face_) {
+	total_time_elapsed_ = that.total_time_elapsed_;
+	visible_glyph_count_ = that.visible_glyph_count_;
 	callback_ = that.callback_;
 }
 
 TextLine::~TextLine() {
-	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_
+	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_ ?
 	hb_buffer_destroy(hb_buffer_);
 	hb_buffer_ = nullptr;
 	hb_font_destroy(font_);
@@ -237,11 +243,10 @@ void TextLine::draw() {
 		             0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
 		GL_ERRORS();
 
-		const glm::vec2 scale_factor = get_scale_physical(); //< scale back to [-1.0f,1.0f]
-		const float vx = cursor_x + x_offset + glyph->bitmap_left * scale_factor.x;
-		const float vy = cursor_y + y_offset + glyph->bitmap_top * scale_factor.y;
-		const float w = glyph->bitmap.width * scale_factor.x;
-		const float h = glyph->bitmap.rows * scale_factor.y;
+		const float vx = cursor_x + x_offset + glyph->bitmap_left * scale_factor_.x;
+		const float vy = cursor_y + y_offset + glyph->bitmap_top * scale_factor_.y;
+		const float w = glyph->bitmap.width * scale_factor_.x;
+		const float h = glyph->bitmap.rows * scale_factor_.y;
 
 		struct {
 			float x, y, s, t;
@@ -258,8 +263,8 @@ void TextLine::draw() {
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		cursor_x += x_advance * scale_factor.x;
-		cursor_y += y_advance * scale_factor.y;
+		cursor_x += x_advance * scale_factor_.x;
+		cursor_y += y_advance * scale_factor_.y;
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -277,13 +282,13 @@ TextBox::TextBox(std::vector<std::pair<glm::uvec4, std::string>> contents,
 
 void TextBox::update(float elapsed) {
 	for (auto &line : lines_) {
-		line.update(elapsed);
+		line->update(elapsed);
 	}
 }
 
 void TextBox::draw() {
 	for (auto &line : lines_) {
-		line.draw();
+		line->draw();
 	}
 }
 void TextBox::set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed) {
@@ -292,29 +297,53 @@ void TextBox::set_contents(std::vector<std::pair<glm::uvec4, std::string>> conte
 	lines_.clear();
 	if (animation_speed_.has_value()) {
 		for (size_t i = 0; i < contents_.size(); i++) {
-			lines_.emplace_back(contents_.at(i).second,
+			lines_.push_back(std::make_shared<TextLine>(contents_.at(i).second,
 			                    position_.x,
 			                    position_.y + font_size_ * i,
 			                    contents_.at(i).first,
 			                    font_size_,
 			                    animation_speed_,
-			                    i == 0); //< only make the first line initially visible
+			                    i == 0)); //< only make the first line initially visible
 			if (i + 1 < contents_.size()) {
-				lines_.at(i).setAnimationCallback(std::make_optional([i, this]() {
-					this->lines_.at(i + 1).setVisibility(true);
+				lines_.at(i)->setAnimationCallback(std::make_optional([i, this]() {
+					this->lines_.at(i + 1)->setVisibility(true);
 				}));
+			} else {
+				lines_.at(i)->setAnimationCallback(callback_);
 			}
 		}
 	} else {
 		for (size_t i = 0; i < contents_.size(); i++) {
-			lines_.emplace_back(contents_.at(i).second,
+			lines_.push_back(std::make_shared<TextLine>(contents_.at(i).second,
 			                    position_.x,
 			                    position_.y + font_size_ * i,
 			                    contents_.at(i).first,
 			                    font_size_,
 			                    std::nullopt,
-			                    true);
+			                    true));
 		}
+	}
+}
+Dialog::Dialog(std::vector<std::pair<glm::uvec4, std::string>> prompts, std::vector<std::string> options)
+	: prompt_{prompts},
+	  options_{options},
+	  prompt_box_{
+		  std::make_shared<TextBox>(prompts, glm::uvec2(PADDING_LEFT, PADDING_TOP), 16, std::make_optional(50.0f))} {
+	for (size_t i = 0; i<options_.size(); i++) {
+		int POS_Y = PADDING_TOP + prompt_box_->get_height() + 16 + i * 16;
+		auto choice = std::make_shared<TextLine>("[ ]", PADDING_LEFT, POS_Y, glm::uvec4(255), 16, std::nullopt, false, "cmuntt.ttf");
+		auto text = std::make_shared<TextLine>(options_.at(i), PADDING_LEFT + 32, POS_Y, glm::uvec4(255), 16, std::nullopt, false);
+		option_lines_.emplace_back(choice, text);
+	}
+	prompt_box_->set_callback([this]() {
+		this->options_shown_ = true;
+		for (auto &p : this->option_lines_) {
+			p.first->setVisibility(true);
+			p.second->setVisibility(true);
+		}
+	});
+	if (!option_lines_.empty()) {
+		option_lines_.at(option_focus_).first->setText("[x]", std::nullopt);
 	}
 }
 }

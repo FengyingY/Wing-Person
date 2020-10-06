@@ -44,15 +44,8 @@ struct StoryMode : Mode {
 
 	//----- game state -----
 
-	view::TextBox my_text_box{
-		std::vector<std::pair<glm::uvec4, std::string>>{},
-		glm::ivec2{16, 16},
-		16,
-		std::make_optional(50.0f)
-	};
+	std::shared_ptr<view::Dialog> main_dialog = nullptr;
 
-	// timer -> if time <= 0:,then do 1) print next line, 2) reset timer, 3) update state if needed
-	float timer_left;
 
 	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
 	bool option = false;
