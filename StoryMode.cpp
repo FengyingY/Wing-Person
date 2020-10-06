@@ -16,7 +16,6 @@
 #include <hb.h>
 #include <hb-ft.h>
 #include <freetype/freetype.h>
-#include <dirent.h>	
 #include <fstream>
 #include <string>
 #include <utility>
