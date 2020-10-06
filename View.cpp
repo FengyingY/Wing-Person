@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <memory>
 
 #include "GL.hpp"
 #include "gl_errors.hpp"
