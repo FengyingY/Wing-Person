@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include <utility>
-#include <memory>
 
 #include "GL.hpp"
 #include "gl_errors.hpp"
@@ -232,10 +231,10 @@ void TextLine::draw() {
 
 
 		if(FT_Load_Glyph(face_, glyphid, FT_LOAD_DEFAULT) != 0)
-			continue;
+			throw std::runtime_error("bbb");
 
 		if (FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL) != 0) {
-			continue;
+			throw std::runtime_error("ccc");
 		}
 
 		GL_ERRORS();
@@ -332,7 +331,7 @@ Dialog::Dialog(std::vector<std::pair<glm::uvec4, std::string>> prompts, std::vec
 		  std::make_shared<TextBox>(prompts, glm::uvec2(PADDING_LEFT, PADDING_TOP), 16, std::make_optional(50.0f))} {
 	for (size_t i = 0; i<options_.size(); i++) {
 		int POS_Y = PADDING_TOP + prompt_box_->get_height() + 16 + i * 16;
-		auto choice = std::make_shared<TextLine>("[ ]", PADDING_LEFT, POS_Y, glm::uvec4(255), 16, std::nullopt, false, "cmuntt.ttf");
+		auto choice = std::make_shared<TextLine>("[ ]", PADDING_LEFT, POS_Y, glm::uvec4(255), 16, std::nullopt, false, "IBMPlexMono-Regular.ttf");
 		auto text = std::make_shared<TextLine>(options_.at(i), PADDING_LEFT + 32, POS_Y, glm::uvec4(255), 16, std::nullopt, false);
 		option_lines_.emplace_back(choice, text);
 	}
