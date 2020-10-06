@@ -7,6 +7,7 @@
 #include <optional>
 #include <functional>
 #include <iostream>
+#include <memory>
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
