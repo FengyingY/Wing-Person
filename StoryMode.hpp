@@ -45,14 +45,9 @@ struct StoryMode : Mode {
 	//----- game state -----
 
 	view::TextBox my_text_box{
-		std::vector<std::pair<glm::uvec3, std::string>>{
-			{glm::uvec3(255, 0, 0), "Hiiiiiiiiiiiiiii"},
-			{glm::uvec3(0, 255, 255), "I have colors"},
-			{glm::uvec3(255, 255, 255), "Make America Great Again"}
-
-		},
-		glm::ivec2{32, 32},
-		32,
+		std::vector<std::pair<glm::uvec4, std::string>>{},
+		glm::ivec2{16, 16},
+		16,
 		std::make_optional(50.0f)
 	};
 
@@ -66,9 +61,9 @@ struct StoryMode : Mode {
 
 	Story::Branch current;
 
-	std::vector<std::pair<glm::vec3, std::string>> on_screen_lines;    // the lines that would be showed on screen
-	std::vector<std::string> on_screen_options;    // for showing the options (cleared after selection)
 	bool show_next_line();
 
+private:
+	void setCurrentBranch(const Story::Branch &new_branch);
 
 };

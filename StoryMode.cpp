@@ -81,7 +81,7 @@ Load<Story> jill_story(LoadTagDefault, []() -> Story * {
 
 StoryMode::StoryMode() : story(*jill_story) {
 	// set the timer and print the first line
-	current = story.stories.at("Opening");
+	setCurrentBranch(story.stories.at("Opening"));
 	timer_left = 1.0; // 1s per line
 
 	show_next_line();
@@ -94,9 +94,8 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 	if (option) {
 		int key = evt.key.keysym.sym - SDLK_1;
 		if (key >= 0 && unsigned(key) < current.next_branch_names.size()) {
-			current = story.stories[current.next_branch_names[key]];
+			setCurrentBranch(story.stories.at(current.next_branch_names.at(key)));
 			option = false;
-			on_screen_options.clear();
 			return true;
 		}
 		return false;
@@ -143,16 +142,31 @@ bool StoryMode::show_next_line() {
 		if (current.option_lines.size() > 0) {
 			if (!option) {
 				option = true;
-				assert(on_screen_options.size() == 0);
 				for (size_t i = 0; i < current.option_lines.size(); ++i) {
 					// TODO show options on screen
 					std::string option = "\t" + std::to_string(i+1) + " " + current.option_lines[i];
 					std::cout  << option << std::endl;
-					on_screen_options.push_back(option);
 				}
 			}
 			return true;
 		}
 	}
 	return false;
+}
+
+void StoryMode::setCurrentBranch(const Story::Branch &new_branch) {
+	current = new_branch;
+	option = true;
+	std::vector<std::pair<glm::uvec4, std::string>> contents_;
+	for (const auto &line : current.lines) {
+		glm::uvec4 color = glm::uvec4(story.characters.at(line.character_idx).second * 255.0f);
+		std::string to_show = story.characters.at(line.character_idx).first + " " + line.line;
+		contents_.emplace_back(color, to_show);
+	}
+
+	for (size_t i = 0; i < current.option_lines.size(); ++i) {
+		std::string option = " " + std::to_string(i+1) + " " + current.option_lines[i];
+		contents_.emplace_back(glm::uvec4(255), option);
+	}
+	my_text_box.set_contents(contents_, std::make_optional(50.0f));
 }

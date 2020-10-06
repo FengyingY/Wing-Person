@@ -150,18 +150,17 @@ private:
 
 class TextBox{
 public:
-	TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
+	TextBox(std::vector<std::pair<glm::uvec4, std::string>> contents,
 	        const glm::ivec2 &position,
 	        unsigned int fontSize,
 	        std::optional<float> animation_speed);
 	void update(float elapsed);
 	void draw();
-	void set_contents(std::vector<std::pair<glm::uvec3, std::string>> contents, std::optional<float> animation_speed);
+	void set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed);
 private:
-
 	glm::ivec2 position_;
 	unsigned font_size_;
-	std::vector<std::pair<glm::uvec3, std::string>> contents_;
+	std::vector<std::pair<glm::uvec4, std::string>> contents_;
 	std::vector<TextLine> lines_;
 	std::optional<float> animation_speed_;
 };

@@ -257,7 +257,7 @@ void TextLine::draw() {
 	GL_ERRORS();
 }
 
-TextBox::TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
+TextBox::TextBox(std::vector<std::pair<glm::uvec4, std::string>> contents,
                  const glm::ivec2 &position,
                  unsigned int fontSize,
                  std::optional<float> animation_speed)
@@ -276,15 +276,16 @@ void TextBox::draw() {
 		line.draw();
 	}
 }
-void TextBox::set_contents(std::vector<std::pair<glm::uvec3, std::string>> contents, std::optional<float> animation_speed) {
+void TextBox::set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed) {
 	animation_speed_ = animation_speed;
 	contents_ = std::move(contents);
+	lines_.clear();
 	if (animation_speed_.has_value()) {
 		for (size_t i = 0; i < contents_.size(); i++) {
 			lines_.emplace_back(contents_.at(i).second,
 			                    position_.x,
 			                    position_.y + font_size_ * i,
-			                    glm::uvec4(contents_.at(i).first, 255U),
+			                    contents_.at(i).first,
 			                    font_size_,
 			                    animation_speed_,
 			                    i == 0); //< only make the first line initially visible
@@ -299,7 +300,7 @@ void TextBox::set_contents(std::vector<std::pair<glm::uvec3, std::string>> conte
 			lines_.emplace_back(contents_.at(i).second,
 			                    position_.x,
 			                    position_.y + font_size_ * i,
-			                    glm::uvec4(contents_.at(i).first, 255U),
+			                    contents_.at(i).first,
 			                    font_size_,
 			                    std::nullopt,
 			                    true);
