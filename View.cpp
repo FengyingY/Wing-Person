@@ -121,19 +121,27 @@ TextLine::TextLine(std::string content,
 
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
-	hb_buffer_ = hb_buffer_create();
-	if (hb_buffer_ == nullptr) { throw std::runtime_error("Error in creating harfbuzz buffer"); }
-	hb_buffer_add_utf8(hb_buffer_, content_.c_str(), -1, 0, -1);
-	hb_buffer_set_direction(hb_buffer_, HB_DIRECTION_LTR);
-	hb_buffer_set_script(hb_buffer_, HB_SCRIPT_LATIN);
-	hb_buffer_set_language(hb_buffer_, hb_language_from_string("en", -1));
-
 	const std::string font_path = data_path(FONT_NAME);
 	error = FT_New_Face(ft_library_, font_path.c_str(), 0, &face_);
 	if (error != 0) { throw std::runtime_error("Error initializing font face"); }
 	error = FT_Set_Pixel_Sizes(face_, 0, ViewContext::compute_physical_px(font_size_));
 	if (error != 0) { throw std::runtime_error("Error setting char size"); }
 	font_ = hb_ft_font_create(face_, nullptr);
+	assert(font_ != nullptr);
+	hb_buffer_ = hb_buffer_create();
+	if (hb_buffer_ == nullptr) { throw std::runtime_error("Error in creating harfbuzz buffer"); }
+	setText(content_, animation_speed_);
+}
+
+TextLine &TextLine::setText(std::string content, std::optional<float> animation_speed) {
+	this->animation_speed_ = animation_speed;
+	this->content_ = std::move(content);
+	hb_buffer_clear_contents(hb_buffer_);
+	hb_buffer_add_utf8(hb_buffer_, content_.c_str(), -1, 0, -1);
+	hb_buffer_set_direction(hb_buffer_, HB_DIRECTION_LTR);
+	hb_buffer_set_script(hb_buffer_, HB_SCRIPT_LATIN);
+	hb_buffer_set_language(hb_buffer_, hb_language_from_string("en", -1));
+
 	hb_shape(font_, hb_buffer_, nullptr, 0);
 
 	glyph_info_ = hb_buffer_get_glyph_infos(hb_buffer_, &glyph_count_);
@@ -144,6 +152,7 @@ TextLine::TextLine(std::string content,
 	} else {
 		visible_glyph_count_ = glyph_count_;
 	}
+	return *this;
 }
 
 TextLine::TextLine(const TextLine &that) : TextLine(that.content_,
@@ -204,7 +213,7 @@ void TextLine::draw() {
 
 	const FT_GlyphSlot glyph = face_->glyph;
 
-	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / 720;
+	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / ViewContext::get().logical_size_.y;
 
 	assert(visible_glyph_count_ <= glyph_count_);
 	for (size_t i = 0; i < visible_glyph_count_; ++i) {
@@ -256,6 +265,7 @@ void TextLine::draw() {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	GL_ERRORS();
 }
+
 
 TextBox::TextBox(std::vector<std::pair<glm::uvec4, std::string>> contents,
                  const glm::ivec2 &position,

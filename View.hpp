@@ -113,6 +113,8 @@ public:
 		return *this;
 	}
 
+	TextLine &setText(std::string content, std::optional<float> animation_speed);
+
 	void update(float elapsed);
 	void draw();
 
@@ -157,6 +159,7 @@ public:
 	void update(float elapsed);
 	void draw();
 	void set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed);
+	int get_height() const { return static_cast<int>(font_size_ * contents_.size()); }
 private:
 	glm::ivec2 position_;
 	unsigned font_size_;
