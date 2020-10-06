@@ -230,11 +230,16 @@ void TextLine::draw() {
 		float y_advance = glyph_pos_[i].y_advance / 64.0;
 
 
-		if(FT_Load_Glyph(face_, glyphid, FT_LOAD_DEFAULT) != 0)
-			throw std::runtime_error("bbb");
+		if(FT_Load_Glyph(face_, glyphid, FT_LOAD_DEFAULT) != 0) {
+			throw std::runtime_error("Error loading glyph");
+			std::cout << "Error rendering glyph" << std::endl;
+			continue;
+		}
 
 		if (FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL) != 0) {
-			throw std::runtime_error("ccc");
+			throw std::runtime_error("Error rendering glyph");
+			std::cout << "Error rendering glyph" << std::endl;
+			continue;
 		}
 
 		GL_ERRORS();
