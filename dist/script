@@ -1,9 +1,11 @@
 2
-A 1.0 1.0 1.0 1.0
+A 1.0 1.0 0.0 1.0
 B 1.0 0.0 0.0 1.0
 
 Opening
-0. Welcome to Mario’s, in this game you will play the role of a bartender, serving drinks and talking to your customers. Are you over 21?
+0. Welcome to Mario’s, in this game you will play the role of a bartender, 
+0. serving drinks and talking to your customers. 
+0. Are you over 21?
 -2.
 Yes
 Jill
@@ -11,10 +13,13 @@ No
 End1
 
 Jill
-0. Carnegie Mellon is notorious for its heavy workload. Here, students in CS related majors are being exposed to the most challenging courses. 
+0. Carnegie Mellon is notorious for its heavy workload. 
+0. Here, students in CS related majors are being exposed to the most challenging courses. 
 0. The quality of life for the students decreases at an alarming rate. 
-0. Some of them decide to devote themselves to studies. The overwhelmed ones look for ways to escape from the stress. 
-0. On a lovely street in Shadyside, you can find a bar called Mario’s Saloon. A small oasis in the middle of the semester. 
+0. Some of them decide to devote themselves to studies. 
+0. The overwhelmed ones look for ways to escape from the stress. 
+0. On a lovely street in Shadyside, you can find a bar called Mario’s Saloon. 
+0. A small oasis in the middle of the semester. 
 2. Hey! Get me a beer!
 -3.
 Give him Fireball
@@ -30,21 +35,29 @@ Hoegaarden
 2. Nah.. just feeling stressed out.
 1. Huh.. CMU student? 
 2. Exactly. The school of CS nerds, haha.. 
-2. I wish I am really passionate about CS and coding. But it seems like I am among the normal people who wish to have a personal life that involves no coding involved.
-2. Turned out the course work has taken up all of my time and I couldn’t afford to have a chill Friday night until the midterm is over.
+2. I wish I am really passionate about CS and coding. 
+2. But it seems like I am among the normal people who wish to have a personal life that 
+2. involves no coding involved.
+2. Turned out the course work has taken up all of my time and I couldn’t afford to 
+2. have a chill Friday night until the midterm is over.
 1. It sucks. What kind of course are you taking, man?
 2. Really? I didn’t expect anyone would listen to a nerd's topic in a bar.
 1. hah, try me, I miss my campus life today.
-2. Okay.. So yeah, I am taking Game Programming. Sounds interesting huh? Of course it is, but the only thing that bothers me is that I keep feeling like I am not good enough for the school, you know.
+2. Okay.. So yeah, I am taking Game Programming. Sounds interesting huh? 
+2. Of course it is, but the only thing that bothers me is that I keep feeling like 
+2. I am not good enough for the school, you know.
 2. At the end of the day, it’s CMU, not gonna be easy.
-2. Like this week, you know, I just want to make a simple game, no fancy graphics, just a game with text and choices.
+2. Like this week, you know, I just want to make a simple game, no fancy graphics, 
+2. just a game with text and choices.
 1. Like galgame?
 2. Well yeah.. Kind of.. Except for there’s no cute girls.
 1. Just text?
 2. Yeah.
 1. Wouldn’t be an easy one?
-2. I thought it would be... Or it should, and I am just to dumb to figure it out quickly. You know, I just want to render some text on the screen, and it took me an entire day to finish it.
-2. And rendering text is just the very first step of finishing the assignment... And I completed it on Sunday night while the due is Tuesday morning. it’s not fun. 
+2. I thought it would be... Or it should, and I am just to dumb to figure it out quickly. 
+2. You know, I just want to render some text on the screen, and it took me an entire day to finish it.
+2. And rendering text is just the very first step of finishing the assignment... 
+2. And I completed it on Sunday night while the due is Tuesday morning. it’s not fun. 
 -2.
 Cont
 Cont
@@ -79,7 +92,7 @@ End1
 0. [End1] Too young to drink
 
 End2
-0. [End2] ???
+0. [End2] Your customer passed out
 
 End3
 0. [End3] not a qualified bartender
