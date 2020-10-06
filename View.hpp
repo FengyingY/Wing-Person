@@ -218,6 +218,10 @@ public:
 		}
 	}
 
+	bool finished() {
+		return options_shown_;
+	}
+
 
 private:
 	void SetOptionFocus(int new_index) {
@@ -232,7 +236,7 @@ private:
 	std::vector<std::string> options_;
 	int option_focus_ = 0;
 
-	bool options_shown_ = true;
+	bool options_shown_ = false;
 
 	std::shared_ptr<TextBox> prompt_box_;
 	std::vector<std::pair<std::shared_ptr<TextLine>, std::shared_ptr<TextLine>>> option_lines_;

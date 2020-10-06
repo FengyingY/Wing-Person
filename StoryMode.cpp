@@ -104,13 +104,15 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 			main_dialog->MoveDown();
 			return true;
 		} else if (keyCode == SDLK_RETURN) {
-			std::optional<int> next_branch = main_dialog->Enter();
-			if (next_branch.has_value()) {
-				setCurrentBranch(story.stories.at(current.next_branch_names.at(next_branch.value())));
-				return true;
-			} else {
-				return false;
+			if (main_dialog->finished()) {
+				std::optional<int> next_branch = main_dialog->Enter();
+				if (next_branch.has_value()) {
+					setCurrentBranch(story.stories.at(current.next_branch_names.at(next_branch.value())));
+					
+					return true;
+				}
 			}
+			return false;
 		}
 	}
 	return false;
