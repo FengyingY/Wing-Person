@@ -2,6 +2,7 @@
 
 #include "Scene.hpp"
 #include "Sound.hpp"
+#include "View.hpp"
 
 #include <glm/glm.hpp>
 
@@ -18,7 +19,7 @@ struct Story {
 
 	struct Branch {
 		std::vector<Line> lines;
-		size_t line_idx = 0;		// current line index
+		size_t line_idx = 0;        // current line index
 
 		// options, ending will have zero length options
 		std::vector<std::string> option_lines;
@@ -43,26 +44,31 @@ struct StoryMode : Mode {
 
 	//----- game state -----
 
-	//local copy of the game scene (so code can change it during gameplay):
-	Scene scene;
+	view::TextBox my_text_box{
+		std::vector<std::pair<glm::uvec3, std::string>>{
+			{glm::uvec3(255, 0, 0), "Hiiiiiiiiiiiiiii"},
+			{glm::uvec3(0, 255, 255), "I have colors"},
+			{glm::uvec3(255, 255, 255), "Make America Great Again"}
 
-	//music coming from the tip of the leg (as a demonstration):
-	std::shared_ptr< Sound::PlayingSample > leg_tip_loop;
-	
-	//camera:
-	Scene::Camera *camera = nullptr;
+		},
+		glm::ivec2{32, 32},
+		32,
+		std::make_optional(50.0f)
+	};
 
-    // timer -> if time <= 0:,then do 1) print next line, 2) reset timer, 3) update state if needed
-    float timer_left;
+	// timer -> if time <= 0:,then do 1) print next line, 2) reset timer, 3) update state if needed
+	float timer_left;
 
-    // current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
-    bool option = false;
-	
+	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
+	bool option = false;
+
 	Story story;
 
 	Story::Branch current;
 
-	std::vector<std::pair<glm::vec3, std::string>> on_screen_lines;	// the lines that would be showed on screen
-	std::vector<std::string> on_screen_options;	// for showing the options (cleared after selection)
+	std::vector<std::pair<glm::vec3, std::string>> on_screen_lines;    // the lines that would be showed on screen
+	std::vector<std::string> on_screen_options;    // for showing the options (cleared after selection)
 	bool show_next_line();
+
+
 };

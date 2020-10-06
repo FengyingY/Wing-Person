@@ -226,14 +226,6 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
 	{
-		auto strings = std::vector<std::pair<glm::uvec3, std::string>>{
-			{glm::uvec3(255, 0, 0), "Hi"},
-			{glm::uvec3(0, 255, 255), "I have colors"}
-		};
-		view::TextBox my_text_box(std::move(strings), glm::ivec2{32, 32}, 32);
-		my_text_box.draw();
-	}
-	{
 		my_line.draw();
 	}
 

@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <utility>
 
 #include "GL.hpp"
 #include "gl_errors.hpp"
@@ -87,16 +88,18 @@ TextLine::TextLine(std::string content,
                    float cursor_y,
                    glm::vec4 fg_color,
                    unsigned font_size,
-                   std::optional<float> appear_by_letter_speed)
-	: content_(std::move(content)),
+                   std::optional<float> animation_speed,
+                   bool visibility)
+	: visibility_{visibility},
+	  content_(std::move(content)),
 	  cursor_x_{cursor_x},
 	  cursor_y_{cursor_y},
 	  fg_color_{fg_color},
 	  font_size_{font_size},
-	  appear_by_letter_speed_{appear_by_letter_speed} {
+	  animation_speed_{animation_speed} {
 
 	// appear_by_letter_speed must be either empty or a positive float
-	if (appear_by_letter_speed.has_value() && appear_by_letter_speed.value() <= 0.0f) {
+	if (animation_speed.has_value() && animation_speed.value() <= 0.0f) {
 		throw std::invalid_argument("appear_by_letter_speed must be either empty or a positive float");
 	}
 
@@ -136,7 +139,7 @@ TextLine::TextLine(std::string content,
 	glyph_info_ = hb_buffer_get_glyph_infos(hb_buffer_, &glyph_count_);
 	glyph_pos_ = hb_buffer_get_glyph_positions(hb_buffer_, &glyph_count_);
 
-	if (appear_by_letter_speed_.has_value()) {
+	if (animation_speed_.has_value()) {
 		visible_glyph_count_ = 0;
 	} else {
 		visible_glyph_count_ = glyph_count_;
@@ -148,7 +151,10 @@ TextLine::TextLine(const TextLine &that) : TextLine(that.content_,
                                                     that.cursor_y_,
                                                     that.fg_color_,
                                                     that.font_size_,
-                                                    std::optional<float>()) {}
+                                                    that.animation_speed_,
+                                                    that.visibility_) {
+	callback_ = that.callback_;
+}
 
 TextLine::~TextLine() {
 	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_
@@ -168,14 +174,19 @@ TextLine::~TextLine() {
 }
 
 void TextLine::update(float elapsed) {
-	if (appear_by_letter_speed_.has_value() && visible_glyph_count_ < glyph_count_) {
+	if (visibility_ && animation_speed_.has_value() && visible_glyph_count_ < glyph_count_) {
 		// show "appear letters one by one" animation
 		total_time_elapsed_ += elapsed;
-		visible_glyph_count_ = static_cast<unsigned>(total_time_elapsed_ * appear_by_letter_speed_.value());
+		visible_glyph_count_ =
+			std::min(static_cast<unsigned>(total_time_elapsed_ * animation_speed_.value()), glyph_count_);
+		if (visible_glyph_count_ == glyph_count_ && callback_.has_value()) {
+			(*callback_)();
+		}
 	}
 }
 
 void TextLine::draw() {
+	if (!visibility_) { return; }
 	// Bind Stuff
 	GL_ERRORS();
 	glActiveTexture(GL_TEXTURE0);
@@ -195,6 +206,7 @@ void TextLine::draw() {
 
 	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / 720;
 
+	assert(visible_glyph_count_ <= glyph_count_);
 	for (size_t i = 0; i < visible_glyph_count_; ++i) {
 		hb_codepoint_t glyphid = glyph_info_[i].codepoint;
 		float x_offset = glyph_pos_[i].x_offset / 64.0;
@@ -245,24 +257,53 @@ void TextLine::draw() {
 	GL_ERRORS();
 }
 
-
 TextBox::TextBox(std::vector<std::pair<glm::uvec3, std::string>> contents,
                  const glm::ivec2 &position,
-                 unsigned int fontSize)
-	: position_(position), font_size_(fontSize), contents_(std::move(contents)) {
-	for (size_t i = 0; i < contents_.size(); i++) {
-		lines_.emplace_back(contents_.at(i).second,
-		                    position_.x,
-		                    position_.y + font_size_ * i,
-		                    glm::uvec4(contents_.at(i).first, 255U),
-		                    font_size_,
-		                    std::nullopt);
+                 unsigned int fontSize,
+                 std::optional<float> animation_speed)
+	: position_(position), font_size_(fontSize), contents_{}, animation_speed_(std::nullopt) {
+	set_contents(std::move(contents), animation_speed);
+}
+
+void TextBox::update(float elapsed) {
+	for (auto &line : lines_) {
+		line.update(elapsed);
 	}
 }
 
 void TextBox::draw() {
 	for (auto &line : lines_) {
 		line.draw();
+	}
+}
+void TextBox::set_contents(std::vector<std::pair<glm::uvec3, std::string>> contents, std::optional<float> animation_speed) {
+	animation_speed_ = animation_speed;
+	contents_ = std::move(contents);
+	if (animation_speed_.has_value()) {
+		for (size_t i = 0; i < contents_.size(); i++) {
+			lines_.emplace_back(contents_.at(i).second,
+			                    position_.x,
+			                    position_.y + font_size_ * i,
+			                    glm::uvec4(contents_.at(i).first, 255U),
+			                    font_size_,
+			                    animation_speed_,
+			                    i == 0); //< only make the first line initially visible
+			if (i + 1 < contents_.size()) {
+				lines_.at(i).setAnimationCallback(std::make_optional([i, this]() {
+					this->lines_.at(i + 1).setVisibility(true);
+				}));
+			}
+		}
+	} else {
+		for (size_t i = 0; i < contents_.size(); i++) {
+			lines_.emplace_back(contents_.at(i).second,
+			                    position_.x,
+			                    position_.y + font_size_ * i,
+			                    glm::uvec4(contents_.at(i).first, 255U),
+			                    font_size_,
+			                    std::nullopt,
+			                    true);
+		}
 	}
 }
 }
