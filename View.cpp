@@ -304,7 +304,7 @@ void TextBox::set_contents(std::vector<std::pair<glm::uvec4, std::string>> conte
 		for (size_t i = 0; i < contents_.size(); i++) {
 			lines_.push_back(std::make_shared<TextLine>(contents_.at(i).second,
 			                    position_.x,
-			                    position_.y + font_size_ * i,
+			                    position_.y + int(font_size_ * i),
 			                    contents_.at(i).first,
 			                    font_size_,
 			                    animation_speed_,
@@ -321,7 +321,7 @@ void TextBox::set_contents(std::vector<std::pair<glm::uvec4, std::string>> conte
 		for (size_t i = 0; i < contents_.size(); i++) {
 			lines_.push_back(std::make_shared<TextLine>(contents_.at(i).second,
 			                    position_.x,
-			                    position_.y + font_size_ * i,
+			                    position_.y + int(font_size_ * i),
 			                    contents_.at(i).first,
 			                    font_size_,
 			                    std::nullopt,
