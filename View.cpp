@@ -224,10 +224,10 @@ void TextLine::draw() {
 	assert(visible_glyph_count_ <= glyph_count_);
 	for (size_t i = 0; i < visible_glyph_count_; ++i) {
 		hb_codepoint_t glyphid = glyph_info_[i].codepoint;
-		float x_offset = glyph_pos_[i].x_offset / 64.0;
-		float y_offset = glyph_pos_[i].y_offset / 64.0;
-		float x_advance = glyph_pos_[i].x_advance / 64.0;
-		float y_advance = glyph_pos_[i].y_advance / 64.0;
+		float x_offset = glyph_pos_[i].x_offset / 64.0f;
+		float y_offset = glyph_pos_[i].y_offset / 64.0f;
+		float x_advance = glyph_pos_[i].x_advance / 64.0f;
+		float y_advance = glyph_pos_[i].y_advance / 64.0f;
 
 
 		if(FT_Load_Glyph(face_, glyphid, FT_LOAD_DEFAULT) != 0) {
