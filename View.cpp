@@ -129,7 +129,7 @@ TextLine::TextLine(std::string content,
 	if (error != 0) { throw std::runtime_error("Error initializing font face"); }
 	error = FT_Set_Pixel_Sizes(face_, 0, ViewContext::compute_physical_px(font_size_));
 	if (error != 0) { throw std::runtime_error("Error setting char size"); }
-	font_ = hb_ft_font_create(face_, nullptr);
+	font_ = hb_ft_font_create_referenced(face_);
 	assert(font_ != nullptr);
 	hb_buffer_ = hb_buffer_create();
 	if (hb_buffer_ == nullptr) { throw std::runtime_error("Error in creating harfbuzz buffer"); }
