@@ -219,7 +219,7 @@ void TextLine::draw() {
 
 	const FT_GlyphSlot glyph = face_->glyph;
 
-	float cursor_x = cursor_x_, cursor_y = cursor_y_ - font_size_ * 2.0f / ViewContext::get().logical_size_.y;
+	float cursor_x = cursor_x_, cursor_y = cursor_y_ - float(font_size_) * 2.0f / ViewContext::get().logical_size_.y;
 
 	assert(visible_glyph_count_ <= glyph_count_);
 	for (size_t i = 0; i < visible_glyph_count_; ++i) {
@@ -335,7 +335,7 @@ Dialog::Dialog(std::vector<std::pair<glm::uvec4, std::string>> prompts, std::vec
 	  prompt_box_{
 		  std::make_shared<TextBox>(prompts, glm::uvec2(PADDING_LEFT, PADDING_TOP), 16, std::make_optional(50.0f))} {
 	for (size_t i = 0; i<options_.size(); i++) {
-		int POS_Y = PADDING_TOP + prompt_box_->get_height() + 16 + i * 16;
+		int POS_Y = int(PADDING_TOP) + prompt_box_->get_height() + 16 + int(i) * 16;
 		auto choice = std::make_shared<TextLine>("[ ]", PADDING_LEFT, POS_Y, glm::uvec4(255), 16, std::nullopt, false, "IBMPlexMono-Regular.ttf");
 		auto text = std::make_shared<TextLine>(options_.at(i), PADDING_LEFT + 32, POS_Y, glm::uvec4(255), 16, std::nullopt, false);
 		option_lines_.emplace_back(choice, text);
