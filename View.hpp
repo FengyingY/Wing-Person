@@ -218,6 +218,10 @@ public:
 		}
 	}
 
+	bool finished() {
+		return options_shown_;
+	}
+
 
 private:
 	void SetOptionFocus(int new_index) {

@@ -1,10 +1,10 @@
-# (TODO: your game's title)
+# Mario's
 
-Author: (TODO: your name)
+Author: Xiaoqiao Xu, Fengying Yang
 
 ## Design: 
 
-(TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+This is a game about what the CMU students would talk in a bar, something they won't discuss in the class.. :P
 
 ## Text Drawing: 
 
@@ -27,7 +27,7 @@ Font fallback is not supported now. As a result, in order to display non-latin t
 
 ## How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+Use the direction keys and Enter to make you selection.
 
 ## Sources: 
 
