@@ -13,15 +13,29 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 	return false;
 }
 IntroMode::IntroMode() {
-	this->headline = std::make_shared<view::TextLine>("Mario's", 250, 150, glm::uvec4(255), 96, std::nullopt, true);
-	this->prompt = std::make_shared<view::TextLine>("Press enter to start...", 250, 500, glm::uvec4(255), 32, std::nullopt, true);
+	headline = std::make_shared<view::TextLine>();
+	headline->set_text("Mario's")
+		.set_position(250, 150)
+		.set_color(glm::u8vec4(255))
+		.set_font_size(96)
+		.disable_animation()
+		.show();
+
+	prompt = std::make_shared<view::TextLine>();
+	prompt->set_text("Press enter to start...")
+		.set_position(250, 500)
+		.set_color(glm::u8vec4(255))
+		.set_font_size(32)
+		.disable_animation()
+		.show();
 }
+
 void IntroMode::update(float elapsed) {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
 	{
 		if (headline) { headline->update(elapsed); }

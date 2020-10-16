@@ -127,8 +127,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
+	glDisable(GL_DEPTH_TEST);
 	{
 		main_dialog->draw();
 	}
@@ -167,9 +166,9 @@ bool StoryMode::show_next_line() {
 void StoryMode::setCurrentBranch(const Story::Branch &new_branch) {
 	current = new_branch;
 	option = true;
-	std::vector<std::pair<glm::uvec4, std::string>> prompts;
+	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
 	for (const auto &line : current.lines) {
-		glm::uvec4 color = glm::uvec4(story.characters.at(line.character_idx).second * 255.0f);
+		glm::u8vec4 color = glm::u8vec4(story.characters.at(line.character_idx).second * 255.0f);
 		std::string to_show = story.characters.at(line.character_idx).first + " " + line.line;
 		prompts.emplace_back(color, to_show);
 	}

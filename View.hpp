@@ -15,6 +15,7 @@
 #include <hb-ft.h>
 #include <freetype/freetype.h>
 #include <SDL.h>
+#include <map>
 
 namespace view {
 
@@ -36,119 +37,144 @@ private:
 	static ViewContext singleton_;
 };
 
+enum class FontFace {
+	ComputerModernRegular,
+	IBMPlexMono,
+};
+
+/**
+ * GlyphTextureCache
+ *
+ * A Texture class that holds all the OpenGL textures for a FreeType glyph bitmap.
+ *
+ * This is a singleton class.
+ */
+class GlyphTextureCache {
+public:
+	struct GlyphTextureEntry {
+	friend GlyphTextureCache;
+		std::vector<uint8_t> bitmap;
+		int bitmap_left;
+		int bitmap_top;
+		int width;
+		int height;
+		GLuint gl_texture_id;
+		GlyphTextureEntry(const std::vector<uint8_t> &bitmap,
+		                  int bitmapLeft,
+		                  int bitmapTop,
+		                  int width,
+		                  int height,
+		                  int refCnt);
+		GlyphTextureEntry() = delete;
+		GlyphTextureEntry(const GlyphTextureEntry &other) = delete;
+		~GlyphTextureEntry();
+		int ref_cnt;
+	};
+	static GlyphTextureCache *get_instance();
+	void incTexRef(FontFace font_face, int font_size, hb_codepoint_t codepoint);
+	const GlyphTextureEntry *getTextRef(FontFace font_face, int font_size, hb_codepoint_t codepoint);
+	void decTexRef(FontFace font_face, int font_size, hb_codepoint_t codepoint);
+	FT_Face get_free_type_face(FontFace font_face);
+private:
+	GlyphTextureCache();
+	~GlyphTextureCache();
+
+	static std::string get_font_filename(FontFace font_face);
+
+	struct GlyphTextureKey {
+		FontFace font_face;
+		int font_size;
+		hb_codepoint_t codepoint;
+		GlyphTextureKey(FontFace fontFace, int fontSize, hb_codepoint_t codepoint);
+		bool operator<(const GlyphTextureKey &rhs) const;
+	};
+	static GlyphTextureCache *singleton_;
+	std::map<GlyphTextureKey, GlyphTextureEntry> map_;
+	FT_Library ft_library_ = nullptr;
+	std::map<FontFace, FT_Face> font_faces_;
+};
+
 class TextLine {
 public:
 	/**
-	 * Create a line of text
-	 * @param content the string to be displayed
-	 * @param cursor_x position in window, 0 to 1280. 0 means left.
-	 * @param cursor_y position in window, 0 to 720. 0 means top
-	 * @param fg_color color. glm::uvec4(255,255,255,255) means white
-	 * @param font_size font size in logical pixels (like CSS pixels)
-	 * @param animation_speed if not null, appear glyphs one by one like an animation
-	 *                               number means "how many new letters per second"
+	 * Constructor - create a TextLine object with an empty string, default position, font face, etc.
 	 */
-	TextLine(std::string content,
-	         int cursor_x,
-	         int cursor_y,
-	         glm::uvec4 fg_color,
-	         unsigned font_size,
-	         std::optional<float> animation_speed,
-	         bool visibility,
-	         std::string font_face = "cmunorm.ttf") :
-		TextLine{std::move(content),
-		         static_cast<float>(cursor_x * (2.0f / ViewContext::get().logical_size_.x) - 1.0f),
-		         static_cast<float>(-(cursor_y * (2.0f / ViewContext::get().logical_size_.y) - 1.0f)),
-		         glm::vec4(fg_color) / 255.0f, font_size,
-		         animation_speed,
-		         visibility,
-		         font_face} {}
-
-	/**
-	 * Create a line of text -- the more openGL friendly version
-	 * @param content the string to be displayed.
-	 * @param cursor_x position in window. Range: [-1.0f,1.0f]. -1 means left.
-	 * @param cursor_y position in window. Range: [-1.0f,1.0f]. -1 means bottom.
-	 * @param fg_color color, range: [0.0f, 1.0f]. 1.0 means highest brightness
-	 * @param font_size font size in logical pixels (like CSS pixels)
-	 * @param animation_speed if not null, appear glyphs one by one like an animation
-	 *                               number means "how many new letters per second"
-	 * @param visibility whether display the content or not
-	 */
-	TextLine(std::string content,
-	         float cursor_x,
-	         float cursor_y,
-	         glm::vec4 fg_color,
-	         unsigned font_size,
-	         std::optional<float> animation_speed,
-	         bool visibility,
-	         std::string font_face = "cmunorm.ttf");
-
-	/**
-	 * copy constructor
-	 */
-	TextLine(const TextLine &that);
-
-	/**
-	 * TODO(xiaoqiao)
-	 * copy assignment not implemented yet
-	 */
-	TextLine &operator=(const TextLine &) = delete;
-
-	/**
-	 * Move constructor and assignment is deleted -- because it'll be a hassle moving OpenGL resources
-	 */
-	TextLine(TextLine &&that) = delete;
-	TextLine& operator=(TextLine &&) = delete;
-	TextLine() = delete;
+	TextLine();
+	TextLine(const TextLine &other);
+	TextLine &operator=(const TextLine &other);
 	~TextLine();
 
+	TextLine &set_text(std::string text);
+	TextLine &set_font(FontFace font_face);
+	TextLine &set_font_size(unsigned font_size);
+	TextLine &set_position(int x, int y);
+	TextLine &set_position(glm::ivec2 pos);
+	TextLine &set_color(glm::u8vec4 color);
+	TextLine &disable_animation();
+	TextLine &set_animation(float speed, std::optional<std::function<void()>> callback);
+	TextLine &show();
+	TextLine &hide();
+
 	/**
-	 * Add a callback when the textLine is fully displayed
-	 * @param cb the callback function
+	 * redo_shape: this function should be called when new call to hb_shape() is needed.
+	 *
+	 * This function should be called when, for example:
+	 * (1) text is changed
+	 * (2) font size or screen dpi is changed
+	 * (3) font is changed
+	 *
 	 */
-	TextLine& setAnimationCallback(std::optional<std::function<void()>> cb) {
-		callback_ = cb;
-		return *this;
-	}
+	 void redo_shape();
 
-	TextLine& setVisibility(bool visibility) {
-		visibility_ = visibility;
-		return *this;
-	}
-
-	TextLine &setText(std::string content, std::optional<float> animation_speed);
-
-	void update(float elapsed);
 	void draw();
+	void update(float elapsed);
+
+
+private:
+	void do_render();
+	void undo_render();
 
 private:
 
-	bool visibility_ = true;
-	std::string content_;
-	float cursor_x_;
-	float cursor_y_;
-	glm::vec4 fg_color_;
-	unsigned font_size_; //< font size in "logical pixel"
-	std::optional<float> animation_speed_;
+	//  ---- data fields that directly relates to setters ---
+	std::string text_;
+	FontFace font_ = FontFace::ComputerModernRegular;
+	unsigned font_size_ = 16; //< font size in "logical pixel"
+	glm::ivec2 position_ = glm::ivec2(0, 0);
+	glm::u8vec4 color_ = glm::u8vec4(255);
+	std::optional<float> animation_speed_ = std::nullopt;
+	std::optional<std::function<void()>> callback_ = std::nullopt;
+	bool is_visible_ = true;
+
+	// ---- internal state related to animation ----
 	float total_time_elapsed_ = 0.0f;
 	unsigned int visible_glyph_count_ = 0;
-	/// callback_ called once when appear_by_letter_speed_.has_value() and all the glyphs are shown.
-	std::optional<std::function<void()>> callback_ = std::nullopt;
 
-	std::string font_face_;
+	// ---- internal states that can be discarded on a copy constructor
+	// text_is_rendered_: a state variable
+	// if set to true, this means (1) GlyphTextureCache holds the reference
+	// of the latest text and (2) the hb_buffer_ related variable reflects the
+	// content of latest text
+	// if set to false, this means: (1) GlyphTextureCache doesn't hold
+	// the glyph ref and (2) hb_buffer_ related fields are set to an empty
+	// state
+	bool text_is_rendered_ = false;
 
-	glm::vec2 scale_factor_;
-
-	FT_Library ft_library_ = nullptr;
-	FT_Face face_ = nullptr;
+	// ---- internal state that can be reconstructed from other fields ----
+	// ---- harf-buzz related fields ----
+	// ---- only valid when text_is_rendered_ is true ---
 	hb_buffer_t *hb_buffer_ = nullptr;
-	hb_font_t *font_ = nullptr;
+	hb_font_t *hb_font_ = nullptr;
 	unsigned int glyph_count_ = 0;
 	hb_glyph_info_t *glyph_info_ = nullptr;
 	hb_glyph_position_t *glyph_pos_ = nullptr;
+	// ----- scale factor for HiDPI screens ----
+	glm::vec2 scale_factor_;
+	// ----- position for text in opengl friendly format
+	glm::vec2 cursor_;
 
-	GLuint texture_{0}, sampler_{0};
+	// --- opengl resources ---
+	GLuint sampler_{0};
 	GLuint vbo_{0}, vao_{0};
 
 	static glm::vec2 get_scale_physical() {
@@ -159,80 +185,50 @@ private:
 
 class TextBox{
 public:
-	TextBox(std::vector<std::pair<glm::uvec4, std::string>> contents,
-	        const glm::ivec2 &position,
-	        unsigned int fontSize,
-	        std::optional<float> animation_speed);
+	TextBox() = default;
+	~TextBox() = default;
+
+	TextBox &set_contents(std::vector<std::pair<glm::u8vec4, std::string>> contents);
+	TextBox &set_position(glm::ivec2 pos);
+	TextBox &set_line_space(int line_space);
+	TextBox &set_font_size(unsigned font_size);
+	TextBox &set_font_face(FontFace font_face);
+	TextBox &disable_animation();
+	TextBox &set_animation(float speed, std::optional<std::function<void()>> callback);
+	TextBox &show();
 	void update(float elapsed);
 	void draw();
-	void set_contents(std::vector<std::pair<glm::uvec4, std::string>> contents, std::optional<float> animation_speed);
-	int get_height() const { return static_cast<int>(font_size_ * contents_.size()); }
-	void set_callback(std::optional<std::function<void()>> cb) {
-		callback_ = cb;
-		if (lines_.empty()) {
-			return;
-		}
-		lines_.at(lines_.size() - 1)->setAnimationCallback(cb);
-	}
+	int get_height() const { return static_cast<int>((font_size_ + line_space_) * contents_.size()); }
+
 private:
-	// called when all letters displayed
-	// precondition: animation_speed_ is not null
-	std::optional<std::function<void()>> callback_;
-	glm::ivec2 position_;
-	unsigned font_size_;
-	std::vector<std::pair<glm::uvec4, std::string>> contents_;
+	FontFace font_face_ = FontFace::ComputerModernRegular;
+	int line_space_ = 4;
+	glm::ivec2 position_ = glm::ivec2(0, 0);
+	unsigned font_size_ = 16;
+	std::vector<std::pair<glm::u8vec4, std::string>> contents_;
 	std::vector<std::shared_ptr<TextLine>> lines_;
 	std::optional<float> animation_speed_;
+	std::optional<std::function<void()>> callback_;
 };
 
 class Dialog {
 public:
-	Dialog(std::vector<std::pair<glm::uvec4, std::string>> prompts, std::vector<std::string> options);
-	void draw() {
-		prompt_box_->draw();
-		for (auto&[choice, text] : option_lines_) {
-			choice->draw();
-			text->draw();
-		}
-	}
-	void update(float elapsed) {
-		prompt_box_->update(elapsed);
-	}
+	Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::vector<std::string> options);
+	void draw();
+	void update(float elapsed);
 
-	void MoveUp() {
-		if (options_shown_ && !options_.empty()) {
-			SetOptionFocus(std::max<int>(option_focus_ - 1, 0));
-		}
-	}
-	void MoveDown() {
-		if (options_shown_ && !options_.empty()) {
-			SetOptionFocus(std::min<int>(option_focus_ + 1, (int)options_.size() - 1));
-		}
-	}
+	void MoveUp();
+	void MoveDown();
 
-	std::optional<int> Enter() {
-		if (options_shown_ && !options_.empty()) {
-			return std::make_optional(option_focus_);
-		} else {
-			return std::nullopt;
-		}
-	}
+	std::optional<int> Enter();
 
-	bool finished() {
-		return options_shown_;
-	}
+	bool finished() const;
 
 
 private:
-	void SetOptionFocus(int new_index) {
-		if (option_focus_ != new_index) {
-			option_lines_.at(option_focus_).first->setText("[ ]", std::nullopt);
-			option_lines_.at(new_index).first->setText("[x]", std::nullopt);
-			option_focus_ = new_index;
-		}
-	}
+	void SetOptionFocus(int new_index);
 
-	std::vector<std::pair<glm::uvec4, std::string>> prompt_;
+	std::vector<std::pair<glm::u8vec4, std::string>> prompt_;
 	std::vector<std::string> options_;
 	int option_focus_ = 0;
 
