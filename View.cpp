@@ -417,13 +417,8 @@ TextLine &TextLine::set_animation(float speed, std::optional<std::function<void(
 	return *this;
 }
 
-TextLine &TextLine::show() {
-	is_visible_ = true;
-	return *this;
-}
-
-TextLine &TextLine::hide() {
-	is_visible_ = false;
+TextLine &TextLine::set_visibility(bool value) {
+	is_visible_ = value;
 	return *this;
 }
 
@@ -542,7 +537,7 @@ TextBox &TextBox::set_animation(float speed, std::optional<std::function<void()>
 		auto text_line_ptr = lines_.at(i);
 		std::optional<std::function<void()>> line_callback;
 		if (i + 1 < lines_.size()) {
-			line_callback = [i, this]() { this->lines_.at(i + 1)->show(); };
+			line_callback = [i, this]() { this->lines_.at(i + 1)->set_visibility(true); };
 		} else {
 			line_callback = callback;
 		}
@@ -554,14 +549,14 @@ TextBox &TextBox::set_animation(float speed, std::optional<std::function<void()>
 TextBox &TextBox::show() {
 	if (animation_speed_.has_value()) {
 		if (!lines_.empty()) {
-			lines_.at(0)->show();
+			lines_.at(0)->set_visibility(true);
 			for (size_t i = 1; i < lines_.size(); i++) {
-				lines_.at(i)->hide();
+				lines_.at(i)->set_visibility(false);
 			}
 		}
 	} else {
 		for (auto &line : lines_) {
-			line->show();
+			line->set_visibility(true);
 		}
 	}
 	return *this;
@@ -586,7 +581,7 @@ Dialog::Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::ve
 			.set_font_size(16)
 			.set_font(FontFace::IBMPlexMono)
 			.disable_animation()
-			.hide();
+			.set_visibility(false);
 		auto text = std::make_shared<TextLine>();
 		text->set_text(options_.at(i))
 			.set_position(PADDING_LEFT + 32, POS_Y)
@@ -594,14 +589,14 @@ Dialog::Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::ve
 			.set_font_size(16)
 			.set_font(FontFace::ComputerModernRegular)
 			.disable_animation()
-			.hide();
+			.set_visibility(false);
 		option_lines_.emplace_back(choice, text);
 	}
 	prompt_box_->set_animation(50.0f, [this]() {
 		this->options_shown_ = true;
 		for (auto &p : this->option_lines_) {
-			p.first->show();
-			p.second->show();
+			p.first->set_visibility(true);
+			p.second->set_visibility(true);
 		}
 	}).show();
 	if (!option_lines_.empty()) {

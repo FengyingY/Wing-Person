@@ -112,8 +112,7 @@ public:
 	TextLine &set_color(glm::u8vec4 color);
 	TextLine &disable_animation();
 	TextLine &set_animation(float speed, std::optional<std::function<void()>> callback);
-	TextLine &show();
-	TextLine &hide();
+	TextLine &set_visibility(bool value);
 
 	/**
 	 * redo_shape: this function should be called when new call to hb_shape() is needed.

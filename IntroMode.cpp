@@ -19,7 +19,7 @@ IntroMode::IntroMode() {
 		.set_color(glm::u8vec4(255))
 		.set_font_size(96)
 		.disable_animation()
-		.show();
+		.set_visibility(true);
 
 	prompt = std::make_shared<view::TextLine>();
 	prompt->set_text("Press enter to start...")
@@ -27,7 +27,7 @@ IntroMode::IntroMode() {
 		.set_color(glm::u8vec4(255))
 		.set_font_size(32)
 		.disable_animation()
-		.show();
+		.set_visibility(true);
 }
 
 void IntroMode::update(float elapsed) {
