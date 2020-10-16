@@ -3,11 +3,10 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <utility>
 #include <optional>
 #include <functional>
-#include <iostream>
 #include <memory>
+#include <map>
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
@@ -15,7 +14,6 @@
 #include <hb-ft.h>
 #include <freetype/freetype.h>
 #include <SDL.h>
-#include <map>
 
 namespace view {
 
@@ -163,7 +161,6 @@ private:
 	// ---- harf-buzz related fields ----
 	// ---- only valid when text_is_rendered_ is true ---
 	hb_buffer_t *hb_buffer_ = nullptr;
-	hb_font_t *hb_font_ = nullptr;
 	unsigned int glyph_count_ = 0;
 	hb_glyph_info_t *glyph_info_ = nullptr;
 	hb_glyph_position_t *glyph_pos_ = nullptr;

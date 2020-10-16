@@ -276,7 +276,6 @@ TextLine &TextLine::operator=(const TextLine &that) {
 }
 
 TextLine::~TextLine() {
-	// TODO(xiaoqiao): release other resources: glyph_info_, glyph_pos_ ?
 	undo_render();
 	hb_buffer_destroy(hb_buffer_);
 	hb_buffer_ = nullptr;
@@ -429,8 +428,6 @@ void TextLine::undo_render() {
 		hb_codepoint_t glyphid = glyph_info_[i].codepoint;
 		cache->decTexRef(font_, font_size_, glyphid);
 	}
-	hb_font_destroy(hb_font_);
-	hb_font_ = nullptr;
 	hb_buffer_reset(hb_buffer_);
 	glyph_count_ = 0;
 	glyph_info_ = nullptr;
@@ -447,20 +444,21 @@ void TextLine::do_render() {
 	if (FT_Set_Pixel_Sizes(ft_face, 0, ViewContext::compute_physical_px(font_size_)) != 0) {
 		throw std::runtime_error("Error setting char size");
 	}
-	hb_font_ = hb_ft_font_create_referenced(ft_face);
-	assert(hb_font_ != nullptr);
+	hb_font_t *hb_font = hb_ft_font_create_referenced(ft_face);
+	assert(hb_font != nullptr);
 	hb_buffer_reset(hb_buffer_);
 	hb_buffer_add_utf8(hb_buffer_, text_.c_str(), -1, 0, text_.size());
 	hb_buffer_set_direction(hb_buffer_, HB_DIRECTION_LTR);
 	hb_buffer_set_script(hb_buffer_, HB_SCRIPT_LATIN);
 	hb_buffer_set_language(hb_buffer_, hb_language_from_string("en", -1));
-	hb_shape(hb_font_, hb_buffer_, nullptr, 0);
+	hb_shape(hb_font, hb_buffer_, nullptr, 0);
 	glyph_info_ = hb_buffer_get_glyph_infos(hb_buffer_, &glyph_count_);
 	glyph_pos_ = hb_buffer_get_glyph_positions(hb_buffer_, &glyph_count_);
 	for (size_t i = 0; i < glyph_count_; ++i) {
 		hb_codepoint_t glyphid = glyph_info_[i].codepoint;
 		cache->incTexRef(font_, font_size_, glyphid);
 	}
+	hb_font_destroy(hb_font);
 	text_is_rendered_ = true;
 }
 
