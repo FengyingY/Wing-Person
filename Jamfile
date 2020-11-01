@@ -5,7 +5,7 @@
 
 if $(OS) = NT { #Windows
 	NEST_LIBS = ..\\nest-libs\\windows ;
-	C++FLAGS = /nologo /Z7 /c /EHsc /W3 /WX /MD
+	C++FLAGS = /nologo /Z7 /c /EHsc /W3 /WX /MD /std:c++17
 		/I"$(NEST_LIBS)/SDL2/include"
 		/I"$(NEST_LIBS)/glm/include"
 		/I"$(NEST_LIBS)/libpng/include"
@@ -101,13 +101,15 @@ if $(OS) = NT { #Windows
 
 #Store the names of various .cpp files to build into variables:
 GAME_NAMES =
-	PlayMode
+	StoryMode
+	IntroMode
 	main
 	LitColorTextureProgram
 	#ColorTextureProgram #not used right now, but you might want it
 	Sound
 	load_wav
 	load_opus
+	View
 	;
 
 COMMON_NAMES =
@@ -141,7 +143,7 @@ SHOW_SCENE_NAMES =
 
 
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
-Objects 
+Objects
 	$(GAME_NAMES:S=.cpp)
 	$(COMMON_NAMES:S=.cpp)
 	$(SHOW_MESHES_NAMES:S=.cpp)
