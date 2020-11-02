@@ -1,5 +1,6 @@
 #include "StoryMode.hpp"
 
+#include "GL.hpp"
 #include "LitColorTextureProgram.hpp"
 
 #include "DrawLines.hpp"
@@ -8,6 +9,7 @@
 #include "Sound.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
+#include "load_save_png.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -82,7 +84,23 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 	return new Sound::Sample(data_path("dusty-floor.opus"));
 });
 
-StoryMode::StoryMode() : story(*jill_story) {
+Load< Sprite > female_sprite(LoadTagDefault, []() -> Sprite const * {
+	return new Sprite("character_femaleAdventurer_hold.png");
+});
+
+Load< Sprite > zombie_sprite(LoadTagDefault, []() -> Sprite const * {
+	return new Sprite("character_zombie_fallDown.png");
+});
+
+Load< Sprite > forest_background(LoadTagDefault, []() -> Sprite const * {
+	return new Sprite("backgroundColorForest.png");
+});
+
+Load< Sprite > textbox_sprite(LoadTagDefault, []() -> Sprite const * {
+	return new Sprite("textbox.png");
+});
+
+StoryMode::StoryMode() : story(*jill_story), girl(*female_sprite), zombie(*zombie_sprite), background(*forest_background), textbox(*textbox_sprite) {
 	// set the timer and print the first line
 	setCurrentBranch(story.stories.at("Opening"));
 
@@ -123,14 +141,29 @@ void StoryMode::update(float elapsed) {
 }
 
 void StoryMode::draw(glm::uvec2 const &drawable_size) {
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//---- compute vertices to draw ----
+
+	glClearColor(0.1f, 0.01f, 0.01f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	
+	// glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	// glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
+	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+
+	glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5);
+	background.draw(center, drawable_size, 0.4f);
+	girl.draw(glm::vec2(center.x*0.7, center.y*1.4), drawable_size, 0.6);
+	zombie.draw(glm::vec2(center.x*1.3, center.y*1.4), drawable_size, 0.6);
+	textbox.draw(glm::vec2(center.x, center.y*0.25), drawable_size, .21f);
 
 	glDisable(GL_DEPTH_TEST);
 	{
 		main_dialog->draw();
 	}
+	
 	GL_ERRORS();
 }
 

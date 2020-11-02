@@ -3,6 +3,7 @@
 #include "Scene.hpp"
 #include "Sound.hpp"
 #include "View.hpp"
+#include "Sprite.hpp"
 
 #include <glm/glm.hpp>
 
@@ -57,6 +58,11 @@ struct StoryMode : Mode {
 	bool show_next_line();
 
 	std::shared_ptr< Sound::PlayingSample > music_loop;
+
+	Sprite girl;
+	Sprite zombie;
+	Sprite background;
+	Sprite textbox;
 
 private:
 	void setCurrentBranch(const Story::Branch &new_branch);

@@ -1,11 +1,9 @@
 2
-Anna 1.0 1.0 0.75 1.0
-Dave 1.0 0.5 0.0 1.0
+Girl 1.0 1.0 0.75 1.0
+Zombie 1.0 0.5 0.0 1.0
 
 Opening
-0. Welcome to Mario’s, you are a bartender and keep seeing a wave 
-0. of students from Carnegie Mellon University seeking an escape from
-0. their stressful life, living deadline to deadline.
+0. Placeholder opening, inherit from an old game. Wanna drink?
 0.
 0. Are you over 21?
 -2.
@@ -19,156 +17,17 @@ Under age
 0. [End] 
 
 Dave
-0. Carnegie Mellon is notorious for its heavy workload. 
-0. Here, students are taught how to plan their life by the second, because what other way is there to live? 
-0. The students learn a lot from the coursework, but at the price of their quality of life.
-0. Some of them decide to devote themselves to studies. They often get overwhelmed. 
-0. Some even develop smoking habits.
-0. On a lovely street in Shadyside, a bar called Mario’s Saloon is where everyone eventually ends up at. 
-0.
-0. You see many students come in regularly.
-0. You feel sad and empathetic, but it's great business for you. You aren't complaining.   
-0. 
-0. A visibly tired guy with heavy dark circles under his eyes sits down, defeated. 
-0.
-1. What can I get you buddy?
-0. He looks up, red-eyed. 
-2. Hey, can I get a shot and beer?
--2.
-Give him a beer. 
+0. Good to know. Testing the continue button.
+-1.
+continue 
 Beer
-Give him a whiskey shot with a beer. 
-Shot and beer
-
-Shot and beer
-1. Thanks.
-0. The guy downs the shot and chugs the beer. 
-2. That was fast, you alright there?
-1. Yeah! I'm great! 
-0. He lays his head down on the counter and passes out. 
-2. Well, looks like a CMU student. 
-0. [End] 
 
 Beer
-2. Thanks. (Sigh)
-1. What’s up?
-2. Just stressed out, man.
-1. Hmm... Let me guess, you're a CMU student? 
-2. (Visibly surprised) Haha, you guessed right. I am a CS nerd. 
-1. That's awesome, dude. You must be pretty damn smart. 
-2. I guess so. The only time I felt smart was on day one. Until I met my peers. 
-2. I'm surrounded by some pretty smart people. 
-1. So, what's got you stressed out tonight? Are you waiting for anyone?
-2. Nope. My friends are all tackling deadlines. I just finished one and decided to grab
-2. a quick beer before starting working tonight.
-1. You look prety exhausted man, don't you wanna sleep?
-2. Haha, not tonight. Looking forward to a good night's sleep at Thanksgiving I guess. 
-1. That sucks! Alright, let me know when you are up for a refill.  
-2. Do you mind staying a minute to chat? I haven't talked to anyone in two days. 
--2.
-Sure! What's on your mind?
-GameProg
-Sorry I have other things to do.
+2. Keep testing the continue button.
+-1.
+continue
 Go away
 
 Go away
-2. I understand, you're busy too. Just like everyone else.
--2.
-Stay and talk.
-GameProg
-Leave
-leave
-
-leave
-0. You see this everyday and you are tired of serving stressed out students
+1. End of the story.
 0. [End]
-
-GameProg
-2. Wow, I didn’t expect you would listen to a nerd's ranting in a bar.
-1. ...
-2. When I was a kid I would love playing video games. I still do, on my semester breaks. 
-2. This semester, I felt like hey, why not learn how to make games? Sounds like a lot of fun!
-2. Turns out, making games is a crap ton harder than playing them (laughs painfully).   
-1. That's damn cool, man. This does sound like a lot of fun. What's got you so stressed?
-2. The professor thinks I'm an expert at everything. 
-2. It took me 3 days to understand what I need to do on an assignment. So much for being smart.  
-1. (Smiles compassionately) 
-2. Now, when I watch the trailer of a new game, all I think about is how stressful it must 
-2. have been to develop it. 
-1. Sounds like you made a good call coming here. You really needed a drink. 
--2. 
-Give him a shot of whiskey. 
-Whiskey shot
-Wait for him to respond. 
-Wait
-
-Whiskey shot
-2. (Smiles widely) Thanks for the shot! Seems like you read my mind. 
-2. I shouldn't have too many, though. I don't wanna be drunk tonight. 
-0. Dave does the shot, and winces slightly. He seems like a new drinker.
-2. That felt great! Can I have another one? 
-1. Take it easy there buddy. You can have another one later. Didn't you say you have to work?
-2. Nah man. Screw the deadlines. I wanna get crap-faced tonight. 
--3. 
-Give him another shot.  
-Another shot
-Say something kind.
-kind words
-Order a burger for him.
-burger
-
-Wait
-2. I really don't know man. I don't wanna be drinking too much. But I don't wanna work either. 
-1. Are you sure about that? Sounds like you need something stronger. 
-2. ...
-2. Alright, screw it! Please get me a shot of whiskey. 
-0. Dave does the shot, and winces slightly. He seems like a new drinker.
-2. That felt great! Can I have another one? 
-1. Take it easy there buddy. You can have another one later. Didn't you say you have to work?
-2. Nah man. Screw the deadlines. I wanna get crap-faced tonight. 
--3. 
-Give him another shot.  
-Another shot
-Say something kind.
-kind words
-Order a burger for him.
-burger
-
-Another shot
-1. Here you go. I'd recommend a burger with that. Our kitchen makes a great burger. 
-1. Should I get you one? 
-2. That sounds great. I haven't eaten anything since breakfast. 
-2. I was busy trying to get my stupid rat to stop going through walls. 
-1. (Laugh) You're funny!
-2. Yeah, I use humor to hide my pain. Didn't expect to learn this at CMU. 
-1. You seem to be a great guy. I'm sure you will pull through. 
-2. (Smiling slightly) I really wish that I didn't feel like I'm good enough for school, you know. 
-2. It's not easy to survive here. Thanks for talking to me.  
-0. And that's how you learned about the life at CMU. 
-0. The students may be smart, but what they don't understand is that you hear the same story 
-0. several times a week. They are all in the same boat, and they will all be fine. 
-0. You find happiness in helping them through this one drink at a time. 
-0. [End] 
-
-burger
-1. I think you need to eat first. Let me get you our famous burger instead. The shot can wait. 
-2. (Disappointed) Okay. That doesn't sound too terrible. I think I'll head right back to work after. 
-1. Sure. Let me get you that. 
-1. You seem to be a great guy. I'm sure you will pull through. 
-2. (Smiling slightly) I really wish that I didn't feel like I'm good enough for school, you know. 
-2. It's not easy to survive here. Thanks for talking to me.
-0. And that's how you learned about the life at CMU. 
-0. The students may be smart, but what they don't understand is that you hear the same story 
-0. several times a week. They are all in the same boat, and they will all be fine. 
-0. You find happiness in helping them through this one drink at a time. 
-0. [End] 
-
-kind words
-1. You seem to be a great guy. I'm sure you will pull through. 
-2. (Smiling slightly) I really wish that I didn't feel like I'm good enough for school, you know. 
-2. It's not easy to survive here. Thanks for talking to me.  
-0. And that's how you learned about the life at CMU. 
-0. The students may be smart, but what they don't understand is that you hear the same story 
-0. several times a week. They are all in the same boat, and they will all be fine. 
-0. You find happiness in helping them through this one drink at a time. 
-0. [End] 

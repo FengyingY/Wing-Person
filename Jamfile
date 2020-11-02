@@ -105,11 +105,12 @@ GAME_NAMES =
 	IntroMode
 	main
 	LitColorTextureProgram
-	#ColorTextureProgram #not used right now, but you might want it
+	ColorTextureProgram
 	Sound
 	load_wav
 	load_opus
 	View
+	Sprite
 	;
 
 COMMON_NAMES =
