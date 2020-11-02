@@ -1,0 +1,123 @@
+28 // Number of Scenes) 
+0:2
+* It's your first day here at Sewer Academy. Mildew drips from the ceiling and the smell of feces wafts through the halls. This place is so much nicer than your old school, Wastewater High. As you skitter up the pipes to the front entrance, you contemplate how to approach your first day...
+    - Just keep your head down.
+        >1
+    - Put a little swagger in your step.
+        >15
+1:1 //Scene 1, with 1 choice
+* You hug your books closer to your chest and hurry forward through the hall. Maybe if you don't make eye contact with anyone, no one will bother y- WAH!
+    - continue
+        >2 //goes to scene 2
+2:1
+* You slam into someone and your books go flying. You scramble to pick them up, but your fingers brush someone else's hand on your binder.
+    - continue
+        >3
+3:1
+* Standing above you is the most beautiful rat you have ever seen. Pristine black fur trimmed neatly into a coif, handsome face, and a small pin fastened to his varsity jacket that reads “Class President.”
+    - continue 
+        >4
+4:1
+* You're mortified. But before you can react, he holds out a hand to help you up.
+    - continue
+        >5
+5:2
+* “Hey, sorry about that. I'm Ratcliffe - nice to meet you.”
+    - He's hot! Say something, stupid!
+        >6
+    - Hot or not, that was rude. Ignore him.
+        >15
+6:1
+* Your mouth opens but no words come out. Your heart skips a beat. It simultaneously feels like the whole world is watching and that there's no one left on earth but the two of you.
+    - continue
+        >7
+7:1
+* Ratcliffe seems to notice your malfunction and smiles sympathetically. He lets go of your hand and gives you back your binder.
+    - continue 
+        >8
+8:1
+* “Come on, I'll walk you to class.” He says, inviting you to take his arm. You do, and - wow - you can feel his firm muscle under the varsity jacket.
+    - continue 
+        >9
+9:1
+* “You know,” He says as you walk together through the halls, “I've never seen anyone like you at this school before. There's… something special about you.”
+    - continue 
+        >10
+10:1
+* You stop in front of the classroom and step apart. But he doesn't leave. Instead, he faces you, rubbing the back of his neck nervously. Part of his shirt lifts as he does and you can see just a hint of the washboard abs and vicious V underneath.
+    - continue 
+        >11
+11:2
+* “I know we just met but… If you feel it too, meet me on the front pipes after school. Maybe we can scavenge for some dinner together.” 
+    - Yes! Yes! Yes!
+        >12
+    - Oh god, this is moving too fast.
+        >15
+12:1
+* You blush and nod. Ratcliffe grins.
+    - continue
+        >13
+13:1
+* “It's a date.” He says, and scurries off, tail swishing happily behind him.
+    - continue
+        >14
+14:1
+* Maybe you can get used to Sewer Academy after all.
+    - Start over? 
+        > 0
+15:1
+* You stand up straight and flip your hair, stalking forward through the halls. As you approach your locker, you notice there's someone blocking it.
+    - continue
+        >16
+16:1
+* Leaning with his arms crossed is a rugged white rat with black eyeliner and and shoulder-length head fur tied half-up in a bun. He's wearing a black leather jacket, fingerless gloves, and a bass guitar slung across his back.
+    - continue
+        >17
+17:1
+* As you approach, he grins a wicked snarl that's equal parts intimidating and… sexy.
+    - continue
+        >18
+18:2
+* “This your locker, fresh meat?” He asks.
+    - Pick your battles. Walk away. 
+        >1
+    - Show him you're not afraid.
+        >19
+19:1
+* You stand in front of him, arms crossed. Unmoving. He raises an eyebrow and gives you a once-over, but you don't budge. He tilts his head and kicks off the wall of lockers, making room for you. You step forward and start turning your combination.
+    - continue
+        >20
+20:1
+* “Almost forgot something.” He says behind you.
+    - continue
+        >21
+21:1
+* As you turn around to look at him, you're suddenly slammed against the lockers. His arm beside your head, pinning you. His face is close, centimeters away, his warm breath on your cheek. A shiver runs down your spine. 
+   - continue
+        >22
+22:2
+* “Name's Oratio.” He whispers in your ear.    
+    - It's creepy. Run.
+        >1
+    - It's thrilling! Stand your ground.
+        >23
+23:1
+* Oratio pulls back, crossing his arms. 
+    - continue
+        >24
+24:1
+* “I like your attitude.” Oratio says, and winks. He turns away and walks off down the hall. A meter or so away he waves a hand and calls to you without looking back.
+    - continue
+        >25
+25:1
+* “Meet me under the bleachers during 2nd period.”
+    - continue
+        >26
+26:1
+* You blush and finish turning the lock, idly stowing your books. Maybe you can get used to Sewer Academy after all.
+    - Start over?
+        >0
+27:1
+* You can't deal with this. You push past him and storm out of the school. Today has been a disaster, and you rush home to tell your mom that you're just not cut out for Sewer Academy.
+    - Start over? 
+        >0
