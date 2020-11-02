@@ -97,7 +97,7 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
 		std::string file_name = entry.path().filename().string();
-		sprites.push_back(new Sprite(entry.path(), file_name.substr(0, file_name.find("."))));
+		sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
 	}
 });
 
