@@ -232,7 +232,7 @@ private:
 
 	std::shared_ptr<TextBox> prompt_box_;
 	std::vector<std::pair<std::shared_ptr<TextLine>, std::shared_ptr<TextLine>>> option_lines_;
-	static constexpr unsigned PADDING_LEFT = 16;
+	static constexpr unsigned PADDING_LEFT = 25;
 	static constexpr unsigned PADDING_TOP = 435;
 };
 

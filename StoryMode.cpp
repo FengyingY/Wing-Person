@@ -22,7 +22,8 @@
 #include <fstream>
 #include <string>
 #include <utility>
-#include <dirent.h>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -94,18 +95,10 @@ std::vector<Sprite*> sprites;
 // load all of the sprite under folder 'dist/story_sprites'
 Load< void > load_sprite(LoadTagDefault, []() -> void {
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-	DIR *dir;
-	struct dirent *ent;
-	if ((dir = opendir(data_path("story_sprites").c_str()))!= NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string file_name = ent->d_name;
-			if (file_name == ".." || file_name == ".")
-				continue;
-
-			sprites.push_back(new Sprite("story_sprites/"+file_name, file_name.substr(0, file_name.find("."))));
-		}
+	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
+		std::string file_name = entry.path().filename().string();
+		sprites.push_back(new Sprite(entry.path(), file_name.substr(0, file_name.find("."))));
 	}
-	std::cout << sprites.size() << std::endl;
 });
 
 
@@ -185,9 +178,13 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 	current = new_dialog;
 	option = true;
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
+	glm::u8vec4 color = glm::u8vec4(255, 255, 255, 255);
+	std::string to_show = current.character_name;
+	if (to_show.length() > 0)
+		prompts.emplace_back(color, to_show);
+
 	for (const auto &line : current.lines) {
-		glm::u8vec4 color = glm::u8vec4(255, 255, 255, 255);//glm::u8vec4(story.characters.at(line.character_idx).second * 255.0f);
-		std::string to_show = current.character_name + " " + line;
+		to_show = " " + line;
 		prompts.emplace_back(color, to_show);
 	}
 	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);

@@ -1,8 +1,8 @@
 #include "Sprite.hpp"
 
-Sprite::Sprite(std::string file_name, std::string sprite_name)  {
+Sprite::Sprite(std::string path, std::string sprite_name)  {
     name = sprite_name;
-    load_png(data_path(file_name), &size, &data, LowerLeftOrigin);
+    load_png(path, &size, &data, LowerLeftOrigin);
 
     // from game0 base code
     glGenBuffers(1, &vertex_buffer);
