@@ -138,6 +138,9 @@ SHOW_SCENE_NAMES =
 	ShowSceneMode
 	;
 
+PACK_TEXT_NAMES =
+	PackDialogs
+	;
 
 
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
@@ -146,6 +149,7 @@ Objects
 	$(COMMON_NAMES:S=.cpp)
 	$(SHOW_MESHES_NAMES:S=.cpp)
 	$(SHOW_SCENE_NAMES:S=.cpp)
+	$(PACK_TEXT_NAMES:S=.cpp)
 	;
 
 #------------------------
@@ -163,3 +167,5 @@ LOCATE_TARGET = scenes ; #put show-meshes and show-scene utilities in the 'scene
 MainFromObjects show-meshes : $(SHOW_MESHES_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
 MainFromObjects show-scene : $(SHOW_SCENE_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
 
+#put dialog utilities in "scenes"
+MainFromObjects pack-text : $(PACK_TEXT_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
