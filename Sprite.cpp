@@ -1,7 +1,7 @@
 #include "Sprite.hpp"
 
-Sprite::Sprite(std::string file_name)  {
-    name = file_name;
+Sprite::Sprite(std::string file_name, std::string sprite_name)  {
+    name = sprite_name;
     load_png(data_path(file_name), &size, &data, LowerLeftOrigin);
 
     // from game0 base code

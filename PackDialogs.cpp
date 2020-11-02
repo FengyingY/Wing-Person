@@ -63,13 +63,23 @@ int main(int argc, char **argv) {
         new_dialog.choice_length = tmp.length();
 
         tmp = "";
-        std::vector<std::string> characters = file[dialog_name]["character"];
-        for (std::string t : characters) {
+        tmp = file[dialog_name]["character"];
+        texts.append(tmp);
+        new_dialog.character_length = tmp.length();
+
+        tmp = "";
+        std::vector<std::string> sprites = file[dialog_name]["sprite"];
+        for (std::string t : sprites) {
             tmp.append(t);
             tmp.append("\n");
         }
         texts.append(tmp);
-        new_dialog.character_length = tmp.length();
+        new_dialog.sprite_length = tmp.length();
+
+        tmp = "";
+        tmp = file[dialog_name]["background"];
+        texts.append(tmp);
+        new_dialog.background_length = tmp.length();
         
         dialogs.push_back(new_dialog);
     }

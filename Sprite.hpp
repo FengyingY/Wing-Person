@@ -8,7 +8,8 @@
 
 struct Sprite
 {
-    Sprite(std::string file_name);
+    Sprite(std::string file_name, std::string sprite_name);
+	Sprite(){};
 
     ~Sprite();
 

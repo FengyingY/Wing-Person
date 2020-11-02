@@ -23,13 +23,15 @@ struct Story {
 		std::vector<std::string> next_branch_names;
 
 		std::string character_name;	// character's name, nullable
+		std::vector<std::string> sprites_name; // name of the sprites to be shown in this dialog
+		std::string background;		// name of the background sprite
 	};
 
 	// all the dialogs, key is the name of the dialog
 	std::map<std::string, Dialog> dialog;
 
-	// character's name and sprite
-	std::map<std::string, Sprite> characters;
+	// images
+	std::map<std::string, Sprite*> sprites;
 };
 
 struct StoryMode : Mode {
@@ -56,11 +58,6 @@ struct StoryMode : Mode {
 	bool show_next_line();
 
 	std::shared_ptr< Sound::PlayingSample > music_loop;
-
-	Sprite girl;
-	Sprite zombie;
-	Sprite background;
-	Sprite textbox;
 
 private:
 	void setCurrentBranch(const Story::Dialog &new_branch);

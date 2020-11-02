@@ -2,26 +2,37 @@
     "Opening": {
         "text": ["Placeholder opening, inherit from an old game.", "Wanna drink?"],
         "choices": ["Yes:Story0", "No:Under Age End"],
-        "character": []
+        "character": "Anna",
+        "sprite": ["Zombie", "FemaleAdvanturer", "Zombie"],
+        "background": ""
     },
     "Under Age End": {
         "text": ["I am sorry you're too young to drink", "[End]"],
         "choices": [],
-        "character": []
+        "character": "",
+        "sprite": [],
+        "background": "Forest"
+    
     },
     "Story0": {
         "text": ["Good to know. Testing the continue button."],
         "choices": ["continue:Story1"],
-        "character": ["FemaleAdvanturer"]
+        "character": "Anna",
+        "sprite": ["FemaleAdvanturer"],
+        "background": "Forest"
     },
     "Story1": {
         "text": ["Keep testing the continue button."],
         "choices": ["continue:End"],
-        "character": ["Zombie"]
+        "character": "Bob",
+        "sprite": ["Zombie"],
+        "background": "Forest"
     },
     "End": {
         "text": ["End of the test", "[End]"],
         "choices": [],
-        "character": []
+        "character": "",
+        "sprite": ["FemaleAdvanturer", "Zombie"],
+        "background": "Forest"
     }
 }

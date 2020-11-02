@@ -22,6 +22,7 @@
 #include <fstream>
 #include <string>
 #include <utility>
+#include <dirent.h>
 
 void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -69,8 +70,15 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		}
 
 		start += d.choice_length;
-		std::string characters = t.substr(start, d.character_length);
-		dlg.character_name = characters; // TODO multiple characters?
+		std::string character = t.substr(start, d.character_length);
+		dlg.character_name = character;
+
+		start += d.character_length;
+		std::string sprites = t.substr(start, d.sprite_length);
+		split_string(sprites, "\n", dlg.sprites_name);
+
+		start += d.sprite_length;
+		dlg.background = t.substr(start, d.background_length);
 		
 		ret->dialog[name] = dlg;
     }
@@ -82,28 +90,34 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 	return new Sound::Sample(data_path("dusty-floor.opus"));
 });
 
-Load< Sprite > female_sprite(LoadTagDefault, []() -> Sprite const * {
-	return new Sprite("character_femaleAdventurer_hold.png");
+std::vector<Sprite*> sprites;
+// load all of the sprite under folder 'dist/story_sprites'
+Load< void > load_sprite(LoadTagDefault, []() -> void {
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(data_path("story_sprites").c_str()))!= NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			std::string file_name = ent->d_name;
+			if (file_name == ".." || file_name == ".")
+				continue;
+
+			sprites.push_back(new Sprite("story_sprites/"+file_name, file_name.substr(0, file_name.find("."))));
+		}
+	}
+	std::cout << sprites.size() << std::endl;
 });
 
-Load< Sprite > zombie_sprite(LoadTagDefault, []() -> Sprite const * {
-	return new Sprite("character_zombie_fallDown.png");
-});
 
-Load< Sprite > forest_background(LoadTagDefault, []() -> Sprite const * {
-	return new Sprite("backgroundColorForest.png");
-});
-
-Load< Sprite > textbox_sprite(LoadTagDefault, []() -> Sprite const * {
-	return new Sprite("textbox.png");
-});
-
-StoryMode::StoryMode() : story(*test_story), girl(*female_sprite), zombie(*zombie_sprite), background(*forest_background), textbox(*textbox_sprite) {
+StoryMode::StoryMode() : story(*test_story) {
 	// set the timer and print the first line
 	setCurrentBranch(story.dialog.at("Opening"));
 
 	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));
 
+	for (Sprite* s : sprites) {
+		story.sprites[s->name] = s;
+	}
 }
 
 StoryMode::~StoryMode() {
@@ -139,24 +153,25 @@ void StoryMode::update(float elapsed) {
 }
 
 void StoryMode::draw(glm::uvec2 const &drawable_size) {
-	//---- compute vertices to draw ----
-
 	glClearColor(0.1f, 0.01f, 0.01f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
 	
-	// glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	// glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
-	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// background
+	if (current.background.length() > 0)
+		story.sprites[current.background]->draw(center, drawable_size, 0.4f);
 
+	// characters
+	float offset = 1.f / (current.sprites_name.size() + 1);
+	for (size_t i = 0; i < current.sprites_name.size(); ++i) {
+		story.sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y*1.4f), drawable_size, 0.5f);
+	}
 
+	// textbox
+	story.sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f);
 
-	glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5);
-	background.draw(center, drawable_size, 0.4f);
-	girl.draw(glm::vec2(center.x*0.7, center.y*1.4), drawable_size, 0.6);
-	zombie.draw(glm::vec2(center.x*1.3, center.y*1.4), drawable_size, 0.6);
-	textbox.draw(glm::vec2(center.x, center.y*0.25), drawable_size, .21f);
-
+	// text
 	glDisable(GL_DEPTH_TEST);
 	{
 		main_dialog->draw();
@@ -172,7 +187,7 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
 	for (const auto &line : current.lines) {
 		glm::u8vec4 color = glm::u8vec4(255, 255, 255, 255);//glm::u8vec4(story.characters.at(line.character_idx).second * 255.0f);
-		std::string to_show = " " + line;
+		std::string to_show = current.character_name + " " + line;
 		prompts.emplace_back(color, to_show);
 	}
 	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);
