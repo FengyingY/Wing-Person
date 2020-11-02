@@ -1,0 +1,27 @@
+{
+    "Opening": {
+        "text": ["Placeholder opening, inherit from an old game.", "Wanna drink?"],
+        "choices": ["Yes:Story0", "No:Under Age End"],
+        "character": []
+    },
+    "Under Age End": {
+        "text": ["I am sorry you're too young to drink", "[End]"],
+        "choices": [],
+        "character": []
+    },
+    "Story0": {
+        "text": ["Good to know. Testing the continue button."],
+        "choices": ["continue:Story1"],
+        "character": ["FemaleAdvanturer"]
+    },
+    "Story1": {
+        "text": ["Keep testing the continue button."],
+        "choices": ["continue:End"],
+        "character": ["Zombie"]
+    },
+    "End": {
+        "text": ["End of the test", "[End]"],
+        "choices": [],
+        "character": []
+    }
+}

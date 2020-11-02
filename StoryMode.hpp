@@ -4,6 +4,7 @@
 #include "Sound.hpp"
 #include "View.hpp"
 #include "Sprite.hpp"
+#include "PackDialogs.hpp"
 
 #include <glm/glm.hpp>
 
@@ -11,27 +12,24 @@
 #include <vector>
 #include <deque>
 
-struct Story {
-	struct Line {
-		Line(int idx_, std::string line_) : character_idx(idx_), line(line_) {};
-		size_t character_idx;
-		std::string line;
-	};
 
-	struct Branch {
-		std::vector<Line> lines;
-		size_t line_idx = 0;        // current line index
+struct Story {
+
+	struct Dialog {
+		std::vector<std::string> lines;
 
 		// options, ending will have zero length options
 		std::vector<std::string> option_lines;
 		std::vector<std::string> next_branch_names;
+
+		std::string character_name;	// character's name, nullable
 	};
 
-	// all the branches, key is the name of the branches,
-	std::map<std::string, Branch> stories;
+	// all the dialogs, key is the name of the dialog
+	std::map<std::string, Dialog> dialog;
 
-	// character's name and line's color
-	std::vector<std::pair<std::string, glm::vec4>> characters;
+	// character's name and sprite
+	std::map<std::string, Sprite> characters;
 };
 
 struct StoryMode : Mode {
@@ -53,7 +51,7 @@ struct StoryMode : Mode {
 
 	Story story;
 
-	Story::Branch current;
+	Story::Dialog current;
 
 	bool show_next_line();
 
@@ -65,6 +63,6 @@ struct StoryMode : Mode {
 	Sprite textbox;
 
 private:
-	void setCurrentBranch(const Story::Branch &new_branch);
+	void setCurrentBranch(const Story::Dialog &new_branch);
 
 };

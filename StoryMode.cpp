@@ -10,6 +10,7 @@
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 #include "load_save_png.hpp"
+#include "read_write_chunk.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -22,61 +23,58 @@
 #include <string>
 #include <utility>
 
-
-Load<Story> jill_story(LoadTagDefault, []() -> Story * {
-	Story *ret = new Story();
-	std::string path = data_path("script");
-	std::ifstream script_file(path);
-	std::string line;
-	if (script_file.is_open()) {
-		// the first character is for narration
-		ret->characters.emplace_back(std::make_pair("", glm::vec4(1, 1, 1, 1)));
-		// read character data, first line would be the number of characters
-		std::string str_num_characters;
-		getline(script_file, str_num_characters);
-		int num_character = std::stoi(str_num_characters);
-		// the following n lines are character data with format: character name r g b a
-		std::string character_name;
-		float r, g, b, a;
-		while (num_character--) {
-			script_file >> character_name >> r >> g >> b >> a;
-			(ret->characters).emplace_back(std::make_pair(character_name, glm::vec4(r, g, b, a)));
-		}
-
-		// reading branches of the story
-		while (getline(script_file, line)) {
-			// first line is the name of story, create a key-value pair in stories map
-			Story::Branch branch;
-			std::string name = line;
-			
-			// read the lines and options in this branch
-			while (true) {
-				getline(script_file, line); 
-				if (line.length() == 0) {
-					// the branch is finished, go to the next one
-					break;
-				}
-				size_t pos = line.find(".");
-				int index = std::stoi(line.substr(0, pos));
-				// this is a line
-				if (index >= 0) {
-					branch.lines.push_back(Story::Line(index, line.substr(pos+1, line.length() - pos)));
-				} 
-				// options
-				else {
-					int num_options = -index;
-					while (num_options--) {
-						std::string option_line, branch_name;
-						getline(script_file, option_line);
-						getline(script_file, branch_name);
-						branch.option_lines.push_back(option_line);
-						branch.next_branch_names.push_back(branch_name);
-					}
-				}
-			}
-			ret->stories[name] = branch;
-		}
+void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
+	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
+	size_t start = 0;
+	size_t end = s.find(delimiter);
+	while (end != std::string::npos) {
+		vec.push_back(s.substr(start, end-start));
+		start = end + delimiter.length();
+		end = s.find(delimiter, start);
 	}
+	if (end != std::string::npos)
+		vec.push_back(s.substr(start, end));
+}
+
+Load<Story> test_story(LoadTagDefault, []() -> Story * {
+	Story *ret = new Story();
+	// read chunk
+	std::vector<char> texts;
+    std::vector<DialogChunk> dialog_chunk;
+
+    std::ifstream in(data_path("dialogs.dat"), std::ios::binary);
+    read_chunk(in, "txts", &texts);
+    read_chunk(in, "dlgs", &dialog_chunk);
+
+	std::string t(texts.begin(), texts.end());
+	
+    for (DialogChunk d : dialog_chunk) {
+		Story::Dialog dlg;
+		size_t start = d.dialog_start;
+		std::string name = t.substr(start, d.name_length);
+
+		start += d.name_length;
+		std::string text = t.substr(start, d.text_length);
+		split_string(text, "\n", dlg.lines);
+
+		start += d.text_length;
+		std::string choices = t.substr(start, d.choice_length);
+		std::vector<std::string> choice_target_pairs;
+		split_string(choices, "\n", choice_target_pairs);
+
+		for (std::string choice_target : choice_target_pairs) {
+			size_t pos = choice_target.find(":");
+			dlg.option_lines.push_back(choice_target.substr(0, pos));
+			dlg.next_branch_names.push_back(choice_target.substr(pos+1, choice_target.length() - pos));
+		}
+
+		start += d.choice_length;
+		std::string characters = t.substr(start, d.character_length);
+		dlg.character_name = characters; // TODO multiple characters?
+		
+		ret->dialog[name] = dlg;
+    }
+
 	return ret;
 });
 
@@ -100,9 +98,9 @@ Load< Sprite > textbox_sprite(LoadTagDefault, []() -> Sprite const * {
 	return new Sprite("textbox.png");
 });
 
-StoryMode::StoryMode() : story(*jill_story), girl(*female_sprite), zombie(*zombie_sprite), background(*forest_background), textbox(*textbox_sprite) {
+StoryMode::StoryMode() : story(*test_story), girl(*female_sprite), zombie(*zombie_sprite), background(*forest_background), textbox(*textbox_sprite) {
 	// set the timer and print the first line
-	setCurrentBranch(story.stories.at("Opening"));
+	setCurrentBranch(story.dialog.at("Opening"));
 
 	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));
 
@@ -125,7 +123,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 			if (main_dialog->finished()) {
 				std::optional<int> next_branch = main_dialog->Enter();
 				if (next_branch.has_value()) {
-					setCurrentBranch(story.stories.at(current.next_branch_names.at(next_branch.value())));
+					setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 					
 					return true;
 				}
@@ -168,41 +166,13 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 }
 
 
-bool StoryMode::show_next_line() {
-	if (current.line_idx < current.lines.size()) {
-		// show the current line on the screen
-		Story::Line current_line = current.lines.at(current.line_idx);
-		std::string to_show = story.characters.at(current_line.character_idx).first + " " + current_line.line;
-		// reset timer - TODO set it according to the length of the sentence
-		// go to next line
-		current.line_idx += 1;
-
-		// TODO show it on the screen
-		std::cout << to_show << std::endl;
-		return true;
-	} else {
-		if (current.option_lines.size() > 0) {
-			if (!option) {
-				option = true;
-				for (size_t i = 0; i < current.option_lines.size(); ++i) {
-					// TODO show options on screen
-					std::string option = "\t" + std::to_string(i+1) + " " + current.option_lines[i];
-					std::cout  << option << std::endl;
-				}
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
-void StoryMode::setCurrentBranch(const Story::Branch &new_branch) {
-	current = new_branch;
+void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
+	current = new_dialog;
 	option = true;
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
 	for (const auto &line : current.lines) {
-		glm::u8vec4 color = glm::u8vec4(story.characters.at(line.character_idx).second * 255.0f);
-		std::string to_show = story.characters.at(line.character_idx).first + " " + line.line;
+		glm::u8vec4 color = glm::u8vec4(255, 255, 255, 255);//glm::u8vec4(story.characters.at(line.character_idx).second * 255.0f);
+		std::string to_show = " " + line;
 		prompts.emplace_back(color, to_show);
 	}
 	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);
