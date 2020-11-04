@@ -447,7 +447,7 @@ void TextLine::do_render() {
 	hb_font_t *hb_font = hb_ft_font_create_referenced(ft_face);
 	assert(hb_font != nullptr);
 	hb_buffer_reset(hb_buffer_);
-	hb_buffer_add_utf8(hb_buffer_, text_.c_str(), -1, 0, text_.size());
+	hb_buffer_add_utf8(hb_buffer_, text_.c_str(), -1, 0, (int)text_.size());
 	hb_buffer_set_direction(hb_buffer_, HB_DIRECTION_LTR);
 	hb_buffer_set_script(hb_buffer_, HB_SCRIPT_LATIN);
 	hb_buffer_set_language(hb_buffer_, hb_language_from_string("en", -1));
@@ -482,7 +482,7 @@ TextBox &TextBox::set_contents(std::vector<std::pair<glm::u8vec4, std::string>> 
 			.set_color(contents_.at(i).first)
 			.set_font(font_face_)
 			.set_font_size(font_size_)
-			.set_position(position_.x, position_.y + int(font_size_ + line_space_) * i);
+			.set_position(position_.x, position_.y + int(font_size_ + line_space_) * (int)i);
 		lines_.push_back(text_line_ptr);
 	}
 	return *this;

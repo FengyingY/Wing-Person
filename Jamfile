@@ -152,7 +152,7 @@ Objects
 	$(COMMON_NAMES:S=.cpp)
 	$(SHOW_MESHES_NAMES:S=.cpp)
 	$(SHOW_SCENE_NAMES:S=.cpp)
-	$(PACK_TEXT_NAMES:S=.cpp)
+	# $(PACK_TEXT_NAMES:S=.cpp)
 	;
 
 #------------------------
@@ -171,4 +171,4 @@ MainFromObjects show-meshes : $(SHOW_MESHES_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=
 MainFromObjects show-scene : $(SHOW_SCENE_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
 
 #put dialog utilities in "scenes"
-MainFromObjects pack-text : $(PACK_TEXT_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
+#MainFromObjects pack-text : $(PACK_TEXT_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
