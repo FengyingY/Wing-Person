@@ -7,6 +7,7 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
+#include "Collisions.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
