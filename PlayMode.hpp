@@ -1,4 +1,5 @@
 #include "Mode.hpp"
+#include "View.hpp"
 
 #include "Scene.hpp"
 #include "Sound.hpp"
@@ -39,8 +40,10 @@ struct PlayMode : Mode {
 
 	glm::vec3 get_leg_tip_position();
 
-	//music coming from the tip of the leg (as a demonstration):
-	std::shared_ptr< Sound::PlayingSample > leg_tip_loop;
+	view::TextLine
+		my_line{"The quick brown fox jumps over the lazy dog。",
+		        0, 0, glm::uvec4(255), 16, std::make_optional(100)};
+
 	
 	//camera:
 	Scene::Camera *camera = nullptr;

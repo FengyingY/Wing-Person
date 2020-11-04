@@ -1,4 +1,3 @@
-#include "Dialogs.hpp"
 #include "read_write_chunk.hpp"
 #include "data_path.hpp"
 
@@ -7,82 +6,111 @@
 #include <fstream>
 #include <string>
 
+#include "PackDialogs.hpp"
+#include "json.hpp"
+using JSON = nlohmann::json;
+
 // Below code used with permission from https://github.com/lassyla/game4/blob/master/PackTextScenes.cpp with minor modifications
 int main(int argc, char **argv) {
-    std::cout << "packing your scene...\n"; 
+    std::cout << "packing your dialogs...\n"; 
 
     // how to open and read a text file https://www.tutorialspoint.com/read-file-line-by-line-using-cplusplus
-    std::vector <Dialog> textscenes; 
-    std::vector <Choice> choices; 
+    std::vector <DialogChunk> dialogs; 
+    
     std::string texts; 
-    std::fstream file; 
-    size_t total_choices = 0; 
+    JSON file;
 
-    file.open(data_path("dialogs.txt"), std::ios::in);
-    if(file.is_open()) {
-        std::string line; 
+	// loading in from a json file
+	try {
+		std::ifstream in("dist/dialog.json");
+		in >> file;
+	}
+	catch (int e) {
+		std::cout << "A json exception occurred. Your json file is most likely formatted incorrectly. Exception #: " << e << std::endl;
+	}
 
-        //get the number of scenes as the first line 
-        std::getline(file, line);
-        line = line.substr(0, line.find("\\")); 
-        size_t num_scenes = stoi(line);    
+    try {
+        file["Opening"];
+    } catch (int e) {
+        std::cout << "Fail to read Opening" << std::endl;
+    }
+    
+    std::string tmp = "";
+    for (JSON::iterator it = file.begin(); it != file.end(); ++it) {
+        DialogChunk new_dialog;
+        new_dialog.dialog_start = texts.length();
 
-        for(size_t i = 0; i < num_scenes; i++) {
-            Dialog ts; 
-            //get scene ID
-            std::getline(file, line, ':');
+        std::string dialog_name = it.key();
+        texts.append(dialog_name);
+        new_dialog.name_length = dialog_name.length();
 
-            ts.id = stoi(line); 
-
-            //get scene number of choices
-            std::getline(file, line);
-            line = line.substr(0, line.find("//")); 
-            ts.num_choices = stoi(line); 
-            ts.choice_start = total_choices; 
-            total_choices += ts.num_choices; 
-
-            //get scene text
-            std::getline(file, line);
-            line = line.substr(1, line.find("//")); 
-            ts.text_start = texts.length(); 
-            ts.text_length = line.length(); 
-            texts.append(line); 
-            
-            //ts.text = line; 
-
-            for(size_t j = 0; j < ts.num_choices; j++) {
-                Choice choice; 
-
-                //get the choice text
-                std::getline(file, line);
-                line = line.substr(line.find("-") + 1, line.find("//")); 
-                choice.text_start = texts.length(); 
-                choice.text_length = line.length(); 
-                texts.append(line); 
-
-                //get the choice ID
-                std::getline(file, line);
-                line = line.substr(line.find(">") + 1, line.find("//")); 
-                choice.scene_id = stoi(line); 
-
-                choices.push_back(choice); 
-            }
-            textscenes.push_back(ts); 
-
+        tmp = "";
+        std::vector<std::string> text = file[dialog_name]["text"];
+        for (std::string t : text) {
+            tmp.append(t);
+            tmp.append("\n");
         }
-        file.close(); 
+        texts.append(tmp);
+        new_dialog.text_length = tmp.length();
+        
+        tmp = "";
+        std::vector<std::string> choices = file[dialog_name]["choices"];
+        for (std::string t : choices) {
+            tmp.append(t);
+            tmp.append("\n");
+        }
+        texts.append(tmp);
+        new_dialog.choice_length = tmp.length();
+
+        tmp = "";
+        tmp = file[dialog_name]["character"];
+        texts.append(tmp);
+        new_dialog.character_length = tmp.length();
+
+        tmp = "";
+        std::vector<std::string> sprites = file[dialog_name]["sprite"];
+        for (std::string t : sprites) {
+            tmp.append(t);
+            tmp.append("\n");
+        }
+        texts.append(tmp);
+        new_dialog.sprite_length = tmp.length();
+
+        tmp = "";
+        tmp = file[dialog_name]["background"];
+        texts.append(tmp);
+        new_dialog.background_length = tmp.length();
+        
+        dialogs.push_back(new_dialog);
     }
 
 	//convert string to vector of chars https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar
-
+    std::cout << texts << std::endl << std::endl;
     std::vector<char> textchars (texts.begin(), texts.end()); 
     
-
-    std::ofstream out(data_path("dialogs.dat"), std::ios::binary);
-    write_chunk("scns", textscenes, &out); 
+    std::ofstream out("dist/dialogs.dat", std::ios::binary);
     write_chunk("txts", textchars, &out); 
-    write_chunk("chcs", choices, &out); 
+    write_chunk("dlgs", dialogs, &out); 
     std::cout << "Packed your file. \n"; 
 
+    // testing
+    /*
+    std::ifstream in("dialogs.dat", std::ios::binary);
+    std::vector<char> read_text;
+    std::vector<DialogChunk> read_dialog;
+    read_chunk(in, "txts", &read_text);
+    read_chunk(in, "dlgs", &read_dialog);
+
+    std::string t(read_text.begin(), read_text.end());
+    std::cout << t << std::endl;
+    for (DialogChunk d : read_dialog) {
+        std::cout << d.dialog_start << " " << d.name_length << " " << d.text_length << " " << 
+        d.choice_length << " " << d.character_length << " " << std::endl;
+        std::cout << "name: " << t.substr(d.dialog_start, d.name_length) << std::endl;
+        std::cout << "text: " << t.substr(d.dialog_start+d.name_length, d.text_length) << std::endl;
+        std::cout << "choice: " << t.substr(d.dialog_start+d.name_length+d.text_length, d.choice_length) << std::endl;
+        std::cout << "character: " << t.substr(d.dialog_start+d.name_length+d.text_length+d.choice_length, d.character_length) << std::endl;
+    }*/
+    
     return 0;
 }

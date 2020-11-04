@@ -1,8 +1,12 @@
+// For view related contexts
+#include "View.hpp"
+
 //Mode.hpp declares the "Mode::current" static member variable, which is used to decide where event-handling, updating, and drawing events go:
 #include "Mode.hpp"
 
 //The 'PlayMode' mode plays the game:
-#include "PlayMode.hpp"
+#include "StoryMode.hpp"
+#include "IntroMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -53,11 +57,11 @@ int main(int argc, char **argv) {
 
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
-		"gp20 game4: choice-based game", //TODO: remember to set a title for your game!
+		"Mario's", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		1280, 720, //TODO: modify window size if you'd like
+		800, 600, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
-		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
+//		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
 	);
 
@@ -98,9 +102,6 @@ int main(int argc, char **argv) {
 	//------------ load assets --------------
 	call_load_functions();
 
-	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
-
 	//------------ main loop ------------
 
 	//this inline function will be called whenever the window is resized,
@@ -115,8 +116,12 @@ int main(int argc, char **argv) {
 		SDL_GL_GetDrawableSize(window, &w, &h);
 		drawable_size = glm::uvec2(w, h);
 		glViewport(0, 0, drawable_size.x, drawable_size.y);
+		view::ViewContext::set(window_size, drawable_size);
 	};
 	on_resize();
+
+	//------------ create game mode + make current --------------
+	Mode::set_current(std::make_shared< IntroMode >());
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {

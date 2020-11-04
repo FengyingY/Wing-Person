@@ -12,3 +12,10 @@ scenes/show-scene*
 *.blend[0-9]
 .vs/*
 CppProperties.json
+.idea/
+cmake-build-*/
+CMakeLists.txt
+hb_example.cpp
+.clangd/
+.vscode/
+compile_commands.json
