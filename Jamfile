@@ -123,6 +123,8 @@ COMMON_NAMES =
 	Mode
 	GL
 	Load
+  Input
+  Stage
 	;
 
 SHOW_MESHES_NAMES =
