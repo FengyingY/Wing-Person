@@ -124,7 +124,8 @@ COMMON_NAMES =
 	GL
 	Load
   Input
-  Stage
+  PuzzleStage
+  Shapes
 	;
 
 SHOW_MESHES_NAMES =
