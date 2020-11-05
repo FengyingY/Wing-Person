@@ -15,7 +15,7 @@ PuzzleMode::PuzzleMode() {
 
   // #HACK : spawn 2 default players
   add_player(glm::vec2(200, 499), SDLK_a, SDLK_d, SDLK_w);
-  //add_player(glm::vec2(600, 500), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+  add_player(glm::vec2(600, 500), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -46,9 +46,8 @@ void PuzzleMode::update(float elapsed) {
       player.velocity.x += Player::movespeed * elapsed;
     }
 
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
-
-    if(player.jump->pressed() && !player.falling && !player.jump_input) {
+    // Process jumping
+    if(player.jump->held() && !player.falling) {
        player.jump_input = true;
        if(player.input_jump_time < Player::max_jump_time) {
          player.input_jump_time += elapsed;
@@ -57,32 +56,32 @@ void PuzzleMode::update(float elapsed) {
          }
        }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
 
-    if(player.jump->released()) {
+    if(player.jump->just_released()) {
        player.jump_input = false;
        if(player.input_jump_time < Player::min_jump_time) {
          player.input_jump_time = Player::min_jump_time;
        }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
 
-    // Process jumping
     if(player.cur_jump_time < player.input_jump_time) {
       player.cur_jump_time += elapsed;
       player.velocity.y += Player::jumpspeed * elapsed;
 
-      if(player.cur_jump_time > player.input_jump_time) {
-        player.cur_jump_time = 0.0f;
-        player.input_jump_time = 0.0f;
+      if(player.cur_jump_time >= player.input_jump_time) {
+        player.jump_clear = true;
       }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+
+    if(!player.jump->held() && player.jump_clear) {
+        player.cur_jump_time = 0.0f;
+        player.input_jump_time = 0.0f;
+        player.jump_clear = false;
+    }
 
     player.position += player.velocity;
   }
 
-  /**
   // Player-player collision
   for (auto t1 = players.begin(); t1 != players.end(); t1++) {
     for (auto t2 = t1 + 1; t2 != players.end(); t2++) {
@@ -141,7 +140,8 @@ void PuzzleMode::update(float elapsed) {
       player.position += gravity;
     }
   }
-  */
+
+  input_manager.tick();
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
@@ -155,7 +155,6 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
   for (auto& player : players) {
-    std::cout << "Player " << player.position.x << " - " << player.position.y << std::endl;
     //player.draw(drawable_size);
   }
   std::cout << std::endl;

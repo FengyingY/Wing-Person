@@ -16,6 +16,14 @@ bool Input::released() {
   return _released;
 }
 
+bool Input::just_pressed() {
+  return _held && !_last_held;
+}
+
+bool Input::just_released() {
+  return !_held && _last_held;
+}
+
 glm::vec2 InputManager::mouse_position_abs() {
   return glm::vec2(_mouse_x, _mouse_y);
 }
@@ -101,6 +109,7 @@ void InputManager::tick() {
     input._downs = 0;
     input._pressed = false;
     input._released = false;
+    input._last_held = input._held;
   }
 
   for (auto&[key, input] : _mouse_inputs) {
@@ -109,5 +118,6 @@ void InputManager::tick() {
     input._downs = 0;
     input._pressed = false;
     input._released = false;
+    input._last_held = input._held;
   }
 }

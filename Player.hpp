@@ -39,6 +39,7 @@ struct Player {
   float cur_jump_time = 0.0f;
 
   bool jump_input = false;
+  bool jump_clear = false;
   bool falling = false;
 
   //Drawing

@@ -14,14 +14,22 @@ class Input {
     // Whether the key is currently being held
     bool held();
 
-    // Whether the key was just pressed this tick
+    // Whether the key was pressed this tick
+    // Note that key repeats will repeatedly trigger this when the button is
+    // held
     bool pressed();
-    // Whether the key was just released this click
+    // Whether the key was released this tick
     bool released();
+
+    // Versions of pressed/released that depend on whether the held state
+    // was changed instead of reading button inputs
+    bool just_pressed();
+    bool just_released();
 
   private:
     int _downs;
     bool _held;
+    bool _last_held;
     bool _pressed;
     bool _released;
 };
