@@ -26,11 +26,11 @@ struct Player {
   Input* jump;
 
   // Constants
-  static constexpr glm::vec2 size = glm::vec2(50.0f, 80.0f);
+  static constexpr glm::vec2 size = glm::vec2(15.0f, 24.0f);
 
-  static constexpr float movespeed = 30.0f;
-  static constexpr float jumpspeed = 50.0f;
-  static constexpr float gravityspeed = 30.0f;
+  static constexpr float movespeed = 80.0f;
+  static constexpr float jumpspeed = 120.0f;
+  static constexpr float gravityspeed = 60.0f;
 
   static constexpr float min_jump_time = 0.3f;
   static constexpr float max_jump_time = 0.6f;

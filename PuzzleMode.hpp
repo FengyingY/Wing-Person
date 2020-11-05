@@ -23,6 +23,6 @@ struct PuzzleMode : Mode
   InputManager input_manager;
 
   //----- game state ------
-  std::vector<Player> players;
+  std::vector<Player *> players;
   std::vector < PlatformTile *> platforms;
 };
