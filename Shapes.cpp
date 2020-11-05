@@ -1,4 +1,5 @@
 #include "Shapes.hpp"
+using namespace Shapes;
 
 Shapes::Circle::Circle(glm::vec2 c, float r, bool s) {
 	center = c;
@@ -7,6 +8,8 @@ Shapes::Circle::Circle(glm::vec2 c, float r, bool s) {
 }
 
 //NOTE: For now it assumes the first argument of Rectangle is the center, but this can change (maybe to a corner)
+
+Rectangle::Rectangle() {}
 
 Shapes::Rectangle::Rectangle(glm::vec2 c, float w, float h, bool s) {
 	center = c;

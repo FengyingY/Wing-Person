@@ -4,6 +4,8 @@
 #include "gl_errors.hpp"
 #include "ColorTextureProgram.hpp"
 
+#include "Shapes.hpp"
+
 struct PlatformTile
 {
 	PlatformTile();
@@ -17,6 +19,8 @@ struct PlatformTile
 
 	// size [x,y]
 	glm::vec2 size;
+
+	Shapes::Rectangle collision_shape;
 
 	//functions called by main loop:
 	void draw(glm::uvec2 const &drawable_size);
