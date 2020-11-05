@@ -1,38 +1,142 @@
 {
-    "Opening": {
-        "text": ["Placeholder opening, inherit from an old game.", "Wanna drink?"],
-        "choices": ["Yes:Story0", "No:Under Age End"],
-        "character": "Anna",
-        "sprite": ["Zombie", "FemaleAdvanturer", "Zombie"],
-        "background": ""
-    },
-    "Under Age End": {
-        "text": ["I am sorry you're too young to drink", "[End]"],
-        "choices": [],
-        "character": "",
-        "sprite": [],
-        "background": "Forest"
-    
-    },
-    "Story0": {
-        "text": ["Good to know. Testing the continue button."],
-        "choices": ["continue:Story1"],
-        "character": "Anna",
-        "sprite": ["FemaleAdvanturer"],
-        "background": "Forest"
-    },
-    "Story1": {
-        "text": ["Keep testing the continue button."],
-        "choices": ["continue:End"],
-        "character": "Bob",
-        "sprite": ["Zombie"],
-        "background": "Forest"
-    },
-    "End": {
-        "text": ["End of the test", "[End]"],
-        "choices": [],
-        "character": "",
-        "sprite": ["FemaleAdvanturer", "Zombie"],
-        "background": "Forest"
-    }
+  "Opening": {
+    "text": [ "Well hello there, stranger!", "Looks like we finally get to meet in person!", "You have no idea how long I've been waiting for this day to come!" ],
+    "choices": [ "What?:Story0", "Who are you?:Story0", "Where am I?:Story0" ],
+    "character": "???",
+    "sprite": [ "FemaleAdvanturer" ],
+    "background": ""
+  },
+  "Story0": {
+    "text": [ "Oh, you seem rather confused...", "My name is Respect, and we're inside your head.", "I'm like a guardian angel of sorts." ],
+    "choices": [ "So you look out for me?:Story1", "Does that mean we can go on a bunch of cool angel adventures together?:Story1" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer" ],
+    "background": ""
+  },
+  "Story1": {
+    "text": [ "That's right! You and I --", "Oh crap. He's here." ],
+    "choices": [ "Who's here?:Story2" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer" ],
+    "background": ""
+  },
+  "Story2": {
+    "text": [ "What's up, party people?!", "You kids ready for some fun?" ],
+    "choices": [ "Who are you?:Story3a", "What kind of fun?:Story3a", "HELL YEAH, LET'S GOOOOO!!!!:Story3b" ],
+    "character": "???",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story3a": {
+    "text": [ "Sheesh kid, haven't you ever heard of fun first, questions later?", "Well whatever. I'm Passion. I'm a guardian angel too!" ],
+    "choices": [ "It was just one question...:Story4", "I know how to have fun!:Story4" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story3b": {
+    "text": [ "Hell yeah kid, I think you and I will get along just fine.", "I'm Passion. I'm a guardian angel too!" ],
+    "choices": [ "I think so too!:Story4", "We'll see. I'm not sure you can keep up with me.:Story4" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story4": {
+    "text": [ "Yes, well now that that's out of the way...", "We're your guardian angels! And we're going to help you get a date!" ],
+    "choices": [ "A date?!?:Story5" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story5": {
+    "text": [ "That's right, kid! A date!", "To get a date you need passion!", "You need to want the person you're with!", "And you need to show them how excited you are to be with them!" ],
+    "choices": [ "That makes sense.:Story6" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story6": {
+    "text": [ "But passion alone isn't enough.", "With just passion, it's easy to rush into things without thinking.", "You also need respect." ],
+    "choices": [ "That makes sense too.:Story7", "And what do I need respect for?:Story7" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story7": {
+    "text": [ "Respect is about respecting yourself and respecting your potential partner.", "Respecting yourself helps you to learn and enforce your own boundaries.", "And respecting your partner makes sure you allow for their boundaries too!", "Respect is necessary for you to trust yourself and for your partner to trust you.", "And trust is key in a relationship!" ],
+    "choices": [ "Wow, respect is really important!:Story8" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story8": {
+    "text": [ "Yeah, respect is definitely important!", "But there are a lot of people I respect that I don't want to date.", "So don't forget about passion, kid!" ],
+    "choices": [ "I won't.:Story9", "Yeah, yeah. Whatever.:Story9" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story9": {
+    "text": [ "Well alright then. Are you ready to get out of your head and look for a date?" ],
+    "choices": [ "Let's do it!:Story10" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": ""
+  },
+  "Story10": {
+    "text": [ "Hmm... Who to date, who to date?", "Look over there! She looks cute!" ],
+    "choices": [ "Eh, not really my type.:Story11", "Yeah, she is!:Story11" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  },
+  "Story11": {
+    "text": [ "Respect is right, she is cute.", "But that guy over there is a whole hunk of man.", "Sign me up, kid!" ],
+    "choices": [ "I'm not really feeling him.:Story12", "Oh boy, sign me up too!:Story12" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  },
+  "Story12": {
+    "text": [ "GOOD LORD, THEY'RE HOT TOO!!!" ],
+    "choices": [ "Yeah, I guess so...:Story13", "GOOD LORD, YOU'RE BOTH RIGHT!!!:Story13" ],
+    "character": "Respect & Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  },
+  "Story13": {
+    "text": [ "So who's it gonna be, kid?", "Who do you wan us to help you get a date with?" ],
+    "choices": [ "The cute woman.:Story14", "The hunk of man.:Story14", "The hot person.:Story14" ],
+    "character": "Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  },
+  "Story14": {
+    "text": [ "Good choice! I think you'll be very happy with that one!", "Now then. How do you want to approach them?" ],
+    "choices": [ "Respectfully.:Story15a", "Passionately.:Story15b", "With a mix of respect and passion.:Story15c" ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  },
+  "Story15a": {
+    "text": [ "Great idea! Let's go respectfully get you a date! [Start Puzzle]" ],
+    "choices": [  ],
+    "character": "Respect",
+    "sprite": [ "FemaleAdvanturer" ],
+    "background": "Forest"
+  },
+  "Story15b": {
+    "text": [ "Hell yeah, kid! I knew you'd make the right choice!", "Now let's go passionately get you a date! [Start Puzzle]" ],
+    "choices": [  ],
+    "character": "Passion",
+    "sprite": [ "Zombie" ],
+    "background": "Forest"
+  },
+  "Story15c": {
+    "text": [ "How very middle of the road of you...", "Let's go get you a date. [Start Puzzle]" ],
+    "choices": [  ],
+    "character": "Respect & Passion",
+    "sprite": [ "FemaleAdvanturer", "Zombie" ],
+    "background": "Forest"
+  }
 }

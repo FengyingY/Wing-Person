@@ -36,6 +36,7 @@ struct Story {
 
 struct StoryMode : Mode {
 	StoryMode();
+	StoryMode(std::string branch_name);
 	virtual ~StoryMode();
 
 	//functions called by main loop:
