@@ -44,8 +44,8 @@ Input* InputManager::register_mouse_button(uint8_t button) {
 bool InputManager::handle_event(SDL_Event const& evt) {
   switch(evt.type) {
     case SDL_MOUSEMOTION:
-      _mouse_x = evt.motion.x;
-      _mouse_y = evt.motion.y;
+      _mouse_x = (float)evt.motion.x;
+      _mouse_y = (float)evt.motion.y;
       return true;
 
     case SDL_KEYDOWN:

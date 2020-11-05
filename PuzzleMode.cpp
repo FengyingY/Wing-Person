@@ -41,9 +41,6 @@ PuzzleMode::PuzzleMode() {
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 375.0f), glm::vec2(100.0f, 10.0f));
 		level_platforms.emplace_back(platform);
 	}
-
-	add_player(Shapes::Rectangle(glm::vec2(20.0f, 20.0f), 50.0f, 80.0f), SDLK_a, SDLK_d, SDLK_w);
-	add_player(Shapes::Rectangle(glm::vec2(600, 200), 50, 80), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 }
 
 PuzzleMode::~PuzzleMode() {
@@ -56,6 +53,7 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
+	/*
 	// Calculate inputs and movement for each player
 	for (auto&& player : _players) {
 		if(player._left->held()) {
@@ -96,17 +94,15 @@ void PuzzleMode::update(float elapsed) {
 
 		// Add gravity
 		if(player._falling) {
-			player._velocity.y -= gravityspeed * elapsed;
+			player._velocity.y -= 9.8f * elapsed;
 		}
-	}
+	}*/
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// tile->draw(drawable_size);
-	// GL_ERRORS();
 	for (auto &&platform : level_platforms)
 	{
 		platform->draw(drawable_size);
