@@ -7,7 +7,7 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
-#include "View.hpp"
+#include "Collisions.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -59,6 +59,10 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
+
+	//start music loop playing:
+	// (note: position will be over-ridden in update())
+	leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
 }
 
 PlayMode::~PlayMode() {
@@ -143,8 +147,12 @@ void PlayMode::update(float elapsed) {
 		glm::vec3(0.0f, 0.0f, 1.0f)
 	);
 
+	//move sound to follow leg tip position:
+	leg_tip_loop->set_position(get_leg_tip_position(), 1.0f / 60.0f);
+
 	//move camera:
 	{
+
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
 		glm::vec2 move = glm::vec2(0.0f);
@@ -169,11 +177,6 @@ void PlayMode::update(float elapsed) {
 		glm::vec3 right = frame[0];
 		glm::vec3 at = frame[3];
 		Sound::listener.set_position_right(at, right, 1.0f / 60.0f);
-	}
-
-	{
-		// update textView
-		my_line.update(elapsed);
 	}
 
 	//reset button press counters:
@@ -222,13 +225,10 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		float ofs = 2.0f / drawable_size.y;
 		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
-			glm::vec3(H, 0.0f, 0.0f),  glm::vec3(0.0f, H, 0.0f),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
-	{
-		my_line.draw();
-	}
-
+	GL_ERRORS();
 }
 
 glm::vec3 PlayMode::get_leg_tip_position() {
