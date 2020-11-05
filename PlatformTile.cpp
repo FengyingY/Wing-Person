@@ -1,12 +1,12 @@
 #include "PlatformTile.hpp"
 
 PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(glm::vec2(10.0f, 10.0f)) {
-	collision_shape = Shapes::Rectangle::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
+	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	setup_opengl();
 }
 
 PlatformTile::PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_) : position(pos_), size(size_) {
-	collision_shape = Shapes::Rectangle::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
+	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	setup_opengl();
 }
 
