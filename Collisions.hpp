@@ -8,16 +8,33 @@ namespace Collisions {
 	bool circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2);
 	bool rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes::Rectangle r2);
 	bool triangle_triangle_collision(Shapes::Triangle t1, Shapes::Triangle t2);
+	glm::vec2 circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2, int axis);
+	glm::vec2 rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes::Rectangle r2, int axis);
+	//glm::vec2 triangle_triangle_collision(Shapes::Triangle t1, Shapes::Triangle t2, int axis);
+	
 
-	//one shape colliding with one other of a different shape:
+	//one circle colliding with one other of a different shape:
 	bool circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle r);
 	bool circle_triangle_collision(Shapes::Circle c, Shapes::Triangle t);
+	glm::vec2 circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle r, int axis);
+	//glm::vec2 circle_triangle_collision(Shapes::Circle c, Shapes::Triangle t, int axis);
+	
+	//one rectangle colliding with one other of a different shape:
+	bool circle_rectangle_collision(Shapes::Rectangle r, Shapes::Circle c);
 	bool rectangle_triangle_collision(Shapes::Rectangle r, Shapes::Triangle t);
+	glm::vec2 circle_rectangle_collision(Shapes::Rectangle r, Shapes::Circle c, int axis);
+	//glm::vec2 rectangle_triangle_collision(Shapes::Rectangle r, Shapes::Triangle t, int axis);
+
+	//one triangle colliding with one other of a different shape:
+	bool circle_triangle_collision(Shapes::Triangle t, Shapes::Circle c);
+	bool rectangle_triangle_collision(Shapes::Triangle t, Shapes::Rectangle r);
+	//glm::vec2 circle_triangle_collision(Shapes::Triangle t, Shapes::Circle c, int axis);
+	//glm::vec2 rectangle_triangle_collision(Shapes::Triangle t, Shapes::Rectangle r, int axis);
 
 	//one player (assumed to be a rectangle) colliding with vectors of other shapes:
-	bool player_circles_collision(Shapes::Rectangle player, std::vector < Shapes::Circle > circles);
-	bool player_rectangles_collision(Shapes::Rectangle player, std::vector < Shapes::Rectangle > rectangles);
-	bool player_triangles_collision(Shapes::Rectangle player, std::vector < Shapes::Triangle > triangles);
+	std::vector< Shapes::Circle > player_circles_collision(Shapes::Rectangle player, std::vector < Shapes::Circle > circles);
+	std::vector< Shapes::Rectangle > player_rectangles_collision(Shapes::Rectangle player, std::vector < Shapes::Rectangle > rectangles);
+	std::vector< Shapes::Triangle > player_triangles_collision(Shapes::Rectangle player, std::vector < Shapes::Triangle > triangles);
 
 	//one player (assumed to be a rectangle) with a new position they want to move to colliding vectors of other shapes:
 	bool player_circles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Circle > circles);
