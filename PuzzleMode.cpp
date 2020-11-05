@@ -14,8 +14,8 @@ PuzzleMode::PuzzleMode() {
 	}
 
   // #HACK : spawn 2 default players
-  add_player(glm::vec2(200, 500), SDLK_a, SDLK_d, SDLK_w);
-  add_player(glm::vec2(600, 500), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+  add_player(glm::vec2(200, 499), SDLK_a, SDLK_d, SDLK_w);
+  //add_player(glm::vec2(600, 500), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -46,6 +46,8 @@ void PuzzleMode::update(float elapsed) {
       player.velocity.x += Player::movespeed * elapsed;
     }
 
+    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+
     if(player.jump->pressed() && !player.falling && !player.jump_input) {
        player.jump_input = true;
        if(player.input_jump_time < Player::max_jump_time) {
@@ -55,6 +57,7 @@ void PuzzleMode::update(float elapsed) {
          }
        }
     }
+    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
 
     if(player.jump->released()) {
        player.jump_input = false;
@@ -62,26 +65,29 @@ void PuzzleMode::update(float elapsed) {
          player.input_jump_time = Player::min_jump_time;
        }
     }
+    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
 
     // Process jumping
     if(player.cur_jump_time < player.input_jump_time) {
       player.cur_jump_time += elapsed;
       player.velocity.y += Player::jumpspeed * elapsed;
 
-      if(player.cur_jump_time >= player.input_jump_time) {
+      if(player.cur_jump_time > player.input_jump_time) {
         player.cur_jump_time = 0.0f;
         player.input_jump_time = 0.0f;
       }
     }
+    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
 
     player.position += player.velocity;
   }
 
+  /**
   // Player-player collision
   for (auto t1 = players.begin(); t1 != players.end(); t1++) {
     for (auto t2 = t1 + 1; t2 != players.end(); t2++) {
     Shapes::Rectangle rect1 = Shapes::Rectangle(t1->position, Player::size.x, Player::size.y, false);
-      Shapes::Rectangle rect2 = Shapes::Rectangle(t1->position, Player::size.x, Player::size.y, false);
+      Shapes::Rectangle rect2 = Shapes::Rectangle(t2->position, Player::size.x, Player::size.y, false);
       t1->position += Collisions::rectangle_rectangle_collision(rect1, rect2, 2);
     }
   }
@@ -135,6 +141,7 @@ void PuzzleMode::update(float elapsed) {
       player.position += gravity;
     }
   }
+  */
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {

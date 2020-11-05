@@ -1,5 +1,7 @@
 #include "Collisions.hpp"
 
+#include <iostream>
+
 //NOTE: For now it is assumed that touching without overlap is not a collision. Code can be changed so it would only ne a collision if the shapes are inside one another
 
 //one shape colliding with one other of the same shape:
@@ -19,25 +21,34 @@ bool Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2) {
 
 //check for collision between two rectangles:
 bool Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes::Rectangle r2) {
+  std::cout << "Rect1 [" << r1.center.x << ", " << r1.center.y << "] [" << r1.width << ", " << r1.height << "]" << std::endl;
+  std::cout << "Rect2 [" << r2.center.x << ", " << r2.center.y << "] [" << r2.width << ", " << r2.height << "]" << std::endl;
 	//check for collision:
 	for (glm::vec2 corner : r1.corners) {
 		if (corner.x <= r2.corners[0].x && corner.x >= r2.corners[1].x &&
-			corner.y <= r2.corners[0].y && corner.y >= r2.corners[2].y)
+			corner.y <= r2.corners[0].y && corner.y >= r2.corners[2].y) {
+      std::cout << "True" << std::endl << std::endl;
 			return true;
+    }
 	}
 
 	//could still be collisions if r2 is contained by r1, so check if the dimensions of the rectangles allow this:
-	if (r1.width <= r2.width && r1.height <= r2.height)
+	if (r1.width <= r2.width && r1.height <= r2.height) {
+      std::cout << "False" << std::endl << std::endl;
 		return false;
+  }
 
 	//r2 could be contained by r1, so check for collision:
 	for (glm::vec2 corner : r2.corners) {
 		if (corner.x <= r1.corners[0].x && corner.x >= r1.corners[1].x &&
-			corner.y <= r1.corners[0].y && corner.y >= r1.corners[2].y)
+			corner.y <= r1.corners[0].y && corner.y >= r1.corners[2].y) {
+      std::cout << "True" << std::endl << std::endl;
 			return true;
+    }
 	}
 
 	//no collision found:
+      std::cout << "False" << std::endl << std::endl;
 	return false;
 }
 
@@ -135,6 +146,8 @@ glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle 
 
 //check for collision between two rectangles:
 glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes::Rectangle r2, int axis) {
+  std::cout << "Rect1 [" << r1.center.x << ", " << r1.center.y << "] [" << r1.width << ", " << r1.height << "]" << std::endl;
+  std::cout << "Rect2 [" << r2.center.x << ", " << r2.center.y << "] [" << r2.width << ", " << r2.height << "]" << std::endl;
 	//check for collision:
 	for (int i = 0; i < 4; i++) {
 		if (r1.corners[i].x < r2.corners[0].x && r1.corners[i].x > r2.corners[1].x &&
@@ -195,11 +208,13 @@ glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes
 
 			//I was asked to return how much the first object would have to move to be out of the second object, but I could just return desired_center
 			glm::vec2 desired_center = r2.center + vector_from_r2;
+  std::cout << "[" << (desired_center - r1.center).x << ", " << (desired_center - r1.center).y << "]" << std::endl << std::endl;
 			return desired_center - r1.center;
 		}
 	}
 
 	//no collision found:
+  std::cout << "NO COLLISION" << std::endl << std::endl;
 	return glm::vec2(0.0f, 0.0f);
 }
 
