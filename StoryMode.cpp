@@ -6,11 +6,13 @@
 #include "DrawLines.hpp"
 #include "Mesh.hpp"
 #include "Load.hpp"
+#include "SDL_keycode.h"
 #include "Sound.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 #include "load_save_png.hpp"
 #include "read_write_chunk.hpp"
+#include "IntroMode.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -103,7 +105,6 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 
 
 StoryMode::StoryMode() : story(*test_story) {
-	// set the timer and print the first line
 	setCurrentBranch(story.dialog.at("Opening"));
 
 	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));
@@ -112,6 +113,18 @@ StoryMode::StoryMode() : story(*test_story) {
 		story.sprites[s->name] = s;
 	}
 }
+
+// go back to story mode at the specified branch
+StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
+	story = *test_story;
+	setCurrentBranch(story.dialog.at(branch_name));
+
+	// TODO make the sprite map as a local variable like music loop (?)
+	for (Sprite* s : sprites) {
+		story.sprites[s->name] = s;
+	}
+}
+
 
 StoryMode::~StoryMode() {
 }
@@ -130,8 +143,15 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 			if (main_dialog->finished()) {
 				std::optional<int> next_branch = main_dialog->Enter();
 				if (next_branch.has_value()) {
-					setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
-					
+					std::string next_branch_name = current.next_branch_names.at(next_branch.value());
+					if (next_branch_name == "PuzzleMode") {
+						// jump to the puzzle mode
+						// TODO using the introMode for testing, please change it to PuzzleMode at intergration
+						Mode::set_current(std::make_shared<IntroMode>());
+					} else {
+						setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
+
+					}				
 					return true;
 				}
 			}

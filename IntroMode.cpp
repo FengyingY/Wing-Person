@@ -1,4 +1,5 @@
 #include "IntroMode.hpp"
+#include "SDL_keycode.h"
 #include "StoryMode.hpp"
 #include "gl_errors.hpp"
 
@@ -7,6 +8,12 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 		SDL_Keycode keyCode = evt.key.keysym.sym;
 		if (keyCode == SDLK_RETURN) {
 			Mode::set_current(std::make_shared<StoryMode>());
+			return true;
+		} else if (keyCode == SDLK_q) {
+			// TODO remove it at integration
+			// can jump to a specified branch when you want to switch back to the story mode
+			std::string branch_name = "Story1";
+			Mode::set_current(std::make_shared<StoryMode>(branch_name));
 			return true;
 		}
 	}
