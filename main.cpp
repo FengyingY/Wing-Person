@@ -7,7 +7,6 @@
 //The 'PlayMode' mode plays the game:
 #include "StoryMode.hpp"
 #include "IntroMode.hpp"
-#include "PuzzleMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -58,7 +57,7 @@ int main(int argc, char **argv) {
 
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
-		"Mario's", //TODO: remember to set a title for your game!
+		"Wing-person", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		800, 600, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
@@ -122,7 +121,7 @@ int main(int argc, char **argv) {
 	on_resize();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PuzzleMode >());
+	Mode::set_current(std::make_shared< IntroMode >());
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {

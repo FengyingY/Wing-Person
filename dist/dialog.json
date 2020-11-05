@@ -120,21 +120,21 @@
   },
   "Story15a": {
     "text": [ "Great idea! Let's go respectfully get you a date! [Start Puzzle]" ],
-    "choices": [  ],
+    "choices": [ ":PuzzleMode" ],
     "character": "Respect",
     "sprite": [ "FemaleAdvanturer" ],
     "background": "Forest"
   },
   "Story15b": {
     "text": [ "Hell yeah, kid! I knew you'd make the right choice!", "Now let's go passionately get you a date! [Start Puzzle]" ],
-    "choices": [  ],
+    "choices": [ ":PuzzleMode" ],
     "character": "Passion",
     "sprite": [ "Zombie" ],
     "background": "Forest"
   },
   "Story15c": {
     "text": [ "How very middle of the road of you...", "Let's go get you a date. [Start Puzzle]" ],
-    "choices": [  ],
+    "choices": [ ":PuzzleMode" ],
     "character": "Respect & Passion",
     "sprite": [ "FemaleAdvanturer", "Zombie" ],
     "background": "Forest"

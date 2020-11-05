@@ -45,8 +45,8 @@ PuzzleMode::PuzzleMode() {
 	}
 
   // #HACK : spawn 2 default players
-  add_player(glm::vec2(200, 499), SDLK_a, SDLK_d, SDLK_w);
-  add_player(glm::vec2(600, 500), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+  add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w);
+  add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -189,7 +189,7 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
   for (auto&& player : players) {
-    std::cout << "Player " << player->position.x << " - " << player->position.y << std::endl;
+    
     player->draw(drawable_size);
   }
   std::cout << std::endl;

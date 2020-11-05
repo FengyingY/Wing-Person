@@ -13,6 +13,7 @@
 #include "load_save_png.hpp"
 #include "read_write_chunk.hpp"
 #include "IntroMode.hpp"
+#include "PuzzleMode.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -147,7 +148,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					if (next_branch_name == "PuzzleMode") {
 						// jump to the puzzle mode
 						// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-						Mode::set_current(std::make_shared<IntroMode>());
+						Mode::set_current(std::make_shared<PuzzleMode>());
 					} else {
 						setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 
