@@ -113,6 +113,7 @@ GAME_NAMES =
 	Sprite
 	PlatformTile
 	PuzzleMode
+	Player
 	;
 
 COMMON_NAMES =
