@@ -5,6 +5,7 @@ Player::Player(glm::vec2 position,
                                             , left(left)
                                             , right(right)
                                             , jump(jump) {
+	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
   setup_opengl();
 }
 
@@ -118,13 +119,13 @@ void Player::draw(glm::uvec2 const &drawable_size) {
 	//inline helper function for rectangle drawing:
 	auto draw_rectangle = [&vertices](glm::vec2 const &center, glm::vec2 const &radius, glm::u8vec4 const &color) {
 		//draw rectangle as two CCW-oriented triangles:
-		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y-radius.y, 0.0f), color, glm::vec2(0.0f, 0.0f));
-		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y-radius.y, 0.0f), color, glm::vec2(1.0f, 0.0f));
-		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y+radius.y, 0.0f), color, glm::vec2(1.0f, 1.0f));
+		vertices.emplace_back(glm::vec3(center.x-radius.x / 2.0f, center.y-radius.y / 2.0f, 0.0f), color, glm::vec2(0.0f, 0.0f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x / 2.0f, center.y-radius.y / 2.0f, 0.0f), color, glm::vec2(1.0f, 0.0f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x / 2.0f, center.y+radius.y / 2.0f, 0.0f), color, glm::vec2(1.0f, 1.0f));
 
-		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y-radius.y, 0.0f), color, glm::vec2(0.0f, 0.0f));
-		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y+radius.y, 0.0f), color, glm::vec2(1.0f, 1.0f));
-		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.0f, 1.0f));
+		vertices.emplace_back(glm::vec3(center.x-radius.x / 2.0f, center.y-radius.y / 2.0f, 0.0f), color, glm::vec2(0.0f, 0.0f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x / 2.0f, center.y+radius.y / 2.0f, 0.0f), color, glm::vec2(1.0f, 1.0f));
+		vertices.emplace_back(glm::vec3(center.x-radius.x / 2.0f, center.y+radius.y / 2.0f, 0.0f), color, glm::vec2(0.0f, 1.0f));
 	};
 
 	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xff, 0xff, 0xff, 0xff));

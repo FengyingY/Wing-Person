@@ -14,34 +14,42 @@ PuzzleMode::PuzzleMode() {
 		// Floor
 		PlatformTile *platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 5.0f), glm::vec2(ScreenWidth, 10.0f));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// Left wall
 		platform = new PlatformTile(glm::vec2(5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// Right wall
 		platform = new PlatformTile(glm::vec2(ScreenWidth - 5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// partition
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// lower-mid
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 125.0f), glm::vec2(100.0f, 10.0f));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// mid-left
 		platform = new PlatformTile(glm::vec2(10.0f + 50.0f, 250.0f), glm::vec2(100.0f, 10.0f));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// mid-right
 		platform = new PlatformTile(glm::vec2(ScreenWidth - 50.0f - 10.0f, 250.0f), glm::vec2(100.0f, 10.0f));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 
 		// upper-mid
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 375.0f), glm::vec2(100.0f, 10.0f));
 		platforms.emplace_back(platform);
+		platform_collision_shapes.emplace_back(platform->collision_shape);
 	}
 
   // #HACK : spawn 2 default players
@@ -66,116 +74,127 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
-  // Calculate inputs and movement for each player
-  for (auto&& player : players) {
-	
-    player->velocity.x = 0;
-    player->velocity.y = 0;
+	for (auto&& player : players) {
 
-    if(player->left->held()) {
-      player->velocity.x -= Player::movespeed * elapsed;
-    }
+		// Calculate inputs and movement for each player
+		player->velocity.x = 0;
+		player->velocity.y = 0;
 
-    if(player->right->held()) {
-      player->velocity.x += Player::movespeed * elapsed;
-    }
+		if (player->left->held()) {
+			player->velocity.x -= Player::movespeed * elapsed;
+		}
 
-    // Process jumping
-    if(player->jump->held() && !player->falling) {
-       player->jump_input = true;
-       if(player->input_jump_time < Player::max_jump_time) {
-         player->input_jump_time += elapsed;
-         if(player->input_jump_time >= Player::max_jump_time) {
-           player->input_jump_time = Player::max_jump_time;
-         }
-       }
-    }
+		if (player->right->held()) {
+			player->velocity.x += Player::movespeed * elapsed;
+		}
 
-    if(player->jump->just_released()) {
-       player->jump_input = false;
-       if(player->input_jump_time < Player::min_jump_time) {
-         player->input_jump_time = Player::min_jump_time;
-       }
-    }
+		// Process jumping
+		if (player->jump->held() && !player->falling) {
+			player->jump_input = true;
+			if (player->input_jump_time < Player::max_jump_time) {
+				player->input_jump_time += elapsed;
+				if (player->input_jump_time >= Player::max_jump_time) {
+					player->input_jump_time = Player::max_jump_time;
+				}
+			}
+		}
 
-    if(player->cur_jump_time < player->input_jump_time) {
-      player->cur_jump_time += elapsed;
-      player->velocity.y += Player::jumpspeed * elapsed;
+		if (player->jump->just_released()) {
+			player->jump_input = false;
+			if (player->input_jump_time < Player::min_jump_time) {
+				player->input_jump_time = Player::min_jump_time;
+			}
+		}
 
-      if(player->cur_jump_time >= player->input_jump_time) {
-        player->jump_clear = true;
-      }
-    }
+		if (player->cur_jump_time < player->input_jump_time) {
+			player->cur_jump_time += elapsed;
+			player->velocity.y += Player::jumpspeed * elapsed;
 
-    if(!player->jump->held() && player->jump_clear) {
-        player->cur_jump_time = 0.0f;
-        player->input_jump_time = 0.0f;
-        player->jump_clear = false;
-    }
+			if (player->cur_jump_time >= player->input_jump_time) {
+				player->jump_clear = true;
+			}
+		}
 
-    player->position += player->velocity;
-  }
+		if (!player->jump->held() && player->jump_clear) {
+			player->cur_jump_time = 0.0f;
+			player->input_jump_time = 0.0f;
+			player->jump_clear = false;
+		}
 
-  // Player-player collision
-  for (auto t1 = players.begin(); t1 != players.end(); t1++) {
-    for (auto t2 = t1 + 1; t2 != players.end(); t2++) {
-    Shapes::Rectangle rect1 = Shapes::Rectangle((*t1)->position, Player::size.x, Player::size.y, false);
-      Shapes::Rectangle rect2 = Shapes::Rectangle((*t2)->position, Player::size.x, Player::size.y, false);
-      (*t1)->position += Collisions::rectangle_rectangle_collision(rect1, rect2, 2);
-    }
-  }
+		//check for collisions before moving due to input:
+		if (!Collisions::player_rectangles_collision(player->collision_box, player->position + player->velocity, platform_collision_shapes)) {
+			player->position += player->velocity;
+			player->collision_box.center += player->velocity;
+		}
 
-  // Player-platform collision
-  for (auto& player : players) {
-    // Check for collision with platforms
-    Shapes::Rectangle player_rect = Shapes::Rectangle(player->position,
-        Player::size.x, Player::size.y, false);
+		//check for collisions before moving due to gravity:
+		glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
+		if (!Collisions::player_rectangles_collision(player->collision_box, player->position + gravity, platform_collision_shapes)) {
+			player->position += gravity;
+			player->collision_box.center += gravity;
+		}
 
-    for (auto& platform : platforms) {
-      Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
-        platform->size.x, platform->size.y, true);
+		/* Player-player collision
+		for (auto t1 = players.begin(); t1 != players.end(); t1++) {
+		  for (auto t2 = t1 + 1; t2 != players.end(); t2++) {
+		  Shapes::Rectangle rect1 = Shapes::Rectangle((*t1)->position, Player::size.x, Player::size.y, false);
+			Shapes::Rectangle rect2 = Shapes::Rectangle((*t2)->position, Player::size.x, Player::size.y, false);
+			(*t1)->position += Collisions::rectangle_rectangle_collision(rect1, rect2, 2);
+		  }
+		}*/
 
-      if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
-        player->position += Collisions::rectangle_rectangle_collision(player_rect,
-            platform_rect, 2);
-        break;
-      }
-    }
-  }
+		/* Player-platform collision
+		for (auto& player : players) {
+		  // Check for collision with platforms
+		  Shapes::Rectangle player_rect = Shapes::Rectangle(player->position,
+			  Player::size.x, Player::size.y, false);
 
-  // Gravity
-  for (auto& player : players) {
-    glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
+		  for (auto& platform : platforms) {
+			Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
+			  platform->size.x, platform->size.y, true);
 
-    player->falling = true;
+			if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
+			  player->position += Collisions::rectangle_rectangle_collision(player_rect,
+				  platform_rect, 2);
+			  break;
+			}
+		  }
+		}*/
 
-    // Check for collision with platforms
-    Shapes::Rectangle player_rect = Shapes::Rectangle(player->position + gravity,
-        Player::size.x, Player::size.y, false);
+		/* Gravity
+		for (auto& player : players) {
+		  glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
 
-    for (auto& platform : platforms) {
-      Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
-        platform->size.x, platform->size.y, true);
+		  player->falling = true;
 
-      if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
-        glm::vec2 movement = Collisions::rectangle_rectangle_collision(player_rect,
-            platform_rect, 1);
+		  // Check for collision with platforms
+		  Shapes::Rectangle player_rect = Shapes::Rectangle(player->position + gravity,
+			  Player::size.x, Player::size.y, false);
 
-        //FIXME bug in collisions with nonzero x value
-        movement.x = 0;
+		  for (auto& platform : platforms) {
+			Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
+			  platform->size.x, platform->size.y, true);
 
-        player->position += gravity + movement;
-        player->falling = false;
-        break;
-      }
-    }
+			if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
+			  glm::vec2 movement = Collisions::rectangle_rectangle_collision(player_rect,
+				  platform_rect, 1);
 
-    if(player->falling) {
-      player->position += gravity;
-    }
-  }
+			  //FIXME bug in collisions with nonzero x value
+			  movement.x = 0;
 
-  input_manager.tick();
+			  player->position += gravity + movement;
+			  player->falling = false;
+			  break;
+			}
+		  }
+
+		  if(player->falling) {
+			player->position += gravity;
+		  }
+		}*/
+
+		input_manager.tick();
+	}
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {

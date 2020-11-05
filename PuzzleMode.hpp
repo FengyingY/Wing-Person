@@ -27,4 +27,5 @@ struct PuzzleMode : Mode
   //----- game state ------
   std::vector<Player *> players;
   std::vector < PlatformTile *> platforms;
+  std::vector < Shapes::Rectangle > platform_collision_shapes;
 };

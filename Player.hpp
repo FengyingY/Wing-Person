@@ -2,6 +2,7 @@
 
 #include "Input.hpp"
 #include "ColorTextureProgram.hpp"
+#include "Shapes.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -77,4 +78,7 @@ struct Player {
 		glm::uvec2 size;
 		std::vector< glm::u8vec4 > data;
 	};
+
+	//Collisions:
+	Shapes::Rectangle collision_box;
 };
