@@ -25,7 +25,9 @@ void PuzzleMode::add_player(glm::vec2 position,
   Input* left = input_manager.register_key(leftkey);
   Input* right = input_manager.register_key(rightkey);
   Input* jump = input_manager.register_key(jumpkey);
-  players.emplace_back(Player(position, left, right, jump));
+
+  Player *player = new Player(position, left, right, jump);
+  players.emplace_back(player);
 }
 
 bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
@@ -34,52 +36,53 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 
 void PuzzleMode::update(float elapsed) {
   // Calculate inputs and movement for each player
-  for (auto& player : players) {
-    player.velocity.x = 0;
-    player.velocity.y = 0;
+  for (auto&& player : players) {
+	
+    player->velocity.x = 0;
+    player->velocity.y = 0;
 
-    if(player.left->held()) {
-      player.velocity.x -= Player::movespeed * elapsed;
+    if(player->left->held()) {
+      player->velocity.x -= Player::movespeed * elapsed;
     }
 
-    if(player.right->held()) {
-      player.velocity.x += Player::movespeed * elapsed;
+    if(player->right->held()) {
+      player->velocity.x += Player::movespeed * elapsed;
     }
 
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+    std::cout << player->jump_input << " - " << player->input_jump_time << " - " << player->cur_jump_time << std::endl;
 
-    if(player.jump->pressed() && !player.falling && !player.jump_input) {
-       player.jump_input = true;
-       if(player.input_jump_time < Player::max_jump_time) {
-         player.input_jump_time += elapsed;
-         if(player.input_jump_time >= Player::max_jump_time) {
-           player.input_jump_time = Player::max_jump_time;
+    if(player->jump->pressed() && !player->falling && !player->jump_input) {
+       player->jump_input = true;
+       if(player->input_jump_time < Player::max_jump_time) {
+         player->input_jump_time += elapsed;
+         if(player->input_jump_time >= Player::max_jump_time) {
+           player->input_jump_time = Player::max_jump_time;
          }
        }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+    std::cout << player->jump_input << " - " << player->input_jump_time << " - " << player->cur_jump_time << std::endl;
 
-    if(player.jump->released()) {
-       player.jump_input = false;
-       if(player.input_jump_time < Player::min_jump_time) {
-         player.input_jump_time = Player::min_jump_time;
+    if(player->jump->released()) {
+       player->jump_input = false;
+       if(player->input_jump_time < Player::min_jump_time) {
+         player->input_jump_time = Player::min_jump_time;
        }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+    std::cout << player->jump_input << " - " << player->input_jump_time << " - " << player->cur_jump_time << std::endl;
 
     // Process jumping
-    if(player.cur_jump_time < player.input_jump_time) {
-      player.cur_jump_time += elapsed;
-      player.velocity.y += Player::jumpspeed * elapsed;
+    if(player->cur_jump_time < player->input_jump_time) {
+      player->cur_jump_time += elapsed;
+      player->velocity.y += Player::jumpspeed * elapsed;
 
-      if(player.cur_jump_time > player.input_jump_time) {
-        player.cur_jump_time = 0.0f;
-        player.input_jump_time = 0.0f;
+      if(player->cur_jump_time > player->input_jump_time) {
+        player->cur_jump_time = 0.0f;
+        player->input_jump_time = 0.0f;
       }
     }
-    std::cout << player.jump_input << " - " << player.input_jump_time << " - " << player.cur_jump_time << std::endl;
+    std::cout << player->jump_input << " - " << player->input_jump_time << " - " << player->cur_jump_time << std::endl;
 
-    player.position += player.velocity;
+    player->position += player->velocity;
   }
 
   /**
@@ -154,9 +157,9 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 		platform->draw(drawable_size);
 	}
 
-  for (auto& player : players) {
-    std::cout << "Player " << player.position.x << " - " << player.position.y << std::endl;
-    //player.draw(drawable_size);
+  for (auto&& player : players) {
+    std::cout << "Player " << player->position.x << " - " << player->position.y << std::endl;
+    player->draw(drawable_size);
   }
   std::cout << std::endl;
 	GL_ERRORS();
