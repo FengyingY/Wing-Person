@@ -1,8 +1,11 @@
+#pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "gl_errors.hpp"
 #include "ColorTextureProgram.hpp"
+#include "Sprite.hpp"
 
 struct PlatformTile
 {

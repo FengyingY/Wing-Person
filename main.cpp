@@ -7,6 +7,7 @@
 //The 'PlayMode' mode plays the game:
 #include "StoryMode.hpp"
 #include "IntroMode.hpp"
+#include "PuzzleMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
 	on_resize();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< IntroMode >());
+	Mode::set_current(std::make_shared< PuzzleMode >());
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {

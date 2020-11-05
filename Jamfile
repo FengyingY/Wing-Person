@@ -90,6 +90,7 @@ if $(OS) = NT { #Windows
 		-L$(NEST_LIBS)/libogg/lib -logg                                                       #libogg (for opusfile)
 		-L$(NEST_LIBS)/harfbuzz/lib -lharfbuzz                                                #harfbuzz
 		-L$(NEST_LIBS)/freetype/lib -lfreetype                                                #freetype
+    -lstdc++fs
 		;
 	#`PATH=$(KIT_LIBS)/SDL2/bin:$PATH sdl2-config --static-libs` -lGL #SDL2 (old way that allows system libs to also work)
 	File README-SDL.txt : $(NEST_LIBS)/SDL2/dist/README-SDL.txt ;
@@ -110,9 +111,11 @@ GAME_NAMES =
 	load_wav
 	load_opus
 	View
-	Sprite
-	PlatformTile
 	PuzzleMode
+	Sprite
+  PlatformTile
+  Player
+  Collisions
 	;
 
 COMMON_NAMES =
@@ -129,7 +132,6 @@ COMMON_NAMES =
 	GL
 	Load
   Input
-  PuzzleStage
   Shapes
 	;
 

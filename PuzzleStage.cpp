@@ -12,10 +12,10 @@ Platform::Platform(Shapes::Rectangle rectangle) : bounding_box(rectangle) {}
 PuzzleStage::PuzzleStage() {
   // TODO
   // default 2 players and a simple platform for now
-  add_player(Shapes::Rectangle(glm::vec2(200, 200), 50, 80), SDLK_a, SDLK_d, SDLK_w);
-  add_player(Shapes::Rectangle(glm::vec2(600, 200), 50, 80), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+  add_player(Shapes::Rectangle(glm::vec2(200, 200), 50, 80, false), SDLK_a, SDLK_d, SDLK_w);
+  add_player(Shapes::Rectangle(glm::vec2(600, 200), 50, 80, false), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 
-  _platforms.emplace_back(Platform(Shapes::Rectangle(glm::vec2(400, 140), 700, 40)));
+  _platforms.emplace_back(Platform(Shapes::Rectangle(glm::vec2(400, 140), 700, 40, true)));
 }
 
 PuzzleStage::~PuzzleStage() {}

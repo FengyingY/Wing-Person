@@ -3,7 +3,6 @@
 //NOTE: For now it is assumed that touching without overlap is not a collision. Code can be changed so it would only ne a collision if the shapes are inside one another
 
 //one shape colliding with one other of the same shape:
-#pragma region SameShapes
 
 //check for collision between two circles:
 bool Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2) {
@@ -203,10 +202,8 @@ glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes
 	//no collision found:
 	return glm::vec2(0.0f, 0.0f);
 }
-#pragma endregion
 
 //one circle colliding with one other of a different shape:
-#pragma region CircleCollisions
 
 //check for collision between one circle and one rectangle:
 bool Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle r) {
@@ -380,10 +377,8 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Recta
 	//no collision found:
 	return glm::vec2(0.0f, 0.0f);
 }
-#pragma endregion
 
 //one rectangle colliding with one other of a different shape:
-#pragma region RectangleCollisions
 
 //check for collision between one rectangle and one circle:
 bool Collisions::circle_rectangle_collision(Shapes::Rectangle r, Shapes::Circle c) {
@@ -542,10 +537,8 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Rectangle r, Shapes::Ci
 	//no collision found:
 	return glm::vec2(0.0f, 0.0f);
 }
-#pragma endregion
 
 //one triangle colliding with one other of a different shape:
-#pragma region TriangleCollisions
 
 //check for collision betwwen one triangle and one circle:
 bool Collisions::circle_triangle_collision(Shapes::Triangle t, Shapes::Circle c) {
@@ -556,10 +549,8 @@ bool Collisions::circle_triangle_collision(Shapes::Triangle t, Shapes::Circle c)
 bool Collisions::rectangle_triangle_collision(Shapes::Triangle t, Shapes::Rectangle r) {
 	return rectangle_triangle_collision(r, t);
 }
-#pragma endregion
 
 //one player (assumed to be a rectangle) colliding with vectors of other shapes:
-#pragma region PlayerCollisions
 
 //return a vector of all the passed in circles currently colliding with the player (assumed to be a rectangle):
 std::vector< Shapes::Circle > Collisions::player_circles_collision(Shapes::Rectangle player, std::vector < Shapes::Circle > circles) {
@@ -605,10 +596,8 @@ std::vector< Shapes::Triangle > Collisions::player_triangles_collision(Shapes::R
 	//return a vector containing all of the collisions:
 	return hit_triangles;
 }
-#pragma endregion
 
 //one player (assumed to be a rectangle) with a new position they want to move to colliding vectors of other shapes:
-#pragma region NewPosCollisions
 
 //check if one player (assumed to be a rectangle) with a new position collides with any circle in the list:
 bool Collisions::player_circles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Circle > circles) {
@@ -654,10 +643,8 @@ bool Collisions::player_triangles_collision(Shapes::Rectangle player, glm::vec2 
 	//no collisions found:
 	return false;
 }
-#pragma endregion
 
 //functions to help with detecting collisions:
-#pragma region HelpfulFunctions
 
 //code for this function came from: https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
 glm::vec2 Collisions::line_intersect(glm::vec2 line1_p1, glm::vec2 line1_p2, glm::vec2 line2_p1, glm::vec2 line2_p2) {
@@ -700,4 +687,3 @@ bool Collisions::point_in_line_segment(glm::vec2 point, glm::vec2 line_p1, glm::
 	//point is not in the line segment:
 	return false;
 }
-#pragma endregion
