@@ -5,12 +5,40 @@
 PuzzleMode::PuzzleMode() {
 	// TODO : Read level data and create platforms
 
-	// #HACK : Creating a set of test platforms
-	for (size_t i = 0; i < 5; i++)
+	// #TEMP : Creating a set of test platforms
+	// Keeping window size as constant 800x600
 	{
-		PlatformTile *platform = new PlatformTile(glm::vec2(i * 120.0f + 60.0f, 400.0f - i * 60.0f), glm::vec2(100.0f, 20.0f));
-		std::cout << platform->position.x << ", " << platform->position.y << std::endl;
-		platforms.emplace_back(platform);
+		// Floor
+		PlatformTile *platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 5.0f), glm::vec2(ScreenWidth, 10.0f));
+		level_platforms.emplace_back(platform);
+
+		// Left wall
+		platform = new PlatformTile(glm::vec2(5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
+		level_platforms.emplace_back(platform);
+
+		// Right wall
+		platform = new PlatformTile(glm::vec2(ScreenWidth - 5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
+		level_platforms.emplace_back(platform);
+
+		// partition
+		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
+		level_platforms.emplace_back(platform);
+
+		// lower-mid
+		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 125.0f), glm::vec2(100.0f, 10.0f));
+		level_platforms.emplace_back(platform);
+
+		// mid-left
+		platform = new PlatformTile(glm::vec2(10.0f + 50.0f, 250.0f), glm::vec2(100.0f, 10.0f));
+		level_platforms.emplace_back(platform);
+
+		// mid-right
+		platform = new PlatformTile(glm::vec2(ScreenWidth - 50.0f - 10.0f, 250.0f), glm::vec2(100.0f, 10.0f));
+		level_platforms.emplace_back(platform);
+
+		// upper-mid
+		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 375.0f), glm::vec2(100.0f, 10.0f));
+		level_platforms.emplace_back(platform);
 	}
 
   // #HACK : spawn 2 default players
@@ -148,7 +176,7 @@ void PuzzleMode::update(float elapsed) {
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
-	glClearColor(1.0f, 0.01f, 0.01f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	GL_ERRORS();
 

@@ -131,8 +131,8 @@ COMMON_NAMES =
 	Mode
 	GL
 	Load
-  Input
-  Shapes
+	Input
+	Shapes
 	;
 
 SHOW_MESHES_NAMES =

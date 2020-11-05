@@ -1,10 +1,12 @@
 #include "PlatformTile.hpp"
 
 PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(glm::vec2(10.0f, 10.0f)) {
+	collision_shape = Shapes::Rectangle::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	setup_opengl();
 }
 
 PlatformTile::PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_) : position(pos_), size(size_) {
+	collision_shape = Shapes::Rectangle::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	setup_opengl();
 }
 
@@ -127,7 +129,7 @@ void PlatformTile::draw(glm::uvec2 const &drawable_size) {
 		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.0f, 1.0f));
 	};
 
-	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xe3, 0xe3, 0xe3, 0xe3));
 
 	//use alpha blending:
 	// glEnable(GL_BLEND); // This is causing issues. Disabled for the time being

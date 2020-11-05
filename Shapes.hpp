@@ -15,6 +15,7 @@ namespace Shapes {
 	};
 
 	struct Rectangle {
+		Rectangle();
 		Rectangle(glm::vec2 c, float w, float h, bool s);
 
 		glm::vec2 center;

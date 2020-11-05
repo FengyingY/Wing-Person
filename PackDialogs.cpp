@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     try {
         file["Opening"];
     } catch (int e) {
-        std::cout << "Fail to read Opening" << std::endl;
+        std::cout << "Fail to read Opening. Error:" << e << std::endl;
     }
     
     std::string tmp = "";
