@@ -2,6 +2,9 @@
 
 #include "Collisions.hpp"
 
+const float ScreenWidth = 800.0f;
+const float ScreenHeight = 600.0f;
+
 PuzzleMode::PuzzleMode() {
 	// TODO : Read level data and create platforms
 
@@ -10,35 +13,35 @@ PuzzleMode::PuzzleMode() {
 	{
 		// Floor
 		PlatformTile *platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 5.0f), glm::vec2(ScreenWidth, 10.0f));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// Left wall
 		platform = new PlatformTile(glm::vec2(5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// Right wall
 		platform = new PlatformTile(glm::vec2(ScreenWidth - 5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// partition
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// lower-mid
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 125.0f), glm::vec2(100.0f, 10.0f));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// mid-left
 		platform = new PlatformTile(glm::vec2(10.0f + 50.0f, 250.0f), glm::vec2(100.0f, 10.0f));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// mid-right
 		platform = new PlatformTile(glm::vec2(ScreenWidth - 50.0f - 10.0f, 250.0f), glm::vec2(100.0f, 10.0f));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 
 		// upper-mid
 		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 375.0f), glm::vec2(100.0f, 10.0f));
-		level_platforms.emplace_back(platform);
+		platforms.emplace_back(platform);
 	}
 
   // #HACK : spawn 2 default players
