@@ -205,7 +205,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	// characters
 	float offset = 1.f / (current.sprites_name.size() + 1);
 	for (size_t i = 0; i < current.sprites_name.size(); ++i) {
-		story.sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y*1.4f), drawable_size, 0.5f);
+		story.sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y), drawable_size, 0.3f);
 	}
 
 	// textbox
