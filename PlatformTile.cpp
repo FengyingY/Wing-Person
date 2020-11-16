@@ -2,11 +2,13 @@
 
 PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(glm::vec2(10.0f, 10.0f)) {
 	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
+	// parse the tile data
 	setup_opengl();
 }
 
 PlatformTile::PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_) : position(pos_), size(size_) {
 	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
+	// parse the tile data
 	setup_opengl();
 }
 
@@ -19,6 +21,31 @@ PlatformTile::~PlatformTile() {
 
 	glDeleteTextures(1, &png_tex);
 	png_tex = 0;
+}
+
+void PlatformTile::parse_tiledata(uint32_t &tile_data) {
+	// based on Tiled editor's data format - https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data
+
+	// Bits on the far end of the 32-bit global tile ID are used for tile flags
+	const uint32_t FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+	const uint32_t FLIPPED_VERTICALLY_FLAG   = 0x40000000;
+	const uint32_t FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
+
+	uint32_t global_tile_id = tile_data;
+
+	// Read out the flags
+	bool flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
+	bool flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
+	bool flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
+
+	// rest of it is the GID
+
+	// Clear the flags
+	global_tile_id &= ~(FLIPPED_HORIZONTALLY_FLAG |
+						FLIPPED_VERTICALLY_FLAG |
+						FLIPPED_DIAGONALLY_FLAG);
+	
+	// TODO: resolve the tileset for the gid : tileset->first_gid - global_tile_id
 }
 
 void PlatformTile::setup_opengl() {
@@ -129,7 +156,7 @@ void PlatformTile::draw(glm::uvec2 const &drawable_size) {
 		vertices.emplace_back(glm::vec3(center.x-radius.x / 2.0f, center.y+radius.y / 2.0f, 0.0f), color, glm::vec2(0.0f, 1.0f));
 	};
 
-	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xe3, 0xe3, 0xe3, 0xe3));
+	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xff, 0x00, 0x44, 0xff));
 
 	//use alpha blending:
 	// glEnable(GL_BLEND); // This is causing issues. Disabled for the time being

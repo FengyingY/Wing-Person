@@ -13,8 +13,9 @@ struct PlatformTile
 {
 	PlatformTile();
 	PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_);
-	~PlatformTile();
+	virtual ~PlatformTile();
 
+	void parse_tiledata(uint32_t &tile_data);
 	void setup_opengl();
 
 	// world position

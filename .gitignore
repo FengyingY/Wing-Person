@@ -19,3 +19,14 @@ hb_example.cpp
 .clangd/
 .vscode/
 compile_commands.json
+level-data/wingperson.tiled-session
+scenes/pack-text.ilk
+scenes/pack-text.pdb
+scenes/pack-text.ilk
+scenes/pack-text.pdb
+scenes/pack-text.ilk
+scenes/pack-text.pdb
+scenes/pack-text.exe
+level-data/pack-level.pdb
+level-data/pack-level.ilk
+level-data/pack-level.exe

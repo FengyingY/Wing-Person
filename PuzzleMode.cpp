@@ -1,60 +1,47 @@
 #include "PuzzleMode.hpp"
 
 #include "Collisions.hpp"
+#include "PackLevelData.hpp"
+#include "read_write_chunk.hpp"
 
-const float ScreenWidth = 800.0f;
-const float ScreenHeight = 600.0f;
+#include <fstream>
+
+const float ScreenWidth = 1024.0f;
+const float ScreenHeight = 768.0f;
+
+Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uint32_t> * {
+	std::vector<uint32_t> *ret = new std::vector< uint32_t >();
+
+	std::ifstream dat_file(data_path("level-data.dat"), std::ios::binary);
+	read_chunk(dat_file, "lvdt", ret);
+
+	return ret;
+});
 
 PuzzleMode::PuzzleMode() {
-	// TODO : Read level data and create platforms
-
-	// #TEMP : Creating a set of test platforms
-	// Keeping window size as constant 800x600
+	// Read level data and create platforms (For now, just creating the quads)
 	{
-		// Floor
-		PlatformTile *platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 5.0f), glm::vec2(ScreenWidth, 10.0f));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// Left wall
-		platform = new PlatformTile(glm::vec2(5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// Right wall
-		platform = new PlatformTile(glm::vec2(ScreenWidth - 5.0f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// partition
-		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, ScreenHeight * 0.5f), glm::vec2(10.0f, ScreenHeight));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// lower-mid
-		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 125.0f), glm::vec2(100.0f, 10.0f));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// mid-left
-		platform = new PlatformTile(glm::vec2(10.0f + 50.0f, 250.0f), glm::vec2(100.0f, 10.0f));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// mid-right
-		platform = new PlatformTile(glm::vec2(ScreenWidth - 50.0f - 10.0f, 250.0f), glm::vec2(100.0f, 10.0f));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
-
-		// upper-mid
-		platform = new PlatformTile(glm::vec2(ScreenWidth * 0.5f, 375.0f), glm::vec2(100.0f, 10.0f));
-		platforms.emplace_back(platform);
-		platform_collision_shapes.emplace_back(platform->collision_shape);
+		PlatformTile *platform;
+		for (size_t y = 0; y < 30; y++)	// TODO: Read Tile map layer data and set height & width accordingly
+		{
+			for (size_t x = 0; x < 40; x++)
+			{
+				if (level_data->at(y*40 + x) == 0){
+					continue;
+				}
+				
+				platform = new PlatformTile(glm::vec2(x*20.0f, ScreenHeight - y*20.0f), glm::vec2(20.0f, 20.0f));
+				platforms.emplace_back(platform);
+				platform_collision_shapes.emplace_back(platform->collision_shape);
+			}
+		}
+		
+		
 	}
 
-  // #HACK : spawn 2 default players
-  add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w);
-  add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+	// #HACK : spawn 2 default players
+	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w);
+	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -211,6 +198,6 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
     
     player->draw(drawable_size);
   }
-  std::cout << std::endl;
+//   std::cout << std::endl;
 	GL_ERRORS();
 }
