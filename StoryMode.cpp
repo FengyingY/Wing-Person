@@ -57,6 +57,7 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		Story::Dialog dlg;
 		size_t start = d.dialog_start;
 		std::string name = t.substr(start, d.name_length);
+		dlg.dlg_name = name;
 
 		start += d.name_length;
 		std::string text = t.substr(start, d.text_length);
@@ -86,6 +87,12 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		
 		ret->dialog[name] = dlg;
     }
+
+	Story::Dialog disagree_dlg;
+	disagree_dlg.dlg_name = "disagree";
+	disagree_dlg.lines.push_back("Too bad, please discuss and make an agreement.");
+	disagree_dlg.option_lines.push_back("back");
+	ret->dialog["disagree"] = disagree_dlg;
 
 	return ret;
 });
@@ -140,20 +147,39 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 		} else if (keyCode == SDLK_DOWN) {
 			main_dialog->MoveDown();
 			return true;
-		} else if (keyCode == SDLK_RETURN) {
+		} else if (keyCode == SDLK_w) {
+			main_dialog->MoveUp2();
+			return true;
+		} else if (keyCode == SDLK_s) {
+			main_dialog->MoveDown2();
+			return true;
+		}
+		else if (keyCode == SDLK_RETURN) {
 			if (main_dialog->finished()) {
-				std::optional<int> next_branch = main_dialog->Enter();
-				if (next_branch.has_value()) {
-					std::string next_branch_name = current.next_branch_names.at(next_branch.value());
-					if (next_branch_name == "PuzzleMode") {
-						// jump to the puzzle mode
-						// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-						Mode::set_current(std::make_shared<PuzzleMode>());
-					} else {
-						setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
+				if (main_dialog->agree()) {
+					std::optional<int> next_branch = main_dialog->Enter();
+					if (next_branch.has_value()) {
+						std::string next_branch_name = current.next_branch_names.at(next_branch.value());
+						if (next_branch_name == "PuzzleMode") {
+							// jump to the puzzle mode
+							// TODO using the introMode for testing, please change it to PuzzleMode at intergration
+							Mode::set_current(std::make_shared<PuzzleMode>());
+						} else {
+							setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 
-					}				
-					return true;
+						}				
+						return true;
+					}
+				} else {
+					// disagree
+					story.dialog["disagree"].background = current.background;
+					story.dialog["disagree"].character_name = current.character_name;
+					if (story.dialog["disagree"].next_branch_names.empty()) {
+						story.dialog["disagree"].next_branch_names.push_back(current.dlg_name);
+					} else {
+						story.dialog["disagree"].next_branch_names[0] = current.dlg_name;
+					}
+					setCurrentBranch(story.dialog["disagree"]);
 				}
 			}
 			return false;

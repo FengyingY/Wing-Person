@@ -582,7 +582,7 @@ Dialog::Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::ve
 			.set_visibility(false);
 		auto text = std::make_shared<TextLine>();
 		text->set_text(options_.at(i))
-			.set_position(PADDING_LEFT + 32, POS_Y)
+			.set_position(PADDING_LEFT + 64, POS_Y)
 			.set_color(glm::u8vec4(255))
 			.set_font_size(16)
 			.set_font(FontFace::ComputerModernRegular)
@@ -598,7 +598,7 @@ Dialog::Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::ve
 		}
 	}).show();
 	if (!option_lines_.empty()) {
-		option_lines_.at(option_focus_).first->set_text(" > ");
+		option_lines_.at(option_focus_).first->set_text(" >  X ");
 	}
 }
 void Dialog::draw() {
@@ -621,6 +621,16 @@ void Dialog::MoveDown() {
 		SetOptionFocus(std::min<int>(option_focus_ + 1, (int) options_.size() - 1));
 	}
 }
+void Dialog::MoveUp2() {
+	if (options_shown_ && !options_.empty()) {
+		SetOptionFocus2(std::max<int>(option_focus_2_ - 1, 0));
+	}
+}
+void Dialog::MoveDown2() {
+	if (options_shown_ && !options_.empty()) {
+		SetOptionFocus2(std::min<int>(option_focus_2_ + 1, (int) options_.size() - 1));
+	}
+}
 std::optional<int> Dialog::Enter() {
 	if (options_shown_ && !options_.empty()) {
 		return std::make_optional(option_focus_);
@@ -631,11 +641,41 @@ std::optional<int> Dialog::Enter() {
 bool Dialog::finished() const {
 	return options_shown_;
 }
+bool Dialog::agree() const {
+	return option_focus_ == option_focus_2_;
+}
 void Dialog::SetOptionFocus(int new_index) {
 	if (option_focus_ != new_index) {
-		option_lines_.at(option_focus_).first->set_text("    ");
-		option_lines_.at(new_index).first->set_text(" > ");
+		if (option_focus_2_ == option_focus_) {
+			option_lines_.at(option_focus_).first->set_text("    X ");
+		} else {
+			option_lines_.at(option_focus_).first->set_text("        ");
+		}
+		
+		if (option_focus_2_ == new_index) {
+			option_lines_.at(new_index).first->set_text(" >  X  ");
+		} else {
+			option_lines_.at(new_index).first->set_text(" >     ");
+		}
+		
 		option_focus_ = new_index;
+	}
+}
+void Dialog::SetOptionFocus2(int new_index) {
+	if (option_focus_2_ != new_index) {
+		if (option_focus_ == option_focus_2_) {
+			option_lines_.at(option_focus_2_).first->set_text(" >     ");
+		} else {
+			option_lines_.at(option_focus_2_).first->set_text("        ");
+		}
+
+		if (option_focus_ == new_index) {
+			option_lines_.at(new_index).first->set_text(" >  X  ");
+		} else {
+			option_lines_.at(new_index).first->set_text("    X ");
+		}
+		
+		option_focus_2_ = new_index;
 	}
 }
 }
