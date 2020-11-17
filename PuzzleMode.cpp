@@ -213,7 +213,8 @@ void PuzzleMode::update(float elapsed) {
 		{
 			float sqr_dist = pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2);
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					Mode::set_current(std::make_shared<StoryMode>());
+					std::string branch_name = "Story16";
+					Mode::set_current(std::make_shared<StoryMode>(branch_name));
 				}
 		}
 		
