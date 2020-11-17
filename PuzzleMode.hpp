@@ -5,8 +5,6 @@
 #include "Input.hpp"
 #include "Player.hpp"
 #include "PlatformTile.hpp"
-#include "Input.hpp"
-#include "Player.hpp"
 
 #include <vector>
 
