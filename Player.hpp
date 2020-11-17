@@ -31,7 +31,8 @@ struct Player {
 
   static constexpr float movespeed = 80.0f;
   static constexpr float jumpspeed = 120.0f;
-  static constexpr float gravityspeed = 60.0f;
+  static constexpr float min_vertical_speed = -60.0f;
+  static constexpr float fall_acceleration = -20.0f;
 
   static constexpr float min_jump_time = 0.3f;
   static constexpr float max_jump_time = 0.6f;
@@ -42,6 +43,8 @@ struct Player {
   bool jump_input = false;
   bool jump_clear = false;
   bool falling = false;
+
+  float gravityspeed = 60.0f;
 
   //Drawing
 	//Shader program that draws transformed, vertices tinted with vertex colors:
@@ -81,7 +84,6 @@ struct Player {
 
 	//Collisions:
 	Shapes::Rectangle collision_box;
-	bool on_ground;
 
 	//to tell players apart
 	glm::u8vec4 color;

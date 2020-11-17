@@ -101,6 +101,7 @@ void PuzzleMode::update(float elapsed) {
 
 		if (players[i]->jump->just_released()) {
 			players[i]->jump_input = false;
+			players[i]->falling = true;
 			if (players[i]->input_jump_time < Player::min_jump_time) {
 				players[i]->input_jump_time = Player::min_jump_time;
 			}
@@ -119,6 +120,7 @@ void PuzzleMode::update(float elapsed) {
 			players[i]->cur_jump_time = 0.0f;
 			players[i]->input_jump_time = 0.0f;
 			players[i]->jump_clear = false;
+			players[i]->falling = true;
 		}
 
 		//quick fix to deal with collision box center not updating properly; not at all optimized code
@@ -137,74 +139,14 @@ void PuzzleMode::update(float elapsed) {
 		}
 
 		//check for collisions before moving due to gravity:
-		glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
+		glm::vec2 gravity = glm::vec2(0, -players[i]->gravityspeed * elapsed);
 		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes)) {
 			players[i]->position += gravity;
 			players[i]->collision_box.center += gravity;
-			players[i]->on_ground = false;
-		} else players[i]->on_ground = true;
+		} else players[i]->falling = false;
 
 		//remove the other player to the list of things the current player can collide with
 		platform_collision_shapes.pop_back();
-
-		/* Player-player collision
-		for (auto t1 = players.begin(); t1 != players.end(); t1++) {
-		  for (auto t2 = t1 + 1; t2 != players.end(); t2++) {
-		  Shapes::Rectangle rect1 = Shapes::Rectangle((*t1)->position, Player::size.x, Player::size.y, false);
-			Shapes::Rectangle rect2 = Shapes::Rectangle((*t2)->position, Player::size.x, Player::size.y, false);
-			(*t1)->position += Collisions::rectangle_rectangle_collision(rect1, rect2, 2);
-		  }
-		}*/
-
-		/* Player-platform collision
-		for (auto& player : players) {
-		  // Check for collision with platforms
-		  Shapes::Rectangle player_rect = Shapes::Rectangle(player->position,
-			  Player::size.x, Player::size.y, false);
-
-		  for (auto& platform : platforms) {
-			Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
-			  platform->size.x, platform->size.y, true);
-
-			if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
-			  player->position += Collisions::rectangle_rectangle_collision(player_rect,
-				  platform_rect, 2);
-			  break;
-			}
-		  }
-		}*/
-
-		/* Gravity
-		for (auto& player : players) {
-		  glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
-
-		  player->falling = true;
-
-		  // Check for collision with platforms
-		  Shapes::Rectangle player_rect = Shapes::Rectangle(player->position + gravity,
-			  Player::size.x, Player::size.y, false);
-
-		  for (auto& platform : platforms) {
-			Shapes::Rectangle platform_rect = Shapes::Rectangle(platform->position,
-			  platform->size.x, platform->size.y, true);
-
-			if(Collisions::rectangle_rectangle_collision(player_rect, platform_rect)) {
-			  glm::vec2 movement = Collisions::rectangle_rectangle_collision(player_rect,
-				  platform_rect, 1);
-
-			  //FIXME bug in collisions with nonzero x value
-			  movement.x = 0;
-
-			  player->position += gravity + movement;
-			  player->falling = false;
-			  break;
-			}
-		  }
-
-		  if(player->falling) {
-			player->position += gravity;
-		  }
-		}*/
 
 		input_manager.tick();
 	}

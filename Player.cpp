@@ -6,7 +6,6 @@ Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, glm::
 																							  , jump(jump)
 																							  , color(color){
 	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
-	on_ground = true;
 	setup_opengl();
 }
 
