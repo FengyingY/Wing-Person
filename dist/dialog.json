@@ -1,142 +1,142 @@
 {
   "Opening": {
-    "text": [ "Well hello there, stranger!", "Looks like we finally get to meet in person!", "You have no idea how long I've been waiting for this day to come!" ],
-    "choices": [ "What?:Story0", "Who are you?:Story0", "Where am I?:Story0" ],
-    "character": "???",
-    "sprite": [ "Respect" ],
+    "text": [ "Hey! Respect!", "Let's talk before they wake up!" ],
+    "choices": [ "Continue:Story0" ],
+    "character": "Passion",
+    "sprite": [ "Passion" ],
     "background": ""
   },
   "Story0": {
-    "text": [ "Oh, you seem rather confused...", "My name is Respect, and we're inside your head.", "I'm like a guardian angel of sorts." ],
-    "choices": [ "So you look out for me?:Story1", "Does that mean we can go on a bunch of cool angel adventures together?:Story1" ],
+    "text": [ "Ugh.. Passion..", "Can't you let me sleep in just this once!" ],
+    "choices": [ "Continue:Story1" ],
     "character": "Respect",
-    "sprite": [ "Respect" ],
+    "sprite": [ "Passion", "Respect" ],
     "background": ""
   },
   "Story1": {
-    "text": [ "That's right! You and I --", "Oh crap. He's here." ],
-    "choices": [ "Who's here?:Story2" ],
-    "character": "Respect",
-    "sprite": [ "Respect" ],
+    "text": [ "No can do!", "We're guardian dating angels!", "We have to be ready to get this person a date!" ],
+    "choices": [ "Continue:Story2" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
     "background": ""
   },
   "Story2": {
-    "text": [ "What's up, party people?!", "You kids ready for some fun?" ],
-    "choices": [ "Who are you?:Story3a", "What kind of fun?:Story3a", "HELL YEAH, LET'S GOOOOO!!!!:Story3b" ],
-    "character": "???",
-    "sprite": [ "Respect", "Passion" ],
+    "text": [ "C'mon now!", "Show some drive! Get excited!" ],
+    "choices": [ "Continue:Story3" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
     "background": ""
   },
-  "Story3a": {
-    "text": [ "Sheesh kid, haven't you ever heard of fun first, questions later?", "Well whatever. I'm Passion. I'm a guardian angel too!" ],
-    "choices": [ "It was just one question...:Story4", "I know how to have fun!:Story4" ],
-    "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
-  },
-  "Story3b": {
-    "text": [ "Hell yeah kid, I think you and I will get along just fine.", "I'm Passion. I'm a guardian angel too!" ],
-    "choices": [ "I think so too!:Story4", "We'll see. I'm not sure you can keep up with me.:Story4" ],
-    "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
+  "Story3": {
+    "text": [ "Yeah, yeah, yeah...", "Anyway, looks like they're waking up now." ],
+    "choices": [ "Continue:Story4" ],
+    "character": "Respect",
+    "sprite": [ "Passion", "Respect" ],
     "background": ""
   },
   "Story4": {
-    "text": [ "Yes, well now that that's out of the way...", "We're your guardian angels! And we're going to help you get a date!" ],
-    "choices": [ "A date?!?:Story5" ],
-    "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
+    "text": [ "Finally! Time for another beautiful day!" ],
+    "choices": [ "Continue:Story5" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
   },
   "Story5": {
-    "text": [ "That's right, kid! A date!", "To get a date you need passion!", "You need to want the person you're with!", "And you need to show them how excited you are to be with them!" ],
-    "choices": [ "That makes sense.:Story6" ],
-    "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
+    "text": [ "Ugh... I don't know how you're always so energetic in the mornings." ],
+    "choices": [ "Continue:Story6" ],
+    "character": "Respect",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
   },
   "Story6": {
-    "text": [ "But passion alone isn't enough.", "With just passion, it's easy to rush into things without thinking.", "You also need respect." ],
-    "choices": [ "That makes sense too.:Story7", "And what do I need respect for?:Story7" ],
-    "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
+    "text": [ "C'mon now, mornings are great!", "Right?" ],
+    "choices": [ "Continue:Story7" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
   },
   "Story7": {
-    "text": [ "Respect is about respecting yourself and respecting your potential partner.", "Respecting yourself helps you to learn and enforce your own boundaries.", "And respecting your partner makes sure you allow for their boundaries too!", "Respect is necessary for you to trust yourself and for your partner to trust you.", "And trust is key in a relationship!" ],
-    "choices": [ "Wow, respect is really important!:Story8" ],
-    "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
-  },
-  "Story8": {
-    "text": [ "Yeah, respect is definitely important!", "But there are a lot of people I respect that I don't want to date.", "So don't forget about passion, kid!" ],
-    "choices": [ "I won't.:Story9", "Yeah, yeah. Whatever.:Story9" ],
+    "text": [ "And before you disagree with me...", "Remember that we have to discuss all our choices until we agree!", "Such is the way of guardian dating angels!" ],
+    "choices": [ "Mornings are great:Story8a", "Mornings aren't great:Story8b" ],
     "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
+  },
+  "Story8a": {
+    "text": [ "I knew you'd come around!", "Anyway, they're on the move now!", "Get ready to help steer their love life!" ],
+    "choices": [ "Continue:Story9" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
+  },
+  "Story8b": {
+    "text": [ "Wow, you actually admitted I was right for once...", "Anyway, they're finally leaving their room.", "Get ready to get this person a date!" ],
+    "choices": [ "Continue:Story9" ],
+    "character": "Respect",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-Dormroom1"
   },
   "Story9": {
-    "text": [ "Well alright then. Are you ready to get out of your head and look for a date?" ],
-    "choices": [ "Let's do it!:Story10" ],
-    "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
-    "background": ""
+    "text": [ "Oh man, I'm so excited!", "I always get so passionate about dating!" ],
+    "choices": [ "Continue:Story10" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
+    "background": "Modern-School1"
   },
   "Story10": {
-    "text": [ "Hmm... Who to date, who to date?", "Look over there! She looks cute!" ],
-    "choices": [ "Eh, not really my type.:Story11", "Yeah, she is!:Story11" ],
+    "text": [ "I know you do.", "But try to respect people's personal space, okay?", "Boundaries are important." ],
+    "choices": [ "Continue:Story11" ],
     "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
+    "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"
   },
   "Story11": {
-    "text": [ "Respect is right, she is cute.", "But that guy over there is a whole hunk of man.", "Sign me up, kid!" ],
-    "choices": [ "I'm not really feeling him.:Story12", "Oh boy, sign me up too!:Story12" ],
+    "text": [ "Yeah, I know!", "We have to work together to get this person a date.", "I won't forget about your role in this Respect!" ],
+    "choices": [ "Continue:Story12" ],
     "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
+    "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"
   },
   "Story12": {
-    "text": [ "GOOD LORD, THEY'RE HOT TOO!!!" ],
-    "choices": [ "Yeah, I guess so...:Story13", "GOOD LORD, YOU'RE BOTH RIGHT!!!:Story13" ],
-    "character": "Respect & Passion",
-    "sprite": [ "Respect", "Passion" ],
+    "text": [ "Anyway, I see some good candidate for dating walking near here!" ],
+    "choices": [ "Continue:Story13" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"
   },
   "Story13": {
-    "text": [ "So who's it gonna be, kid?", "Who do you wan us to help you get a date with?" ],
-    "choices": [ "The cute woman.:Story14", "The hunk of man.:Story14", "The hot person.:Story14" ],
-    "character": "Passion",
-    "sprite": [ "Respect", "Passion" ],
+    "text": [ "Yeah, there's that cute guy there..." ],
+    "choices": [ "Continue:Story14" ],
+    "character": "Respect",
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Story14": {
-    "text": [ "Good choice! I think you'll be very happy with that one!", "Now then. How do you want to approach them?" ],
-    "choices": [ "Respectfully.:Story15a", "Passionately.:Story15b", "With a mix of respect and passion.:Story15c" ],
-    "character": "Respect",
-    "sprite": [ "Respect", "Passion" ],
+    "text": [ "And that cute girl too.", "Who should we convince them to talk to?" ],
+    "choices": [ "The cute guy:Story15a", "The cute girl:Story15b" ],
+    "character": "Passion",
+    "sprite": [ "Passion", "FemaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Story15a": {
-    "text": [ "Great idea! Let's go respectfully get you a date! [Start Puzzle]" ],
-    "choices": [ ":PuzzleMode" ],
+    "text": [ "Alright, the cute guy it is!", "Let's get this flirting on the way right! [Start Puzzle]" ],
+    "choices": [ "Continue:PuzzleMode" ],
     "character": "Respect",
-    "sprite": [ "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Story15b": {
-    "text": [ "Hell yeah, kid! I knew you'd make the right choice!", "Now let's go passionately get you a date! [Start Puzzle]" ],
-    "choices": [ ":PuzzleMode" ],
+    "text": [ "Ooh, that's who I was hoping we'd agree on!", "I'm so excited! But let's be smooth while we flirt... [Start Puzzle]" ],
+    "choices": [ "Continue:PuzzleMode" ],
     "character": "Passion",
-    "sprite": [ "Passion" ],
+    "sprite": [ "Passion", "FemaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
-  "Story15c": {
-    "text": [ "How very middle of the road of you...", "Let's go get you a date. [Start Puzzle]" ],
-    "choices": [ ":PuzzleMode" ],
-    "character": "Respect & Passion",
-    "sprite": [ "Respect", "Passion" ],
+  "Story16": {
+    "text": [ "That went great! [End of Vertical Slice]" ],
+    "choices": [ "" ],
+    "character": "Passion & Respect",
+    "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"
   }
 }
