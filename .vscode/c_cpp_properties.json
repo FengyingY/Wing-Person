@@ -6,7 +6,11 @@
                 "${default}",
                 "${workspaceFolder}/**",
                 "C:/Projects/15666/nest-libs/windows/SDL2/include",
-                "C:/Projects/15666/nest-libs/windows/glm/include"
+                "C:/Projects/15666/nest-libs/windows/glm/include",
+                "C:/Projects/15666/nest-libs/windows/harfbuzz/include",
+                "C:/Projects/15666/nest-libs/windows/freetype/include",
+                "${workspaceFolder}/level-data",
+                "C:/Projects/15666/nest-libs/windows/libpng/include"
             ],
             "defines": [
                 "_DEBUG",

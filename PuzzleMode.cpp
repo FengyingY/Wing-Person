@@ -5,6 +5,7 @@
 #include "read_write_chunk.hpp"
 
 #include <fstream>
+#include <map>
 
 const float ScreenWidth = 800.0f;
 const float ScreenHeight = 600.0f;
@@ -18,7 +19,33 @@ Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uin
 	return ret;
 });
 
-Load <PlatformTile::Texture> tile_set(LoadTagEarly, []() -> PlatformTile::Texture * {
+Load < std::map<std::string, PlatformTile::Texture*> > sprites(LoadTagEarly, []() -> std::map<std::string, PlatformTile::Texture *> * {
+	std::map<std::string, PlatformTile::Texture*> *ret = new std::map<std::string, PlatformTile::Texture *>();
+
+	std::vector< std::string > images;
+	images.emplace_back("puzzle_sprites/platform.png");
+	images.emplace_back("puzzle_sprites/collectible.png");
+
+	try
+	{
+		PlatformTile::Texture *newTex = nullptr;
+		for (auto &&img : images)
+		{
+			newTex = new PlatformTile::Texture();
+			load_png(data_path(img), &newTex->size, &newTex->data, LowerLeftOrigin);
+			ret->emplace(img, newTex);
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "PuzzleMode::Sprites load failed. " << e.what() << '\n';
+	}
+	
+	
+	return ret;
+});
+
+/*Load <PlatformTile::Texture> tile_set(LoadTagEarly, []() -> PlatformTile::Texture * {
 	PlatformTile::Texture *ret = new PlatformTile::Texture();
 
 	try
@@ -33,6 +60,22 @@ Load <PlatformTile::Texture> tile_set(LoadTagEarly, []() -> PlatformTile::Textur
 	return ret;
 });
 
+// TODO: Refactor this. SO redundant
+Load <PlatformTile::Texture> collectible_tex(LoadTagEarly, []() -> PlatformTile::Texture * {
+	PlatformTile::Texture *ret = new PlatformTile::Texture();
+
+	try
+	{
+		load_png(data_path("puzzle_sprites/collectible.png"), &ret->size, &ret->data, LowerLeftOrigin);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Load png of platform failed. " << e.what() << '\n';
+	}
+
+	return ret;
+});*/
+
 PuzzleMode::PuzzleMode() {
 	// Read level data and create platforms
 	{
@@ -45,10 +88,27 @@ PuzzleMode::PuzzleMode() {
 				if (level_data->at(y*25 + x) == 0){
 					continue;
 				}
-				// TODO : Assign texture to selected tile
-				platform = new PlatformTile(glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)), glm::vec2(tile_size, tile_size), PlatformTile::Texture(tile_set->size, tile_set->data));
-				platforms.emplace_back(platform);
-				platform_collision_shapes.emplace_back(platform->collision_shape);
+
+				if (level_data->at(y*25 + x) == 36){	// HACK: collectible
+					platform = new PlatformTile(
+						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(sprites->at("puzzle_sprites/collectible.png")->size, sprites->at("puzzle_sprites/collectible.png")->data)
+					);
+					collectibles.emplace_back(platform);
+					collectible_colliders.emplace_back(platform->collision_shape);
+				}
+				else
+				{
+					// TODO : Assign proper texture to tile based on tilemap data
+					platform = new PlatformTile(
+						glm::vec2((x * tile_size) + (tile_size * 0.5f),	ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(sprites->at("puzzle_sprites/platform.png")->size, sprites->at("puzzle_sprites/platform.png")->data)
+					);
+					platforms.emplace_back(platform);
+					platform_collision_shapes.emplace_back(platform->collision_shape);
+				}
 			}
 		}
 	}
@@ -161,6 +221,12 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		platform->draw(drawable_size);
 	}
+
+	for (auto &&collectible : collectibles)
+	{
+		collectible->draw(drawable_size);
+	}
+	
 
   for (auto&& player : players) {
     

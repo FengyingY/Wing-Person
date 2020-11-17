@@ -5,6 +5,8 @@
 #include "Input.hpp"
 #include "Player.hpp"
 #include "PlatformTile.hpp"
+#include "Input.hpp"
+#include "Player.hpp"
 
 #include <vector>
 
@@ -23,9 +25,12 @@ struct PuzzleMode : Mode
 	InputManager input_manager;
 
 	//----- game state ------
-	std::vector <Player *> players;
+	std::vector < Player *> players;
 	std::vector < PlatformTile *> platforms;
 	std::vector < Shapes::Rectangle > platform_collision_shapes;
+	
+	std::vector < PlatformTile *> collectibles;
+	std::vector < Shapes::Rectangle > collectible_colliders;
 
 	struct LevelData
 	{
