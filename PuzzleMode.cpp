@@ -2,6 +2,7 @@
 
 #include "Collisions.hpp"
 #include "PackLevelData.hpp"
+#include "data_path.hpp"
 #include "read_write_chunk.hpp"
 
 #include <fstream>
@@ -33,6 +34,13 @@ Load <PlatformTile::Texture> tile_set(LoadTagEarly, []() -> PlatformTile::Textur
 	return ret;
 });
 
+Sprite *pink, *blue;
+Load< void > load_sprites(LoadTagEarly, []() -> void {
+	pink = new Sprite(data_path("puzzle_sprites/pinkman.png"), "pink_man");
+	blue = new Sprite(data_path("puzzle_sprites/virtualguy.png"), "virtual_guy");
+});
+
+
 PuzzleMode::PuzzleMode() {
 	// Read level data and create platforms
 	{
@@ -54,18 +62,18 @@ PuzzleMode::PuzzleMode() {
 	}
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w, glm::u8vec4(0x65, 0xc9, 0xee, 0xff));
-	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, glm::u8vec4(0xf3, 0x0c, 0x23, 0xff));
+	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w, pink);
+	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue);
 }
 
 PuzzleMode::~PuzzleMode() {}
 
-void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, glm::u8vec4 color) {
+void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, Sprite* sprite) {
 	Input* left = input_manager.register_key(leftkey);
 	Input* right = input_manager.register_key(rightkey);
 	Input* jump = input_manager.register_key(jumpkey);
 
-	Player *player = new Player(position, left, right, jump, color);
+	Player *player = new Player(position, left, right, jump, sprite);
 	players.emplace_back(player);
 }
 
@@ -128,7 +136,7 @@ void PuzzleMode::update(float elapsed) {
 		float height = players[other_player_index]->collision_box.height;
 
 		//add the other player to the list of things the current player can collide with
-		platform_collision_shapes.emplace_back(Shapes::Rectangle::Rectangle(center, width, height, false));
+		platform_collision_shapes.emplace_back(Shapes::Rectangle(center, width, height, false));
 
 		//check for collisions before moving due to input:
 		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity, platform_collision_shapes)) {
