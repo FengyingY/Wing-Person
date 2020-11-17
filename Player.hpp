@@ -3,6 +3,7 @@
 #include "Input.hpp"
 #include "ColorTextureProgram.hpp"
 #include "Shapes.hpp"
+#include "Sprite.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,7 +11,7 @@
 #include "gl_errors.hpp"
 
 struct Player {
-  Player(glm::vec2 position, Input* left, Input* right, Input* jump, glm::u8vec4 color);
+  Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite);
   ~Player();
 
 	void setup_opengl();
@@ -27,7 +28,7 @@ struct Player {
   Input* jump;
 
   // Constants
-  static constexpr glm::vec2 size = glm::vec2(15.0f, 24.0f);
+  static constexpr glm::vec2 size = glm::vec2(32.0f, 32.0f);
 
   static constexpr float movespeed = 80.0f;
   static constexpr float jumpspeed = 120.0f;
@@ -86,5 +87,6 @@ struct Player {
 	Shapes::Rectangle collision_box;
 
 	//to tell players apart
-	glm::u8vec4 color;
+	// glm::u8vec4 color;
+	Sprite *sprite;
 };

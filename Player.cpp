@@ -1,10 +1,10 @@
 #include "Player.hpp"
 
-Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, glm::u8vec4 color) : position(position)
+Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite) : position(position)
 																							  , left(left)
 																							  , right(right)
 																							  , jump(jump)
-																							  , color(color){
+																							  , sprite(sprite){
 	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
 	setup_opengl();
 }
@@ -21,6 +21,7 @@ Player::~Player() {
 }
 
 void Player::setup_opengl() {
+	/*
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
 		glGenBuffers(1, &vertex_buffer);
@@ -107,10 +108,11 @@ void Player::setup_opengl() {
 
 		GL_ERRORS(); //PARANOIA: print out any OpenGL errors that may have happened
 	}
+	*/
 }
 
 void Player::draw(glm::uvec2 const &drawable_size) {
-	
+	/*
 	//---- compute vertices to draw ----
 	
 	//vertices will be accumulated into this list and then uploaded+drawn at the end of this function:
@@ -160,4 +162,6 @@ void Player::draw(glm::uvec2 const &drawable_size) {
 	glBindVertexArray(0);
 	glUseProgram(0);
 	GL_ERRORS();
+	*/
+	sprite->draw(position, drawable_size, .5f);
 }
