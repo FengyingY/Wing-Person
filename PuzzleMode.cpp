@@ -5,6 +5,9 @@
 #include "data_path.hpp"
 #include "read_write_chunk.hpp"
 
+#include "StoryMode.hpp"
+// #include "View.hpp"
+
 #include <fstream>
 #include <map>
 
@@ -26,6 +29,7 @@ Load < std::map<std::string, PlatformTile::Texture*> > sprites(LoadTagEarly, [](
 	std::vector< std::string > images;
 	images.emplace_back("puzzle_sprites/platform.png");
 	images.emplace_back("puzzle_sprites/collectible.png");
+	images.emplace_back("puzzle_sprites/End.png");
 
 	try
 	{
@@ -73,7 +77,13 @@ PuzzleMode::PuzzleMode() {
 						PlatformTile::Texture(sprites->at("puzzle_sprites/collectible.png")->size, sprites->at("puzzle_sprites/collectible.png")->data)
 					);
 					collectibles.emplace_back(platform);
-					collectible_colliders.emplace_back(platform->collision_shape);
+				}
+				else if(level_data->at(y*25 + x) == 76){
+					end = new PlatformTile(
+						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(sprites->at("puzzle_sprites/End.png")->size, sprites->at("puzzle_sprites/End.png")->data)
+					);
 				}
 				else
 				{
@@ -91,8 +101,8 @@ PuzzleMode::PuzzleMode() {
 	}
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w, pink);
-	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue);
+	add_player(glm::vec2(200, 85), SDLK_a, SDLK_d, SDLK_w, pink);
+	add_player(glm::vec2(600, 85), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue);
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -185,6 +195,29 @@ void PuzzleMode::update(float elapsed) {
 		//remove the other player to the list of things the current player can collide with
 		platform_collision_shapes.pop_back();
 
+		// collectibles collection check | Not using collision. Just checking for distance
+		if (collectibles.size() > 0)
+		{
+			for (auto &&collectible : collectibles)
+			{
+				float sqr_dist = pow(collectible->position.x - players[i]->position.x, 2) + pow(collectible->position.y - players[i]->position.y, 2);
+				if(sqr_dist < pow(collectible->size.x * 0.5f, 2)){
+					// removing an element from a vector - https://stackoverflow.com/a/3385251
+					collectibles.erase(std::remove(collectibles.begin(), collectibles.end(), collectible));
+					break;
+				}
+			}
+		}
+		
+		if (end != nullptr)
+		{
+			float sqr_dist = pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2);
+				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
+					Mode::set_current(std::make_shared<StoryMode>());
+				}
+		}
+		
+
 		input_manager.tick();
 	}
 }
@@ -203,6 +236,8 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		collectible->draw(drawable_size);
 	}
+
+	end->draw(drawable_size);
 	
 
   for (auto&& player : players) {

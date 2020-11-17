@@ -163,5 +163,5 @@ void Player::draw(glm::uvec2 const &drawable_size) {
 	glUseProgram(0);
 	GL_ERRORS();
 	*/
-	sprite->draw(position, drawable_size, .5f);
+	sprite->draw(position, drawable_size, .6f);
 }

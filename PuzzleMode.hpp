@@ -30,7 +30,8 @@ struct PuzzleMode : Mode
 	std::vector < Shapes::Rectangle > platform_collision_shapes;
 	
 	std::vector < PlatformTile *> collectibles;
-	std::vector < Shapes::Rectangle > collectible_colliders;
+
+	PlatformTile *end;
 
 	struct LevelData
 	{
