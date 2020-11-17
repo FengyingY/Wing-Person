@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 
 	// Done parsing JSON. Now start reading the data
 	LevelData level_data;
+	(void) level_data;
 
 	// Read width (in num of tiles), height (in num of tiles), tile width and tile height (in px)
 	level_data.map_width = jsonData["width"];

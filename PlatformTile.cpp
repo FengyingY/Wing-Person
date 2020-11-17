@@ -37,6 +37,9 @@ void PlatformTile::parse_tiledata(uint32_t &tile_data) {
 	bool flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
 	bool flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
 	bool flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
+	(void) flipped_vertically;
+	(void) flipped_horizontally;
+	(void) flipped_diagonally;
 
 	// rest of it is the GID
 

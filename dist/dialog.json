@@ -115,7 +115,7 @@
     "text": [ "And that cute girl too.", "Who should we convince them to talk to?" ],
     "choices": [ "The cute guy:Story15a", "The cute girl:Story15b" ],
     "character": "Passion",
-    "sprite": [ "Passion", "FemaleSpriteBySutemo", "Respect" ],
+    "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Story15a": {
@@ -129,12 +129,12 @@
     "text": [ "Ooh, that's who I was hoping we'd agree on!", "I'm so excited! But let's be smooth while we flirt... [Start Puzzle]" ],
     "choices": [ "Continue:PuzzleMode" ],
     "character": "Passion",
-    "sprite": [ "Passion", "FemaleSpriteBySutemo", "Respect" ],
+    "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Story16": {
     "text": [ "That went great! [End of Vertical Slice]" ],
-    "choices": [ "" ],
+    "choices": [ "Continue:Story16" ],
     "character": "Passion & Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"

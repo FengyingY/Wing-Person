@@ -204,6 +204,7 @@ glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes
 
 			//I was asked to return how much the first object would have to move to be out of the second object, but I could just return desired_center
 			glm::vec2 desired_center = r2.center + vector_from_r2;
+			(void) desired_center;
   
 		}
 	}
