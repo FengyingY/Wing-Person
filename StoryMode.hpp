@@ -16,6 +16,7 @@
 struct Story {
 
 	struct Dialog {
+		std::string dlg_name;
 		std::vector<std::string> lines;
 
 		// options, ending will have zero length options

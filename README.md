@@ -14,6 +14,10 @@ How To Play:
 
 (TODO: describe the controls and (if needed) goals/strategy.)
 
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Sources: 
+
+- Virtual novel characters: http://www.jewel-s.jp/download/
+- Virtual novel background: https://konett.itch.io/modern-visual-novel-backgrounds
+- Platformer: https://pixelfrog-store.itch.io/pixel-adventure-1, https://pixelfrog-store.itch.io/pixel-adventure-2
 
 This game was built with [NEST](NEST.md).

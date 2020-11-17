@@ -216,17 +216,23 @@ public:
 	void MoveUp();
 	void MoveDown();
 
+	void MoveUp2();
+	void MoveDown2();
+
 	std::optional<int> Enter();
 
 	bool finished() const;
 
+	bool agree() const;
 
 private:
 	void SetOptionFocus(int new_index);
+	void SetOptionFocus2(int new_index);
 
 	std::vector<std::pair<glm::u8vec4, std::string>> prompt_;
 	std::vector<std::string> options_;
 	int option_focus_ = 0;
+	int option_focus_2_ = 0;
 
 	bool options_shown_ = false;
 
