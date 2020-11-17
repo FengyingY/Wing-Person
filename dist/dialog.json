@@ -88,55 +88,55 @@
     "choices": [ "Eh, not really my type.:Story11", "Yeah, she is!:Story11" ],
     "character": "Respect",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story11": {
     "text": [ "Respect is right, she is cute.", "But that guy over there is a whole hunk of man.", "Sign me up, kid!" ],
     "choices": [ "I'm not really feeling him.:Story12", "Oh boy, sign me up too!:Story12" ],
     "character": "Passion",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story12": {
     "text": [ "GOOD LORD, THEY'RE HOT TOO!!!" ],
     "choices": [ "Yeah, I guess so...:Story13", "GOOD LORD, YOU'RE BOTH RIGHT!!!:Story13" ],
     "character": "Respect & Passion",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story13": {
     "text": [ "So who's it gonna be, kid?", "Who do you wan us to help you get a date with?" ],
     "choices": [ "The cute woman.:Story14", "The hunk of man.:Story14", "The hot person.:Story14" ],
     "character": "Passion",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story14": {
     "text": [ "Good choice! I think you'll be very happy with that one!", "Now then. How do you want to approach them?" ],
     "choices": [ "Respectfully.:Story15a", "Passionately.:Story15b", "With a mix of respect and passion.:Story15c" ],
     "character": "Respect",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story15a": {
     "text": [ "Great idea! Let's go respectfully get you a date! [Start Puzzle]" ],
     "choices": [ ":PuzzleMode" ],
     "character": "Respect",
     "sprite": [ "Respect" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story15b": {
     "text": [ "Hell yeah, kid! I knew you'd make the right choice!", "Now let's go passionately get you a date! [Start Puzzle]" ],
     "choices": [ ":PuzzleMode" ],
     "character": "Passion",
     "sprite": [ "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   },
   "Story15c": {
     "text": [ "How very middle of the road of you...", "Let's go get you a date. [Start Puzzle]" ],
     "choices": [ ":PuzzleMode" ],
     "character": "Respect & Passion",
     "sprite": [ "Respect", "Passion" ],
-    "background": "Forest"
+    "background": "Modern-School1"
   }
 }
