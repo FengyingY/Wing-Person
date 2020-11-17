@@ -7,6 +7,7 @@
 //The 'PlayMode' mode plays the game:
 #include "StoryMode.hpp"
 #include "IntroMode.hpp"
+#include "PuzzleMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
@@ -59,7 +60,7 @@ int main(int argc, char **argv) {
 	SDL_Window *window = SDL_CreateWindow(
 		"Wing-person", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		1024, 768, // window size. Keeping this in 4:3 for now
+		800, 600, // window size. Keeping this in 4:3 for now
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_ALLOW_HIGHDPI //uncomment for full resolution on high-DPI screens
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
 	on_resize();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< IntroMode >());
+	Mode::set_current(std::make_shared< PuzzleMode >());
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {

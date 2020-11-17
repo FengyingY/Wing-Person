@@ -6,8 +6,8 @@
 
 #include <fstream>
 
-const float ScreenWidth = 1024.0f;
-const float ScreenHeight = 768.0f;
+const float ScreenWidth = 800.0f;
+const float ScreenHeight = 600.0f;
 
 Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uint32_t> * {
 	std::vector<uint32_t> *ret = new std::vector< uint32_t >();
@@ -18,25 +18,39 @@ Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uin
 	return ret;
 });
 
-PuzzleMode::PuzzleMode() {
-	// Read level data and create platforms (For now, just creating the quads)
+Load <PlatformTile::Texture> tile_set(LoadTagEarly, []() -> PlatformTile::Texture * {
+	PlatformTile::Texture *ret = new PlatformTile::Texture();
+
+	try
 	{
+		load_png(data_path("puzzle_sprites/platform.png"), &ret->size, &ret->data, LowerLeftOrigin);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Load png of platform failed. " << e.what() << '\n';
+	}
+
+	return ret;
+});
+
+PuzzleMode::PuzzleMode() {
+	// Read level data and create platforms
+	{
+		float tile_size = 32.0f;
 		PlatformTile *platform;
-		for (size_t y = 0; y < 30; y++)	// TODO: Read Tile map layer data and set height & width accordingly
+		for (size_t y = 0; y < 18; y++)	// TODO: Read Tile map layer data and set height & width accordingly
 		{
-			for (size_t x = 0; x < 40; x++)
+			for (size_t x = 0; x < 25; x++)
 			{
-				if (level_data->at(y*40 + x) == 0){
+				if (level_data->at(y*25 + x) == 0){
 					continue;
 				}
-				
-				platform = new PlatformTile(glm::vec2(x*20.0f, ScreenHeight - y*20.0f), glm::vec2(20.0f, 20.0f));
+				// TODO : Assign texture to selected tile
+				platform = new PlatformTile(glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)), glm::vec2(tile_size, tile_size), PlatformTile::Texture(tile_set->size, tile_set->data));
 				platforms.emplace_back(platform);
 				platform_collision_shapes.emplace_back(platform->collision_shape);
 			}
 		}
-		
-		
 	}
 
 	// #HACK : spawn 2 default players

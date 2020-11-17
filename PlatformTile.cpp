@@ -3,13 +3,13 @@
 PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(glm::vec2(10.0f, 10.0f)) {
 	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	// parse the tile data
-	setup_opengl();
+	setup_opengl(texture);	// will be null. careful
 }
 
-PlatformTile::PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_) : position(pos_), size(size_) {
+PlatformTile::PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_, Texture const &texture_) : position(pos_), size(size_), texture(texture_) {
 	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	// parse the tile data
-	setup_opengl();
+	setup_opengl(texture);
 }
 
 PlatformTile::~PlatformTile() {
@@ -48,7 +48,7 @@ void PlatformTile::parse_tiledata(uint32_t &tile_data) {
 	// TODO: resolve the tileset for the gid : tileset->first_gid - global_tile_id
 }
 
-void PlatformTile::setup_opengl() {
+void PlatformTile::setup_opengl(Texture &texture) {
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
 		glGenBuffers(1, &vertex_buffer);
@@ -116,9 +116,9 @@ void PlatformTile::setup_opengl() {
 		glBindTexture(GL_TEXTURE_2D, png_tex);
 
 		//upload a 1x1 image of solid white to the texture:
-		glm::uvec2 size = glm::uvec2(1,1);
-		std::vector< glm::u8vec4 > data(size.x*size.y, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
+		// glm::uvec2 size = glm::uvec2(48,48);
+		// std::vector< glm::u8vec4 > data(size.x*size.y, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.size.x, texture.size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data.data());
 
 		//set filtering and wrapping parameters:
 		//(it's a bit silly to mipmap a 1x1 texture, but I'm doing it because you may want to use this code to load different sizes of texture)
@@ -156,11 +156,8 @@ void PlatformTile::draw(glm::uvec2 const &drawable_size) {
 		vertices.emplace_back(glm::vec3(center.x-radius.x / 2.0f, center.y+radius.y / 2.0f, 0.0f), color, glm::vec2(0.0f, 1.0f));
 	};
 
-	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xff, 0x00, 0x44, 0xff));
+	draw_rectangle(glm::vec2(position.x, position.y), size, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
 
-	//use alpha blending:
-	// glEnable(GL_BLEND); // This is causing issues. Disabled for the time being
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//don't use the depth test:
 	glDisable(GL_DEPTH_TEST);
 	GL_ERRORS();

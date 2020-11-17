@@ -1,4 +1,4 @@
-# (TODO: your game's title)
+# Wingperson
 
 Author: (TODO: your name)
 
@@ -14,6 +14,8 @@ How To Play:
 
 (TODO: describe the controls and (if needed) goals/strategy.)
 
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Sources:
+Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
+Platform tiles : https://pixelfrog-store.itch.io/pixel-adventure-1
 
 This game was built with [NEST](NEST.md).
