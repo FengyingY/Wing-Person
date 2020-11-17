@@ -134,7 +134,7 @@
   },
   "Story16": {
     "text": [ "That went great! [End of Vertical Slice]" ],
-    "choices": [ "Continue:Story16" ],
+    "choices": [ "continue:Story16" ],
     "character": "Passion & Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-School1"
