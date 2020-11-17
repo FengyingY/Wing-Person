@@ -10,7 +10,7 @@
 #include "gl_errors.hpp"
 
 struct Player {
-  Player(glm::vec2 position, Input* left, Input* right, Input* jump);
+  Player(glm::vec2 position, Input* left, Input* right, Input* jump, glm::u8vec4 color);
   ~Player();
 
 	void setup_opengl();
@@ -81,4 +81,8 @@ struct Player {
 
 	//Collisions:
 	Shapes::Rectangle collision_box;
+	bool on_ground;
+
+	//to tell players apart
+	glm::u8vec4 color;
 };

@@ -15,7 +15,7 @@ struct PuzzleMode : Mode
 	PuzzleMode();
 	virtual ~PuzzleMode();
 
-	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey);
+	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, glm::u8vec4 color);
 
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;

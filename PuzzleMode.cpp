@@ -54,20 +54,19 @@ PuzzleMode::PuzzleMode() {
 	}
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w);
-	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP);
+	add_player(glm::vec2(200, 75), SDLK_a, SDLK_d, SDLK_w, glm::u8vec4(0x65, 0xc9, 0xee, 0xff));
+	add_player(glm::vec2(600, 75), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, glm::u8vec4(0xf3, 0x0c, 0x23, 0xff));
 }
 
 PuzzleMode::~PuzzleMode() {}
 
-void PuzzleMode::add_player(glm::vec2 position,
-    SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey) {
-  Input* left = input_manager.register_key(leftkey);
-  Input* right = input_manager.register_key(rightkey);
-  Input* jump = input_manager.register_key(jumpkey);
+void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, glm::u8vec4 color) {
+	Input* left = input_manager.register_key(leftkey);
+	Input* right = input_manager.register_key(rightkey);
+	Input* jump = input_manager.register_key(jumpkey);
 
-  Player *player = new Player(position, left, right, jump);
-  players.emplace_back(player);
+	Player *player = new Player(position, left, right, jump, color);
+	players.emplace_back(player);
 }
 
 bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
@@ -75,65 +74,78 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
-	for (auto&& player : players) {
+	for (int i = 0; i < players.size(); i++) {
 
 		// Calculate inputs and movement for each player
-		player->velocity.x = 0;
-		player->velocity.y = 0;
+		players[i]->velocity.x = 0;
+		players[i]->velocity.y = 0;
 
-		if (player->left->held()) {
-			player->velocity.x -= Player::movespeed * elapsed;
+		if (players[i]->left->held()) {
+			players[i]->velocity.x -= Player::movespeed * elapsed;
 		}
 
-		if (player->right->held()) {
-			player->velocity.x += Player::movespeed * elapsed;
+		if (players[i]->right->held()) {
+			players[i]->velocity.x += Player::movespeed * elapsed;
 		}
 
 		// Process jumping
-		if (player->jump->held() && !player->falling) {
-			player->jump_input = true;
-			if (player->input_jump_time < Player::max_jump_time) {
-				player->input_jump_time += elapsed;
-				if (player->input_jump_time >= Player::max_jump_time) {
-					player->input_jump_time = Player::max_jump_time;
+		if (players[i]->jump->held() && !players[i]->falling) {
+			players[i]->jump_input = true;
+			if (players[i]->input_jump_time < Player::max_jump_time) {
+				players[i]->input_jump_time += elapsed;
+				if (players[i]->input_jump_time >= Player::max_jump_time) {
+					players[i]->input_jump_time = Player::max_jump_time;
 				}
 			}
 		}
 
-		if (player->jump->just_released()) {
-			player->jump_input = false;
-			if (player->input_jump_time < Player::min_jump_time) {
-				player->input_jump_time = Player::min_jump_time;
+		if (players[i]->jump->just_released()) {
+			players[i]->jump_input = false;
+			if (players[i]->input_jump_time < Player::min_jump_time) {
+				players[i]->input_jump_time = Player::min_jump_time;
 			}
 		}
 
-		if (player->cur_jump_time < player->input_jump_time) {
-			player->cur_jump_time += elapsed;
-			player->velocity.y += Player::jumpspeed * elapsed;
+		if (players[i]->cur_jump_time < players[i]->input_jump_time) {
+			players[i]->cur_jump_time += elapsed;
+			players[i]->velocity.y += Player::jumpspeed * elapsed;
 
-			if (player->cur_jump_time >= player->input_jump_time) {
-				player->jump_clear = true;
+			if (players[i]->cur_jump_time >= players[i]->input_jump_time) {
+				players[i]->jump_clear = true;
 			}
 		}
 
-		if (!player->jump->held() && player->jump_clear) {
-			player->cur_jump_time = 0.0f;
-			player->input_jump_time = 0.0f;
-			player->jump_clear = false;
+		if (!players[i]->jump->held() && players[i]->jump_clear) {
+			players[i]->cur_jump_time = 0.0f;
+			players[i]->input_jump_time = 0.0f;
+			players[i]->jump_clear = false;
 		}
+
+		//quick fix to deal with collision box center not updating properly; not at all optimized code
+		int other_player_index = (i + 1) % players.size();
+		glm::vec2 center = players[other_player_index]->collision_box.center;
+		float width = players[other_player_index]->collision_box.width;
+		float height = players[other_player_index]->collision_box.height;
+
+		//add the other player to the list of things the current player can collide with
+		platform_collision_shapes.emplace_back(Shapes::Rectangle::Rectangle(center, width, height, false));
 
 		//check for collisions before moving due to input:
-		if (!Collisions::player_rectangles_collision(player->collision_box, player->position + player->velocity, platform_collision_shapes)) {
-			player->position += player->velocity;
-			player->collision_box.center += player->velocity;
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity, platform_collision_shapes)) {
+			players[i]->position += players[i]->velocity;
+			players[i]->collision_box.center += players[i]->velocity;
 		}
 
 		//check for collisions before moving due to gravity:
 		glm::vec2 gravity = glm::vec2(0, -Player::gravityspeed * elapsed);
-		if (!Collisions::player_rectangles_collision(player->collision_box, player->position + gravity, platform_collision_shapes)) {
-			player->position += gravity;
-			player->collision_box.center += gravity;
-		}
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes)) {
+			players[i]->position += gravity;
+			players[i]->collision_box.center += gravity;
+			players[i]->on_ground = false;
+		} else players[i]->on_ground = true;
+
+		//remove the other player to the list of things the current player can collide with
+		platform_collision_shapes.pop_back();
 
 		/* Player-player collision
 		for (auto t1 = players.begin(); t1 != players.end(); t1++) {

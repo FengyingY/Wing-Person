@@ -1,12 +1,13 @@
 #include "Player.hpp"
 
-Player::Player(glm::vec2 position,
-    Input* left, Input* right, Input* jump) : position(position)
-                                            , left(left)
-                                            , right(right)
-                                            , jump(jump) {
+Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, glm::u8vec4 color) : position(position)
+																							  , left(left)
+																							  , right(right)
+																							  , jump(jump)
+																							  , color(color){
 	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
-  setup_opengl();
+	on_ground = true;
+	setup_opengl();
 }
 
 Player::~Player() {
@@ -89,7 +90,7 @@ void Player::setup_opengl() {
 
 		//upload a 1x1 image of solid white to the texture:
 		glm::uvec2 size = glm::uvec2(1,1);
-		std::vector< glm::u8vec4 > data(size.x*size.y, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+		std::vector< glm::u8vec4 > data(size.x*size.y, color);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 
 		//set filtering and wrapping parameters:
