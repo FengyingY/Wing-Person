@@ -11,17 +11,29 @@
 
 struct PlatformTile
 {
-	PlatformTile();
-	PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_);
-	~PlatformTile();
+	// loaded texture references
+	struct Texture {
+		Texture(){};
+		Texture(glm::uvec2 const &size_, std::vector< glm::u8vec4 > const &data_) :
+			size(size_), data(data_) {}
+		glm::uvec2 size;
+		std::vector< glm::u8vec4 > data;
+	};
 
-	void setup_opengl();
+	PlatformTile();
+	PlatformTile(glm::vec2 const &pos_, glm::vec2 const &size_, Texture const &texture_);
+	virtual ~PlatformTile();
+
+	void parse_tiledata(uint32_t &tile_data);
+	void setup_opengl(Texture &texture);
 
 	// world position
 	glm::vec2 position;
 
 	// size [x,y]
 	glm::vec2 size;
+
+	Texture texture;
 
 	Shapes::Rectangle collision_shape;
 
@@ -54,12 +66,5 @@ struct PlatformTile
 	};
 	static_assert(sizeof(Vertex) == 4*3 + 1*4 + 4*2, "PlatformTile::Vertex should be packed");
 
-	// TODO: change this to suit sprites loaded from an atlas
-	// loaded texture references
-	struct Texture {
-		Texture(glm::uvec2 const &size_, std::vector< glm::u8vec4 > const &data_) :
-			size(size_), data(data_) {}
-		glm::uvec2 size;
-		std::vector< glm::u8vec4 > data;
-	};
+	
 };

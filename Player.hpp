@@ -3,6 +3,7 @@
 #include "Input.hpp"
 #include "ColorTextureProgram.hpp"
 #include "Shapes.hpp"
+#include "Sprite.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,7 +11,7 @@
 #include "gl_errors.hpp"
 
 struct Player {
-  Player(glm::vec2 position, Input* left, Input* right, Input* jump);
+  Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite);
   ~Player();
 
 	void setup_opengl();
@@ -27,11 +28,12 @@ struct Player {
   Input* jump;
 
   // Constants
-  static constexpr glm::vec2 size = glm::vec2(15.0f, 24.0f);
+  static constexpr glm::vec2 size = glm::vec2(32.0f, 44.0f);
 
   static constexpr float movespeed = 80.0f;
-  static constexpr float jumpspeed = 120.0f;
-  static constexpr float gravityspeed = 60.0f;
+  static constexpr float jumpspeed = 150.0f;
+  static constexpr float min_vertical_speed = -60.0f;
+  static constexpr float fall_acceleration = -20.0f;
 
   static constexpr float min_jump_time = 0.3f;
   static constexpr float max_jump_time = 0.6f;
@@ -42,6 +44,8 @@ struct Player {
   bool jump_input = false;
   bool jump_clear = false;
   bool falling = false;
+
+  float gravityspeed = 60.0f;
 
   //Drawing
 	//Shader program that draws transformed, vertices tinted with vertex colors:
@@ -81,4 +85,8 @@ struct Player {
 
 	//Collisions:
 	Shapes::Rectangle collision_box;
+
+	//to tell players apart
+	// glm::u8vec4 color;
+	Sprite *sprite;
 };

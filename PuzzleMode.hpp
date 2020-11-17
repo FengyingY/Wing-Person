@@ -12,20 +12,30 @@
 
 struct PuzzleMode : Mode
 {
-  PuzzleMode();
-  virtual ~PuzzleMode();
+	PuzzleMode();
+	virtual ~PuzzleMode();
 
-  void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey);
+	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, Sprite *sprite);
 
-  //functions called by main loop:
-  virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
-  virtual void update(float elapsed) override;
-  virtual void draw(glm::uvec2 const &drawable_size) override;
+	//functions called by main loop:
+	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
+	virtual void update(float elapsed) override;
+	virtual void draw(glm::uvec2 const &drawable_size) override;
 
-  InputManager input_manager;
+	InputManager input_manager;
 
-  //----- game state ------
-  std::vector<Player *> players;
-  std::vector < PlatformTile *> platforms;
-  std::vector < Shapes::Rectangle > platform_collision_shapes;
+	//----- game state ------
+	std::vector < Player *> players;
+	std::vector < PlatformTile *> platforms;
+	std::vector < Shapes::Rectangle > platform_collision_shapes;
+	
+	std::vector < PlatformTile *> collectibles;
+
+	PlatformTile *end;
+
+	struct LevelData
+	{
+		
+	};
+  
 };

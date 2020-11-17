@@ -1,4 +1,4 @@
-# (TODO: your game's title)
+# Wingperson
 
 Author: (TODO: your name)
 
@@ -14,7 +14,8 @@ How To Play:
 
 (TODO: describe the controls and (if needed) goals/strategy.)
 
-Sources: 
+Sources:
+Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
 
 - Virtual novel characters: http://www.jewel-s.jp/download/
 - Virtual novel background: https://konett.itch.io/modern-visual-novel-backgrounds

@@ -1,12 +1,12 @@
 #include "Player.hpp"
 
-Player::Player(glm::vec2 position,
-    Input* left, Input* right, Input* jump) : position(position)
-                                            , left(left)
-                                            , right(right)
-                                            , jump(jump) {
+Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite) : position(position)
+																							  , left(left)
+																							  , right(right)
+																							  , jump(jump)
+																							  , sprite(sprite){
 	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
-  setup_opengl();
+	setup_opengl();
 }
 
 Player::~Player() {
@@ -21,6 +21,7 @@ Player::~Player() {
 }
 
 void Player::setup_opengl() {
+	/*
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
 		glGenBuffers(1, &vertex_buffer);
@@ -89,7 +90,7 @@ void Player::setup_opengl() {
 
 		//upload a 1x1 image of solid white to the texture:
 		glm::uvec2 size = glm::uvec2(1,1);
-		std::vector< glm::u8vec4 > data(size.x*size.y, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+		std::vector< glm::u8vec4 > data(size.x*size.y, color);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 
 		//set filtering and wrapping parameters:
@@ -107,10 +108,11 @@ void Player::setup_opengl() {
 
 		GL_ERRORS(); //PARANOIA: print out any OpenGL errors that may have happened
 	}
+	*/
 }
 
 void Player::draw(glm::uvec2 const &drawable_size) {
-	
+	/*
 	//---- compute vertices to draw ----
 	
 	//vertices will be accumulated into this list and then uploaded+drawn at the end of this function:
@@ -160,4 +162,6 @@ void Player::draw(glm::uvec2 const &drawable_size) {
 	glBindVertexArray(0);
 	glUseProgram(0);
 	GL_ERRORS();
+	*/
+	sprite->draw(position, drawable_size, .6f);
 }

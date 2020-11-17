@@ -152,6 +152,10 @@ PACK_TEXT_NAMES =
 	PackDialogs
 	;
 
+PACK_LEVEL_NAMES =
+	PackLevelData
+	;
+
 
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
 Objects
@@ -160,6 +164,7 @@ Objects
 	$(SHOW_MESHES_NAMES:S=.cpp)
 	$(SHOW_SCENE_NAMES:S=.cpp)
 	$(PACK_TEXT_NAMES:S=.cpp)
+	$(PACK_LEVEL_NAMES:S=.cpp)
 	;
 
 #------------------------
@@ -179,3 +184,7 @@ MainFromObjects show-scene : $(SHOW_SCENE_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(
 
 #put dialog utilities in "scenes"
 MainFromObjects pack-text : $(PACK_TEXT_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
+
+#put level utilities in "level-data"
+LOCATE_TARGET = level-data ;
+MainFromObjects pack-level : $(PACK_LEVEL_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
