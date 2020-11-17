@@ -16,6 +16,9 @@ How To Play:
 
 Sources:
 Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
-Platform tiles : https://pixelfrog-store.itch.io/pixel-adventure-1
+
+- Virtual novel characters: http://www.jewel-s.jp/download/
+- Virtual novel background: https://konett.itch.io/modern-visual-novel-backgrounds
+- Platformer: https://pixelfrog-store.itch.io/pixel-adventure-1, https://pixelfrog-store.itch.io/pixel-adventure-2
 
 This game was built with [NEST](NEST.md).
