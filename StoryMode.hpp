@@ -31,8 +31,6 @@ struct Story {
 	// all the dialogs, key is the name of the dialog
 	std::map<std::string, Dialog> dialog;
 
-	// images
-	std::map<std::string, Sprite*> sprites;
 };
 
 struct StoryMode : Mode {

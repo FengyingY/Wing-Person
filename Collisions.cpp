@@ -9,7 +9,7 @@
 //check for collision between two circles:
 bool Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2) {
 	//get the distance between the centers of the circles:
-	float center_dist = std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
+	float center_dist = (float) std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
 
 	//check for collision:
 	if (center_dist <= c1.radius + c2.radius)
@@ -71,7 +71,7 @@ bool Collisions::triangle_triangle_collision(Shapes::Triangle t1, Shapes::Triang
 //check for collision between two circles:
 glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2, int axis) {
 	//get the distance between the centers of the circles:
-	float center_dist = std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
+	float center_dist = (float) std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
 
 	//check for collision:
 	if (center_dist < c1.radius + c2.radius) {
@@ -96,7 +96,7 @@ glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle 
 			float radius_dist = c1.radius + c2.radius;
 			float y_dist = c1.center.y - c2.center.y;
 
-			desired_dist = std::sqrt(std::pow(radius_dist, 2) - std::pow(y_dist, 2)) * avg_diff.x;
+			desired_dist = (float) std::sqrt(std::pow(radius_dist, 2) - std::pow(y_dist, 2)) * avg_diff.x;
 		}
 		else if (axis == 1) {
 			avg_diff.x = 0.0f;
@@ -108,7 +108,7 @@ glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle 
 			float radius_dist = c1.radius + c2.radius;
 			float x_dist = c1.center.x - c2.center.x;
 
-			desired_dist = std::sqrt(std::pow(radius_dist, 2) - std::pow(x_dist, 2)) * avg_diff.y;
+			desired_dist = (float) std::sqrt(std::pow(radius_dist, 2) - std::pow(x_dist, 2)) * avg_diff.y;
 		}
 		else {
 			desired_dist = c1.radius + c2.radius;
@@ -128,7 +128,7 @@ glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle 
 		}
 		else {
 			float ratio_avg_diff = avg_diff.y / avg_diff.x;
-			vector_from_c2_x = (desired_dist * ratio_avg_diff) / sqrt(1.0f + std::pow(ratio_avg_diff, 2));
+			vector_from_c2_x = (desired_dist * ratio_avg_diff) / (float) sqrt(1.0f + std::pow(ratio_avg_diff, 2));
 			vector_from_c2_y = vector_from_c2_x / ratio_avg_diff;
 		}
 		glm::vec2 vector_from_c2 = glm::vec2(vector_from_c2_x, vector_from_c2_y);
@@ -197,7 +197,7 @@ glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes
 			}
 			else {
 				float ratio_avg_diff = avg_diff.y / avg_diff.x;
-				vector_from_r2_x = (desired_dist * ratio_avg_diff) / sqrt(1.0f + std::pow(ratio_avg_diff, 2));
+				vector_from_r2_x = (desired_dist * ratio_avg_diff) / (float) sqrt(1.0f + std::pow(ratio_avg_diff, 2));
 				vector_from_r2_y = vector_from_r2_x / ratio_avg_diff;
 			}
 			glm::vec2 vector_from_r2 = glm::vec2(vector_from_r2_x, vector_from_r2_y);
@@ -218,7 +218,7 @@ glm::vec2 Collisions::rectangle_rectangle_collision(Shapes::Rectangle r1, Shapes
 //check for collision between one circle and one rectangle:
 bool Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle r) {
 	//get the distance between the centers of the shapes:
-	float center_dist = std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
+	float center_dist = (float) std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
 
 	//if the circle radius and rectangle corner distance are too large, there is no chance for a collision:
 	if (center_dist > c.radius + r.corner_dist)
@@ -238,7 +238,7 @@ bool Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle 
 
 	//check for collision:
 	for (glm::vec2 intersect : intersections) {
-		float intersect_dist = std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
+		float intersect_dist = (float) std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
 		if (center_dist <= c.radius + intersect_dist)
 			return true;
 	}
@@ -251,7 +251,7 @@ bool Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle 
 bool Collisions::circle_triangle_collision(Shapes::Circle c, Shapes::Triangle t) {
 	//check for collision:
 	for (glm::vec2 point : t.points) {
-		float dist = std::sqrt(std::pow(c.center.x - point.x, 2) + std::pow(c.center.y - point.y, 2));
+		float dist = (float) std::sqrt(std::pow(c.center.x - point.x, 2) + std::pow(c.center.y - point.y, 2));
 		if (dist < c.radius)
 			return true;
 	}
@@ -263,7 +263,7 @@ bool Collisions::circle_triangle_collision(Shapes::Circle c, Shapes::Triangle t)
 //check for collision between one circle and one rectangle:
 glm::vec2 Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle r, int axis) {
 	//get the distance between the centers of the shapes:
-	float center_dist = std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
+	float center_dist = (float) std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
 
 	//if the circle radius and rectangle corner distance are too large, there is no chance for a collision:
 	if (center_dist > c.radius + r.corner_dist)
@@ -322,7 +322,7 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Recta
 
 	//check for collision:
 	for (glm::vec2 intersect : intersections) {
-		float intersect_dist = std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
+		float intersect_dist = (float) std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
 		if (center_dist < c.radius + intersect_dist) {
 
 			//get the adjusted distance vector between the centers:
@@ -373,7 +373,7 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Recta
 			}
 			else {
 				float ratio_avg_diff = avg_diff.y / avg_diff.x;
-				vector_from_r_x = (desired_dist * ratio_avg_diff) / sqrt(1.0f + std::pow(ratio_avg_diff, 2));
+				vector_from_r_x = (desired_dist * ratio_avg_diff) / (float) sqrt(1.0f + std::pow(ratio_avg_diff, 2));
 				vector_from_r_y = vector_from_r_x / ratio_avg_diff;
 			}
 			glm::vec2 vector_from_r = glm::vec2(vector_from_r_x, vector_from_r_y);
@@ -423,7 +423,7 @@ bool Collisions::rectangle_triangle_collision(Shapes::Rectangle r, Shapes::Trian
 //check for collision between one rectangle and one circle:
 glm::vec2 Collisions::circle_rectangle_collision(Shapes::Rectangle r, Shapes::Circle c, int axis) {
 	//get the distance between the centers of the shapes:
-	float center_dist = std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
+	float center_dist = (float) std::sqrt(std::pow(c.center.x - r.center.x, 2) + std::pow(c.center.y - r.center.y, 2));
 
 	//if the circle radius and rectangle corner distance are too large, there is no chance for a collision:
 	if (center_dist > c.radius + r.corner_dist)
@@ -482,7 +482,7 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Rectangle r, Shapes::Ci
 
 	//check for collision:
 	for (glm::vec2 intersect : intersections) {
-		float intersect_dist = std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
+		float intersect_dist = (float) std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
 		if (center_dist < c.radius + intersect_dist) {
 
 			//get the adjusted distance vector between the centers:
@@ -533,7 +533,7 @@ glm::vec2 Collisions::circle_rectangle_collision(Shapes::Rectangle r, Shapes::Ci
 			}
 			else {
 				float ratio_avg_diff = avg_diff.y / avg_diff.x;
-				vector_from_c_x = (desired_dist * ratio_avg_diff) / sqrt(1.0f + std::pow(ratio_avg_diff, 2));
+				vector_from_c_x = (desired_dist * ratio_avg_diff) / (float) sqrt(1.0f + std::pow(ratio_avg_diff, 2));
 				vector_from_c_y = vector_from_c_x / ratio_avg_diff;
 			}
 			glm::vec2 vector_from_c = glm::vec2(vector_from_c_x, vector_from_c_y);
@@ -686,9 +686,9 @@ glm::vec2 Collisions::line_intersect(glm::vec2 line1_p1, glm::vec2 line1_p2, glm
 //code for this function came from: https://stackoverflow.com/questions/1585459/whats-the-most-efficient-way-to-detect-triangle-triangle-intersections
 bool Collisions::point_in_line_segment(glm::vec2 point, glm::vec2 line_p1, glm::vec2 line_p2) {
 	//get the distances between the three points:
-	float point_p1_dist = std::sqrt(std::pow(point.x - line_p1.x, 2) + std::pow(point.y - line_p1.y, 2));
-	float point_p2_dist = std::sqrt(std::pow(point.x - line_p2.x, 2) + std::pow(point.y - line_p2.y, 2));
-	float line_dist = std::sqrt(std::pow(line_p1.x - line_p2.x, 2) + std::pow(line_p1.y - line_p2.y, 2));
+	float point_p1_dist = (float) std::sqrt(std::pow(point.x - line_p1.x, 2) + std::pow(point.y - line_p1.y, 2));
+	float point_p2_dist = (float) std::sqrt(std::pow(point.x - line_p2.x, 2) + std::pow(point.y - line_p2.y, 2));
+	float line_dist = (float) std::sqrt(std::pow(line_p1.x - line_p2.x, 2) + std::pow(line_p1.y - line_p2.y, 2));
 
 	//check if point is in the line segment:
 	if (point_p1_dist + point_p2_dist == line_dist)
