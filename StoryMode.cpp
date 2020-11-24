@@ -25,8 +25,14 @@
 #include <fstream>
 #include <string>
 #include <utility>
+#if defined(__linux__)
+#include <dirent.h>
+DIR *dpdf;
+struct dirent *epdf;
+#else
 #include <filesystem>
 namespace fs = std::filesystem;
+#endif
 
 void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -104,11 +110,23 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 std::vector<Sprite*> sprites;
 // load all of the sprite under folder 'dist/story_sprites'
 Load< void > load_sprite(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path("story_sprites");
+	dpdf = opendir(path.c_str());
+	if (dpdf != NULL) {
+		while ((epdf = readdir(dpdf))) {
+			std::string file_name = epdf->d_name;
+			if (file_name != "." && file_name != "..")
+				sprites.push_back(new Sprite(path + "/" + file_name, file_name.substr(0, file_name.find("."))));
+		}
+	}
+	#else
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
 		std::string file_name = entry.path().filename().string();
 		sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
 	}
+	#endif
 });
 
 

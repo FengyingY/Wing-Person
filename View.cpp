@@ -302,7 +302,6 @@ void TextLine::update_all() {
 	is_visible_ = true;
 	do_render();
 	visible_glyph_count_ = glyph_count_;
-	std::cout << visible_glyph_count_ << std::endl;
 	(*callback_)();
 }
 
