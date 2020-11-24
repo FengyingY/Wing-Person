@@ -38,6 +38,7 @@ private:
 enum class FontFace {
 	ComputerModernRegular,
 	IBMPlexMono,
+	Literata,
 };
 
 /**
@@ -198,7 +199,7 @@ public:
 	int get_height() const { return static_cast<int>((font_size_ + line_space_) * contents_.size()); }
 
 private:
-	FontFace font_face_ = FontFace::ComputerModernRegular;
+	FontFace font_face_ = FontFace::Literata;
 	int line_space_ = 4;
 	glm::ivec2 position_ = glm::ivec2(0, 0);
 	unsigned font_size_ = 16;

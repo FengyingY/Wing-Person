@@ -95,7 +95,7 @@ GlyphTextureCache *GlyphTextureCache::get_instance() {
 GlyphTextureCache::GlyphTextureCache() {
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
-	for (FontFace f : {FontFace::IBMPlexMono, FontFace::ComputerModernRegular}) {
+	for (FontFace f : {FontFace::IBMPlexMono, FontFace::ComputerModernRegular, FontFace::Literata}) {
 		const std::string font_path = data_path(get_font_filename(f));
 		FT_Face face = nullptr;
 		error = FT_New_Face(ft_library_, font_path.c_str(), 0, &face);
@@ -116,8 +116,9 @@ GlyphTextureCache::~GlyphTextureCache() {
 
 std::string GlyphTextureCache::get_font_filename(FontFace font_face) {
 	switch (font_face) {
-		case FontFace::IBMPlexMono : return "IBMPlexMono-Regular.ttf";
+		case FontFace::IBMPlexMono : return "IBMPlexMono-Bold.ttf";
 		case FontFace::ComputerModernRegular : return "cmunorm.ttf";
+		case FontFace::Literata : return "LiterataMedium-J68n.ttf";
 		default: throw std::runtime_error("unreachable code");
 	}
 }
@@ -599,7 +600,7 @@ Dialog::Dialog(std::vector<std::pair<glm::u8vec4, std::string>> prompts, std::ve
 			.set_position(PADDING_LEFT + 64, POS_Y)
 			.set_color(glm::u8vec4(255))
 			.set_font_size(16)
-			.set_font(FontFace::ComputerModernRegular)
+			.set_font(FontFace::Literata)
 			.disable_animation()
 			.set_visibility(false);
 		option_lines_.emplace_back(choice, text);
