@@ -38,6 +38,7 @@ private:
 enum class FontFace {
 	ComputerModernRegular,
 	IBMPlexMono,
+	Literata,
 };
 
 /**
@@ -125,7 +126,7 @@ public:
 
 	void draw();
 	void update(float elapsed);
-
+	void update_all();
 
 private:
 	void do_render();
@@ -193,11 +194,12 @@ public:
 	TextBox &set_animation(float speed, std::optional<std::function<void()>> callback);
 	TextBox &show();
 	void update(float elapsed);
+	void update_all();
 	void draw();
 	int get_height() const { return static_cast<int>((font_size_ + line_space_) * contents_.size()); }
 
 private:
-	FontFace font_face_ = FontFace::ComputerModernRegular;
+	FontFace font_face_ = FontFace::Literata;
 	int line_space_ = 4;
 	glm::ivec2 position_ = glm::ivec2(0, 0);
 	unsigned font_size_ = 16;
@@ -222,6 +224,7 @@ public:
 	std::optional<int> Enter();
 
 	bool finished() const;
+	void show_all_text() const;
 
 	bool agree() const;
 

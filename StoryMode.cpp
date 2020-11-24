@@ -25,8 +25,14 @@
 #include <fstream>
 #include <string>
 #include <utility>
+#if defined(__linux__)
+#include <dirent.h>
+DIR *dpdf;
+struct dirent *epdf;
+#else
 #include <filesystem>
 namespace fs = std::filesystem;
+#endif
 
 void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -101,14 +107,31 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 	return new Sound::Sample(data_path("dusty-floor.opus"));
 });
 
-std::vector<Sprite*> sprites;
+// images
+std::map<std::string, Sprite*> story_sprites;
 // load all of the sprite under folder 'dist/story_sprites'
 Load< void > load_sprite(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path("story_sprites");
+	dpdf = opendir(path.c_str());
+	if (dpdf != NULL) {
+		while ((epdf = readdir(dpdf))) {
+			std::string file_name = epdf->d_name;
+			if (file_name != "." && file_name != "..") {
+				std::string sprite_name = file_name.substr(0, file_name.find("."));
+				story_sprites[sprite_name] = (new Sprite(path + "/" + file_name, sprite_name));
+			}
+		}
+	}
+	#else
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
 		std::string file_name = entry.path().filename().string();
-		sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
+		// sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
+		std::string sprite_name = file_name.substr(0, file_name.find("."));
+		story_sprites[sprite_name] = (new Sprite(entry.path().string(), sprite_name));
 	}
+	#endif
 });
 
 
@@ -116,21 +139,12 @@ StoryMode::StoryMode() : story(*test_story) {
 	setCurrentBranch(story.dialog.at("Opening"));
 
 	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));
-
-	for (Sprite* s : sprites) {
-		story.sprites[s->name] = s;
-	}
 }
 
 // go back to story mode at the specified branch
 StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	story = *test_story;
 	setCurrentBranch(story.dialog.at(branch_name));
-
-	// TODO make the sprite map as a local variable like music loop (?)
-	for (Sprite* s : sprites) {
-		story.sprites[s->name] = s;
-	}
 }
 
 
@@ -167,8 +181,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 						} else {
 							setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 
-						}				
-						return true;
+						}
 					}
 				} else {
 					// disagree
@@ -181,6 +194,10 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					}
 					setCurrentBranch(story.dialog["disagree"]);
 				}
+			} else {
+				// text skip
+				main_dialog->show_all_text();
+				return true;
 			}
 			return false;
 		}
@@ -200,16 +217,16 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	
 	// background
 	if (current.background.length() > 0)
-		story.sprites[current.background]->draw(center, drawable_size, 0.4f, 1.0f);
+		story_sprites[current.background]->draw(center, drawable_size, 0.4f, 1.0f);
 
 	// characters
 	float offset = 1.f / (current.sprites_name.size() + 1);
 	for (size_t i = 0; i < current.sprites_name.size(); ++i) {
-		story.sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y), drawable_size, 0.3f, 1.0f);
+		story_sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y), drawable_size, 0.3f, 1.0f);
 	}
 
 	// textbox
-	story.sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
+	story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
 
 	// text
 	glDisable(GL_DEPTH_TEST);
