@@ -1,10 +1,9 @@
 #include "Player.hpp"
 
-Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite) : position(position)
-																							  , left(left)
-																							  , right(right)
-																							  , jump(jump)
-																							  , sprite(sprite){
+Player::Player(glm::vec2 position, Input* left, Input* right, Input* jump, std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites) :
+	position(position), left(left), right(right), jump(jump), idle_sprites(idle_sprites), jump_sprite(jump_sprite), fall_sprite(fall_sprite), run_sprites(run_sprites) {
+	
+	curr_sprite = idle_sprites[0];
 	collision_box = Shapes::Rectangle(position, (float)Player::size.x, (float)Player::size.y, false);
 	setup_opengl();
 }
@@ -163,5 +162,5 @@ void Player::draw(glm::uvec2 const &drawable_size) {
 	glUseProgram(0);
 	GL_ERRORS();
 	*/
-	sprite->draw(position, drawable_size, .6f);
+	curr_sprite->draw(position, drawable_size, 0.6f, direction);
 }
