@@ -217,16 +217,16 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	
 	// background
 	if (current.background.length() > 0)
-		story_sprites[current.background]->draw(center, drawable_size, 0.4f);
+		story_sprites[current.background]->draw(center, drawable_size, 0.4f, 1.0f);
 
 	// characters
 	float offset = 1.f / (current.sprites_name.size() + 1);
 	for (size_t i = 0; i < current.sprites_name.size(); ++i) {
-		story_sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y), drawable_size, 0.3f);
+		story_sprites[current.sprites_name[i]]->draw(glm::vec2(drawable_size.x * offset*(1.f+i), center.y), drawable_size, 0.3f, 1.0f);
 	}
 
 	// textbox
-	story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f);
+	story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
 
 	// text
 	glDisable(GL_DEPTH_TEST);

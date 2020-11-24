@@ -50,10 +50,46 @@ Load < std::map<std::string, PlatformTile::Texture*> > sprites(LoadTagEarly, [](
 	return ret;
 });
 
-Sprite *pink, *blue;
+std::vector< Sprite* > red_idle, red_run, blue_idle, blue_run;
+Sprite *red_jump, *red_fall, *blue_jump, *blue_fall;
 Load< void > load_sprites(LoadTagEarly, []() -> void {
-	pink = new Sprite(data_path("puzzle_sprites/pinkman.png"), "pink_man");
-	blue = new Sprite(data_path("puzzle_sprites/virtualguy.png"), "virtual_guy");
+	red_jump = new Sprite(data_path("puzzle_sprites/red/jump.png"), "red_jump");
+	red_fall = new Sprite(data_path("puzzle_sprites/red/fall.png"), "red_fall");
+	blue_jump = new Sprite(data_path("puzzle_sprites/blue/jump.png"), "blue_jump");
+	blue_fall = new Sprite(data_path("puzzle_sprites/blue/fall.png"), "blue_fall");
+
+	bool look_for_red_idle = true, look_for_red_run = true, look_for_blue_idle = true, look_for_blue_run = true;
+	for (int i = 0; i < 100; i++) {
+		std::string tile_name = "tile0";
+		if (i <= 9) tile_name = tile_name + std::to_string(0) + std::to_string(i);
+		else tile_name = tile_name + std::to_string(i);
+		
+		if (look_for_red_idle) {
+			Sprite *new_red_idle = new Sprite(data_path("puzzle_sprites/red/idle/" + tile_name + ".png"), "red_idle_" + tile_name);
+			if (new_red_idle->data.size() > 0) red_idle.emplace_back(new_red_idle);
+			else look_for_red_idle = false;
+		}
+		
+		if (look_for_red_run) {
+			Sprite *new_red_run = new Sprite(data_path("puzzle_sprites/red/run/" + tile_name + ".png"), "red_run_" + tile_name);
+			if (new_red_run->data.size() > 0) red_run.emplace_back(new_red_run);
+			else look_for_red_run = false;
+		}
+
+		if (look_for_blue_idle) {
+			Sprite *new_blue_idle = new Sprite(data_path("puzzle_sprites/blue/idle/" + tile_name + ".png"), "blue_idle_" + tile_name);
+			if (new_blue_idle->data.size() > 0) blue_idle.emplace_back(new_blue_idle);
+			else look_for_blue_idle = false;
+		}
+
+		if (look_for_blue_run) {
+			Sprite *new_blue_run = new Sprite(data_path("puzzle_sprites/blue/run/" + tile_name + ".png"), "blue_run_" + tile_name);
+			if (new_blue_run->data.size() > 0) blue_run.emplace_back(new_blue_run);
+			else look_for_blue_run = false;
+		}
+
+		if (!(look_for_red_idle || look_for_red_run || look_for_blue_idle || look_for_blue_run)) break;
+	}
 });
 
 
@@ -101,18 +137,20 @@ PuzzleMode::PuzzleMode() {
 	}
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(200, 85), SDLK_a, SDLK_d, SDLK_w, pink);
-	add_player(glm::vec2(600, 85), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue);
+	add_player(glm::vec2(200, 85), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
+	add_player(glm::vec2(600, 85), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 }
 
 PuzzleMode::~PuzzleMode() {}
 
-void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, Sprite* sprite) {
+void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
+	std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites) {
+	
 	Input* left = input_manager.register_key(leftkey);
 	Input* right = input_manager.register_key(rightkey);
 	Input* jump = input_manager.register_key(jumpkey);
 
-	Player *player = new Player(position, left, right, jump, sprite);
+	Player *player = new Player(position, left, right, jump, idle_sprites, jump_sprite, fall_sprite, run_sprites);
 	players.emplace_back(player);
 }
 
@@ -121,23 +159,41 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
+	total_time += elapsed;
+
 	for (unsigned int i = 0; i < players.size(); i++) {
 
 		// Calculate inputs and movement for each player
 		players[i]->velocity.x = 0;
 		players[i]->velocity.y = 0;
 
+		size_t idle_sprites_size = players[i]->idle_sprites.size();
+		size_t run_sprites_size = players[i]->run_sprites.size();
+		if (!players[i]->falling)
+			players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
+
 		if (players[i]->left->held()) {
 			players[i]->velocity.x -= Player::movespeed * elapsed;
+			players[i]->direction = -1.0f;
+			if (!players[i]->falling)
+				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
 		}
 
 		if (players[i]->right->held()) {
 			players[i]->velocity.x += Player::movespeed * elapsed;
+			players[i]->direction = 1.0f;
+			if (!players[i]->falling) {
+				if (players[i]->left->held())
+					players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
+				else
+					players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+			}
 		}
 
 		// Process jumping
 		if (players[i]->jump->held() && !players[i]->falling) {
 			players[i]->jump_input = true;
+			players[i]->curr_sprite = players[i]->jump_sprite;
 			if (players[i]->input_jump_time < Player::max_jump_time) {
 				players[i]->input_jump_time += elapsed;
 				if (players[i]->input_jump_time >= Player::max_jump_time) {
@@ -190,7 +246,21 @@ void PuzzleMode::update(float elapsed) {
 		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes)) {
 			players[i]->position += gravity;
 			players[i]->collision_box.center += gravity;
-		} else players[i]->falling = false;
+			if (!players[i]->jump->held() || players[i]->input_jump_time >= Player::max_jump_time)
+				players[i]->curr_sprite = players[i]->fall_sprite;
+		} else {
+			players[i]->falling = false;
+			if (!(players[i]->left->held() || players[i]->right->held()) ||
+				(players[i]->left->held() && players[i]->right->held()))
+				players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
+			else if (players[i]->left->held()) {
+				players[i]->direction = -1.0f;
+				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+			} else if (players[i]->right->held()) {
+				players[i]->direction = 1.0f;
+				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+			}
+		}
 
 		//remove the other player to the list of things the current player can collide with
 		platform_collision_shapes.pop_back();

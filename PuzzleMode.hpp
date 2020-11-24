@@ -15,7 +15,8 @@ struct PuzzleMode : Mode
 	PuzzleMode();
 	virtual ~PuzzleMode();
 
-	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey, Sprite *sprite);
+	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
+		std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites);
 
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
@@ -32,6 +33,7 @@ struct PuzzleMode : Mode
 	std::vector < PlatformTile *> collectibles;
 
 	PlatformTile *end;
+	float total_time = 0.0f;
 
 	struct LevelData
 	{

@@ -9,7 +9,7 @@
 //check for collision between two circles:
 bool Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle c2) {
 	//get the distance between the centers of the circles:
-	float center_dist = (float) std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
+	center_dist = std::sqrt(std::pow(c1.center.x - c2.center.x, 2) + std::pow(c1.center.y - c2.center.y, 2));
 
 	//check for collision:
 	if (center_dist <= c1.radius + c2.radius)

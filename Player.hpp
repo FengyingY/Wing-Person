@@ -11,7 +11,7 @@
 #include "gl_errors.hpp"
 
 struct Player {
-  Player(glm::vec2 position, Input* left, Input* right, Input* jump, Sprite* sprite);
+  Player(glm::vec2 position, Input* left, Input* right, Input* jump, std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites);
   ~Player();
 
 	void setup_opengl();
@@ -22,6 +22,7 @@ struct Player {
   // State
   glm::vec2 position;
   glm::vec2 velocity;
+  float direction = 1.0f;
 
   Input* left;
   Input* right;
@@ -88,5 +89,9 @@ struct Player {
 
 	//to tell players apart
 	// glm::u8vec4 color;
-	Sprite *sprite;
+	Sprite *curr_sprite;
+	std::vector< Sprite* > idle_sprites;
+	Sprite *jump_sprite;
+	Sprite *fall_sprite;
+	std::vector< Sprite* > run_sprites;
 };
