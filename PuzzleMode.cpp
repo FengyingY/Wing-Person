@@ -11,7 +11,7 @@
 #include <fstream>
 #include <map>
 
-// const float ScreenWidth = 800.0f;
+const float ScreenWidth = 800.0f;
 const float ScreenHeight = 600.0f;
 
 Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uint32_t> * {
@@ -270,7 +270,7 @@ void PuzzleMode::update(float elapsed) {
 		{
 			for (auto &&collectible : collectibles)
 			{
-				float sqr_dist = (float) (pow(collectible->position.x - players[i]->position.x, 2) + pow(collectible->position.y - players[i]->position.y, 2));
+				float sqr_dist = pow(collectible->position.x - players[i]->position.x, 2) + pow(collectible->position.y - players[i]->position.y, 2);
 				if(sqr_dist < pow(collectible->size.x * 0.5f, 2)){
 					// removing an element from a vector - https://stackoverflow.com/a/3385251
 					collectibles.erase(std::remove(collectibles.begin(), collectibles.end(), collectible));
@@ -281,7 +281,7 @@ void PuzzleMode::update(float elapsed) {
 		
 		if (end != nullptr)
 		{
-			float sqr_dist = (float) (pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
+			float sqr_dist = pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2);
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
 					std::string branch_name = "Story16";
 					Mode::set_current(std::make_shared<StoryMode>(branch_name));
