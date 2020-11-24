@@ -125,7 +125,7 @@ public:
 
 	void draw();
 	void update(float elapsed);
-
+	void update_all();
 
 private:
 	void do_render();
@@ -193,6 +193,7 @@ public:
 	TextBox &set_animation(float speed, std::optional<std::function<void()>> callback);
 	TextBox &show();
 	void update(float elapsed);
+	void update_all();
 	void draw();
 	int get_height() const { return static_cast<int>((font_size_ + line_space_) * contents_.size()); }
 
@@ -222,6 +223,7 @@ public:
 	std::optional<int> Enter();
 
 	bool finished() const;
+	void show_all_text() const;
 
 	bool agree() const;
 

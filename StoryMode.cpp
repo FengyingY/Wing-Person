@@ -167,8 +167,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 						} else {
 							setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 
-						}				
-						return true;
+						}
 					}
 				} else {
 					// disagree
@@ -181,6 +180,10 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					}
 					setCurrentBranch(story.dialog["disagree"]);
 				}
+			} else {
+				// text skip
+				main_dialog->show_all_text();
+				return true;
 			}
 			return false;
 		}

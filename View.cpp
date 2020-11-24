@@ -297,6 +297,14 @@ void TextLine::update(float elapsed) {
 	}
 }
 
+void TextLine::update_all() {
+	is_visible_ = true;
+	do_render();
+	visible_glyph_count_ = glyph_count_;
+	std::cout << visible_glyph_count_ << std::endl;
+	(*callback_)();
+}
+
 void TextLine::draw() {
 	if (!is_visible_) { return; }
 	do_render();
@@ -465,6 +473,12 @@ void TextLine::do_render() {
 void TextBox::update(float elapsed) {
 	for (auto &line : lines_) {
 		line->update(elapsed);
+	}
+}
+
+void TextBox::update_all() {
+	for (auto &line : lines_) {
+		line->update_all();
 	}
 }
 
@@ -640,6 +654,9 @@ std::optional<int> Dialog::Enter() {
 }
 bool Dialog::finished() const {
 	return options_shown_;
+}
+void Dialog::show_all_text() const {
+	prompt_box_->update_all();
 }
 bool Dialog::agree() const {
 	return option_focus_ == option_focus_2_;
