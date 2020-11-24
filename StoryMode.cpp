@@ -129,7 +129,7 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 		std::string file_name = entry.path().filename().string();
 		// sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
 		std::string sprite_name = file_name.substr(0, file_name.find("."));
-		sprites[sprite_name] = (new Sprite(entry.path().string(), sprite_name));
+		story_sprites[sprite_name] = (new Sprite(entry.path().string(), sprite_name));
 	}
 	#endif
 });
