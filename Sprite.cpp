@@ -97,7 +97,7 @@ Sprite::~Sprite() {
     png_tex = 0;
 }
 
-void Sprite::draw(glm::vec2 center_pos, glm::vec2 drawable_size, float scale) {
+void Sprite::draw(glm::vec2 center_pos, glm::vec2 drawable_size, float scale, float direction) {
     //vertices will be accumulated into this list and then uploaded+drawn at the end of this function:
     std::vector< Vertex > vertices;
 
@@ -113,7 +113,7 @@ void Sprite::draw(glm::vec2 center_pos, glm::vec2 drawable_size, float scale) {
         vertices.emplace_back(glm::vec3(center.x-radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.0f, 1.0f));
     };
 
-    draw_rectangle(center_pos, glm::vec2(size.x * scale, size.y*scale), glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+    draw_rectangle(center_pos, glm::vec2(size.x * scale * direction, size.y * scale), glm::u8vec4(0xff, 0xff, 0xff, 0xff));
     
     
     //use alpha blending:

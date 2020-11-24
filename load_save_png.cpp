@@ -18,11 +18,20 @@ void load_png(std::string filename, glm::uvec2 *size, std::vector< glm::u8vec4 >
 	assert(size);
 
 	std::ifstream file(filename.c_str(), std::ios::binary);
-	if (!file) {
-		throw std::runtime_error("Failed to open PNG image file '" + filename + "'.");
+	try {
+		if (!file) {
+			throw std::runtime_error("Failed to open PNG image file '" + filename + "'.");
+		}
+	} catch (const std::runtime_error& e) {
+		std::cout << e.what() << std::endl;
 	}
-	if (!load_png(file, &size->x, &size->y, data, origin)) {
-		throw std::runtime_error("Failed to read PNG image from '" + filename + "'.");
+	
+	try {
+		if (!load_png(file, &size->x, &size->y, data, origin)) {
+			throw std::runtime_error("Failed to read PNG image from '" + filename + "'.");
+		}
+	} catch (const std::runtime_error& e) {
+		std::cout << e.what() << std::endl;
 	}
 }
 

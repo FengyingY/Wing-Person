@@ -15,7 +15,7 @@ struct Sprite
 
     ~Sprite();
 
-    void draw(glm::vec2 center_pos, glm::vec2 drawable_size, float scale);
+    void draw(glm::vec2 center_pos, glm::vec2 drawable_size, float scale, float direction);
     
     std::string name;
     glm::uvec2 size;
