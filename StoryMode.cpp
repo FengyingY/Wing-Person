@@ -138,7 +138,7 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 StoryMode::StoryMode() : story(*test_story) {
 	setCurrentBranch(story.dialog.at("Opening"));
 
-	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));
+	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));	
 }
 
 // go back to story mode at the specified branch
@@ -202,6 +202,50 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 			return false;
 		}
 	}
+
+	if ( evt.type == SDL_MOUSEMOTION ) {
+		int x, y;
+		SDL_GetMouseState( &x, &y );
+		
+		if (y <= 30.f) {
+			if (620 <= x && x < 680) {
+				save_selected = true;
+				load_selected = false;
+				menu_selected = false;
+				return true;
+			} else if (680 <= x && x < 740) {
+				save_selected = false;
+				load_selected = true;
+				menu_selected = false;
+				return true;
+			} else if (740 <= x) {
+				save_selected = false;
+				load_selected = false;
+				menu_selected = true;
+				return true;
+			}
+		}
+		save_selected = false;
+		load_selected = false;
+		menu_selected = false;
+		return true;
+	}
+
+	if (evt.type == SDL_MOUSEBUTTONDOWN) {
+		if (save_selected) {
+			// TODO save the current status
+			std::cout << "saved!" << std::endl;
+		}
+		if (load_selected) {
+			// TODO load from selected slot
+			std::cout << "loading!" << std::endl;
+		}
+		if (menu_selected) {
+			music_loop->stop();
+			Mode::set_current(std::make_shared<IntroMode>());
+		}
+	}
+
 	return false;
 }
 
@@ -213,7 +257,8 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	glClearColor(0.1f, 0.01f, 0.01f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
+	// glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
+	glm::vec2 center(400.f, 300.f);
 	
 	// background
 	if (current.background.length() > 0)
@@ -226,11 +271,30 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	// textbox
-	story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
+	// story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
+	story_sprites["ui"]->draw(center, drawable_size, 0.5f, 1.0f);
+
+	// buttons
+	if (menu_selected) {
+		story_sprites["Menu_select"]->draw(glm::vec2(800-30, 600-15), drawable_size, 0.5f, 1.f);
+	} else {
+		story_sprites["Menu"]->draw(glm::vec2(800-30, 600-15), drawable_size, 0.5f, 1.f);
+	}
+	if (load_selected) {
+		story_sprites["Load_select"]->draw(glm::vec2(800-30*3, 600-15), drawable_size, 0.5f, 1.f);
+	} else {
+		story_sprites["Load"]->draw(glm::vec2(800-30*3, 600-15), drawable_size, 0.5f, 1.f);
+	}
+	if (save_selected) {
+		story_sprites["Save_select"]->draw(glm::vec2(800-30*5, 600-15), drawable_size, 0.5f, 1.f);
+	} else {
+		story_sprites["Save"]->draw(glm::vec2(800-30*5, 600-15), drawable_size, 0.5f, 1.f);
+	}
 
 	// text
 	glDisable(GL_DEPTH_TEST);
 	{
+		character_name->draw();
 		main_dialog->draw();
 	}
 	
@@ -244,9 +308,18 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
 	glm::u8vec4 color = glm::u8vec4(255, 255, 255, 255);
 	std::string to_show = current.character_name;
-	if (to_show.length() > 0)
-		prompts.emplace_back(color, to_show);
-
+	if (to_show.length() > 0) {
+		// prompts.emplace_back(color, to_show);
+		character_name = std::make_shared<view::TextLine>();
+		character_name->set_font(view::FontFace::BUILT_BD)
+					.set_text(current.character_name)
+					.set_font_size(28)
+					.set_position(glm::vec2(21.5f, 418.f))
+					.set_color(glm::u8vec4(0, 0, 0, 255))
+					.disable_animation()
+					.set_visibility(true);
+	}
+		
 	for (const auto &line : current.lines) {
 		to_show = " " + line;
 		prompts.emplace_back(color, to_show);

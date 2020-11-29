@@ -44,8 +44,10 @@ struct StoryMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	//----- game state -----
-
+	std::shared_ptr<view::TextLine> character_name = nullptr;
 	std::shared_ptr<view::Dialog> main_dialog = nullptr;
+
+	bool menu_selected = false, load_selected = false, save_selected = false;
 
 
 	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
