@@ -5,6 +5,7 @@
 #include "View.hpp"
 #include "Sprite.hpp"
 #include "PackDialogs.hpp"
+#include "GameLoadSave.hpp"
 
 #include <glm/glm.hpp>
 
@@ -45,9 +46,11 @@ struct StoryMode : Mode {
 
 	//----- game state -----
 	std::shared_ptr<view::TextLine> character_name = nullptr;
+	std::shared_ptr<view::TextBox> slot_info[3];
+	
 	std::shared_ptr<view::Dialog> main_dialog = nullptr;
 
-	bool menu_selected = false, load_selected = false, save_selected = false;
+	bool menu_selected = false, load_selected = false, save_selected = false, loading_page_shown = false;
 
 
 	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line

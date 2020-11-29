@@ -139,66 +139,71 @@ StoryMode::StoryMode() : story(*test_story) {
 	setCurrentBranch(story.dialog.at("Opening"));
 
 	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));	
+	GameSaveLoad::read();
 }
 
 // go back to story mode at the specified branch
 StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	story = *test_story;
 	setCurrentBranch(story.dialog.at(branch_name));
+	GameSaveLoad::read();
 }
 
 
 StoryMode::~StoryMode() {
+	GameSaveLoad::write();
 }
 
 bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 
-	if (evt.type == SDL_KEYDOWN) {
-		SDL_Keycode keyCode = evt.key.keysym.sym;
-		if (keyCode == SDLK_UP) {
-			main_dialog->MoveUp();
-			return true;
-		} else if (keyCode == SDLK_DOWN) {
-			main_dialog->MoveDown();
-			return true;
-		} else if (keyCode == SDLK_w) {
-			main_dialog->MoveUp2();
-			return true;
-		} else if (keyCode == SDLK_s) {
-			main_dialog->MoveDown2();
-			return true;
-		}
-		else if (keyCode == SDLK_RETURN) {
-			if (main_dialog->finished()) {
-				if (main_dialog->agree()) {
-					std::optional<int> next_branch = main_dialog->Enter();
-					if (next_branch.has_value()) {
-						std::string next_branch_name = current.next_branch_names.at(next_branch.value());
-						if (next_branch_name == "PuzzleMode") {
-							// jump to the puzzle mode
-							// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-							Mode::set_current(std::make_shared<PuzzleMode>());
-						} else {
-							setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
-						}
-					}
-				} else {
-					// disagree
-					story.dialog["disagree"].background = current.background;
-					story.dialog["disagree"].character_name = current.character_name;
-					if (story.dialog["disagree"].next_branch_names.empty()) {
-						story.dialog["disagree"].next_branch_names.push_back(current.dlg_name);
-					} else {
-						story.dialog["disagree"].next_branch_names[0] = current.dlg_name;
-					}
-					setCurrentBranch(story.dialog["disagree"]);
-				}
-			} else {
-				// text skip
-				main_dialog->show_all_text();
+	if (!loading_page_shown) {
+		if (evt.type == SDL_KEYDOWN) {
+			SDL_Keycode keyCode = evt.key.keysym.sym;
+			if (keyCode == SDLK_UP) {
+				main_dialog->MoveUp();
+				return true;
+			} else if (keyCode == SDLK_DOWN) {
+				main_dialog->MoveDown();
+				return true;
+			} else if (keyCode == SDLK_w) {
+				main_dialog->MoveUp2();
+				return true;
+			} else if (keyCode == SDLK_s) {
+				main_dialog->MoveDown2();
 				return true;
 			}
-			return false;
+			else if (keyCode == SDLK_RETURN) {
+				if (main_dialog->finished()) {
+					if (main_dialog->agree()) {
+						std::optional<int> next_branch = main_dialog->Enter();
+						if (next_branch.has_value()) {
+							std::string next_branch_name = current.next_branch_names.at(next_branch.value());
+							if (next_branch_name == "PuzzleMode") {
+								// jump to the puzzle mode
+								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
+								Mode::set_current(std::make_shared<PuzzleMode>());
+							} else {
+								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
+							}
+						}
+					} else {
+						// disagree
+						story.dialog["disagree"].background = current.background;
+						story.dialog["disagree"].character_name = current.character_name;
+						if (story.dialog["disagree"].next_branch_names.empty()) {
+							story.dialog["disagree"].next_branch_names.push_back(current.dlg_name);
+						} else {
+							story.dialog["disagree"].next_branch_names[0] = current.dlg_name;
+						}
+						setCurrentBranch(story.dialog["disagree"]);
+					}
+				} else {
+					// text skip
+					main_dialog->show_all_text();
+					return true;
+				}
+				return false;
+			}
 		}
 	}
 
@@ -206,42 +211,100 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 		int x, y;
 		SDL_GetMouseState( &x, &y );
 		
-		if (y <= 30.f) {
-			if (620 <= x && x < 680) {
-				save_selected = true;
-				load_selected = false;
-				menu_selected = false;
-				return true;
-			} else if (680 <= x && x < 740) {
-				save_selected = false;
-				load_selected = true;
-				menu_selected = false;
-				return true;
-			} else if (740 <= x) {
-				save_selected = false;
-				load_selected = false;
-				menu_selected = true;
-				return true;
+		if (!loading_page_shown) {
+			if (y <= 30.f) {
+				if (620 <= x && x < 680) {
+					save_selected = true;
+					load_selected = false;
+					menu_selected = false;
+					return true;
+				} else if (680 <= x && x < 740) {
+					save_selected = false;
+					load_selected = true;
+					menu_selected = false;
+					return true;
+				} else if (740 <= x) {
+					save_selected = false;
+					load_selected = false;
+					menu_selected = true;
+					return true;
+				}
 			}
+			save_selected = false;
+			load_selected = false;
+			menu_selected = false;
+			return true;
 		}
-		save_selected = false;
-		load_selected = false;
-		menu_selected = false;
-		return true;
 	}
 
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
-		if (save_selected) {
-			// TODO save the current status
-			std::cout << "saved!" << std::endl;
-		}
-		if (load_selected) {
-			// TODO load from selected slot
-			std::cout << "loading!" << std::endl;
-		}
-		if (menu_selected) {
-			Sound::stop_all_samples();
-			Mode::set_current(std::make_shared<IntroMode>());
+		if (!loading_page_shown) {
+			if (save_selected) {
+				// TODO save the current status
+				std::cout << "saved!" << std::endl;
+				loading_page_shown = true;
+				return true;
+			}
+			if (load_selected) {
+				// TODO load from selected slot
+				std::cout << "loading!" << std::endl;
+				loading_page_shown = true;
+				return true;
+			}
+			if (menu_selected) {
+				Sound::stop_all_samples();
+				Mode::set_current(std::make_shared<IntroMode>());
+				return true;
+			}
+		} else {
+			int x, y;
+			SDL_GetMouseState( &x, &y );
+
+			// load from slots
+			if (109 <= x && x <= 716) {
+				size_t slot_idx = 3;
+				if (169 <= y && y <= 253) {
+					// slot 1
+					slot_idx = 0;
+				}
+				if (304 <= y && y <= 400) {
+					// slot 2
+					slot_idx = 1;
+				}
+				if (438 <= y && y <= 528) {
+					// slot 3
+					slot_idx = 2;
+				}
+				
+				if (slot_idx < 3) {
+					if (save_selected) {
+						GameSaveLoad::save(current.dlg_name, slot_idx);
+						return true;
+					}
+					if (load_selected) {
+						GameSaveLoad::mtx.lock();
+						std::string branch_name = GameSaveLoad::slots[slot_idx].story_name;
+						GameSaveLoad::mtx.unlock();
+						if ( story.dialog.find(branch_name) != story.dialog.end() ) {
+							loading_page_shown = false;
+							load_selected = false;
+							setCurrentBranch(story.dialog.at(branch_name));
+							return true;
+						} else {
+							std::cout << "Can't find branch: " << branch_name << std::endl;
+						}
+					}
+					std::cout << "Neither save or load selected" << std::endl;
+				}
+			}
+
+			// back button
+			if (635 <= x && x <= 756 && 100 <= y && y <= 149) {
+				save_selected = false;
+				load_selected = false;
+				loading_page_shown = false;
+				return true;
+			}
 		}
 	}
 
@@ -295,6 +358,34 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		character_name->draw();
 		main_dialog->draw();
+	}
+
+	if (loading_page_shown) {
+		story_sprites["story_loading"]->draw(center, drawable_size, 0.4f, 1.f);
+		// text
+		glDisable(GL_DEPTH_TEST);
+		{
+			for (int i = 0; i < 3; ++i) {
+				slot_info[i] = std::make_shared<view::TextBox>();
+				std::vector<std::pair<glm::u8vec4, std::string> > contents;
+				GameSaveLoad::mtx.lock();
+				if (GameSaveLoad::slots[i].story_name != "Empty") {
+					contents.emplace_back(glm::vec4(255), "Story: " + GameSaveLoad::slots[i].story_name);
+					contents.emplace_back(glm::vec4(255), "Time: " + GameSaveLoad::slots[i].save_time);
+				} else {
+					contents.emplace_back(glm::vec4(255), "Empty");
+				}
+				GameSaveLoad::mtx.unlock();
+				
+				slot_info[i]->set_font_face(view::FontFace::BUILT_BD)
+							.set_contents(contents)
+							.set_font_size(22)
+							.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
+							.disable_animation()
+							.show();
+				slot_info[i]->draw();
+			}
+		}
 	}
 	
 	GL_ERRORS();

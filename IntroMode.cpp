@@ -11,44 +11,91 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 	if ( evt.type == SDL_MOUSEMOTION ) {
 		int x, y;
 		SDL_GetMouseState( &x, &y );
-		if (237 <= x && x <= 562) {
-			if (346 <= y && y <= 393) {
-				start_selected = true;
-				load_selected = false;
-				tutorial_selected = false;
-				return true;
+		if (!loading_page_shown) {
+			if (237 <= x && x <= 562) {
+				if (346 <= y && y <= 393) {
+					start_selected = true;
+					load_selected = false;
+					tutorial_selected = false;
+					return true;
+				}
+				if (426 <= y && y <= 473) {
+					start_selected = false;
+					load_selected = true;
+					tutorial_selected = false;
+					return true;
+				}
+				if (506 <= y && y <= 553) {
+					start_selected = false;
+					load_selected = false;
+					tutorial_selected = true;
+					return true;
+				}
 			}
-			if (426 <= y && y <= 473) {
-				start_selected = false;
-				load_selected = true;
-				tutorial_selected = false;
-				return true;
-			}
-			if (506 <= y && y <= 553) {
-				start_selected = false;
-				load_selected = false;
-				tutorial_selected = true;
-				return true;
-			}
+			start_selected = false;
+			load_selected = false;
+			tutorial_selected = false;
+			return true;
 		}
-		start_selected = false;
-		load_selected = false;
-		tutorial_selected = false;
-		return true;
 	}
 
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
-		if (start_selected) {
-			Sound::stop_all_samples();
-			Mode::set_current(std::make_shared<StoryMode>());
-		}
-		if (load_selected) {
-			// TODO load from slots
-			std::cout << "loading!" << std::endl;
-		}
-		if (tutorial_selected) {
-			// TODO build tutorial mode
-			std::cout << "tutorial!" << std::endl;
+		if (!loading_page_shown) {
+			if (start_selected) {
+				Sound::stop_all_samples();
+				GameSaveLoad::write();
+				Mode::set_current(std::make_shared<StoryMode>());
+				return true;
+			}
+			if (load_selected) {
+				GameSaveLoad::read();
+				loading_page_shown = true;
+				return true;
+			}
+			if (tutorial_selected) {
+				// TODO build tutorial mode
+				std::cout << "tutorial!" << std::endl;
+				return true;
+			}
+		} else {
+			int x, y;
+			SDL_GetMouseState( &x, &y );
+
+			// load from slots
+			if (109 <= x && x <= 716) {
+				size_t slot_idx = 3;
+				if (169 <= y && y <= 253) {
+					// slot 1
+					slot_idx = 0;
+				}
+				if (304 <= y && y <= 400) {
+					// slot 2
+					slot_idx = 1;
+				}
+				if (438 <= y && y <= 528) {
+					// slot 3
+					slot_idx = 2;
+				}
+
+				if (slot_idx < 3) {
+					GameSaveLoad::mtx.lock();
+					std::string branch_name = GameSaveLoad::slots[slot_idx].story_name;
+					GameSaveLoad::mtx.unlock();
+					if (branch_name != "Empty") {
+						Sound::stop_all_samples();
+						GameSaveLoad::write();
+						Mode::set_current(std::make_shared<StoryMode>(branch_name));
+						return true;
+					}
+				}
+			}
+
+			// back button
+			if (635 <= x && x <= 756 && 100 <= y && y <= 149) {
+				load_selected = false;
+				loading_page_shown = false;
+				return true;
+			}
 		}
 	}
 	return false;
@@ -58,7 +105,7 @@ Load< Sound::Sample > intro_background_sample(LoadTagDefault, []() -> Sound::Sam
 	return new Sound::Sample(data_path("dusty-floor.opus"));
 });
 
-Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text;
+Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading;
 Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 	menu_background = new Sprite(data_path("HomeScreenBackground.png"), "background");
 	menu_button = new Sprite(data_path("MenuButton.png"), "button");
@@ -66,10 +113,12 @@ Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 	menu_title = new Sprite(data_path("Wing-Person.png"), "title");
 	menu_subtitle = new Sprite(data_path("Subtitle.png"), "subtitle");
 	menu_button_text = new Sprite(data_path("buttons_text.png"), "buttons_text");
+	loading = new Sprite(data_path("Loading_slots.png"), "loading");
 });
 
 IntroMode::IntroMode() {
 	music_loop = Sound::loop_3D(*intro_background_sample, 1.0f, glm::vec3(0, 0, 0));
+	GameSaveLoad::read();
 	headline_bg = std::make_shared<view::TextLine>();
 	headline_bg->set_text("Wing-Person")
 		.set_position(125, 150)
@@ -95,6 +144,9 @@ IntroMode::IntroMode() {
 		.set_font_size(32)
 		.disable_animation()
 		.set_visibility(true);
+}
+
+IntroMode::~IntroMode() {
 }
 
 void IntroMode::update(float elapsed) {
@@ -133,4 +185,34 @@ void IntroMode::draw(glm::uvec2 const &drawable_size) {
 	menu_title->draw(center, drawable_size, 0.45f, 1.f);
 	menu_subtitle->draw(center, drawable_size, 0.45f, 1.f);
 	menu_button_text->draw(center, drawable_size, 0.4f, 1.f);
+
+	if (loading_page_shown) {
+		loading->draw(center, drawable_size, 0.4f, 1.f);
+
+		// text
+		glDisable(GL_DEPTH_TEST);
+		{
+			for (int i = 0; i < 3; ++i) {
+				slot_info[i] = std::make_shared<view::TextBox>();
+				std::vector<std::pair<glm::u8vec4, std::string> > contents;
+				glm::vec4 color(0, 97, 146, 255);
+				GameSaveLoad::mtx.lock();
+				if (GameSaveLoad::slots[i].story_name != "Empty") {
+					contents.emplace_back(color, "Story: " + GameSaveLoad::slots[i].story_name);
+					contents.emplace_back(color, "Time: " + GameSaveLoad::slots[i].save_time);
+				} else {
+					contents.emplace_back(color, "Empty");
+				}
+				GameSaveLoad::mtx.unlock();
+				
+				slot_info[i]->set_font_face(view::FontFace::BUILT_BD)
+							.set_contents(contents)
+							.set_font_size(30)
+							.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
+							.disable_animation()
+							.show();
+				slot_info[i]->draw();
+			}
+		}
+	}
 }
