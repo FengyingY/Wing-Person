@@ -15,10 +15,8 @@ struct IntroMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 private:
-	std::shared_ptr<view::TextLine> headline;
-	std::shared_ptr<view::TextLine> headline_bg;
 	std::shared_ptr<view::TextLine> prompt;
-	std::shared_ptr<view::TextBox> slot_info[3];
+	std::shared_ptr<view::TextLine> slot_info[6];
 	std::shared_ptr< Sound::PlayingSample > music_loop;
 	bool start_selected = false, load_selected = false, tutorial_selected = false, loading_page_shown = false;
 };

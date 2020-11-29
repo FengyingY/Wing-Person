@@ -45,23 +45,24 @@ struct StoryMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	//----- game state -----
+	int happiness = 50, respect = 50;	// DUMMIES FOR AFFINITY SYSTEM
+
+	// Story control
+	Story story;
+	Story::Dialog current;
+	bool show_next_line();
+
+	// Text & UI
 	std::shared_ptr<view::TextLine> character_name = nullptr;
-	std::shared_ptr<view::TextBox> slot_info[3];
-	
+	std::shared_ptr<view::TextLine> slot_info[6];
 	std::shared_ptr<view::Dialog> main_dialog = nullptr;
-
+	std::shared_ptr<view::TextLine> happiness_status = nullptr;
+	std::shared_ptr<view::TextLine> respect_status = nullptr;
 	bool menu_selected = false, load_selected = false, save_selected = false, loading_page_shown = false;
-
-
 	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
 	bool option = false;
 
-	Story story;
-
-	Story::Dialog current;
-
-	bool show_next_line();
-
+	// music 
 	std::shared_ptr< Sound::PlayingSample > music_loop;
 
 private:

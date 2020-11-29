@@ -182,7 +182,11 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 								// jump to the puzzle mode
 								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
 								Mode::set_current(std::make_shared<PuzzleMode>());
-							} else {
+							} else { 
+								// agreed with a valid option
+								// DUMMY STATUS TEXT UPDATE, TODO CHANGE THE STATUS ACCORDING TO THE STORY
+								happiness += rand() % 5;
+								respect += rand() % 5;
 								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
 							}
 						}
@@ -358,6 +362,26 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		character_name->draw();
 		main_dialog->draw();
+
+		happiness_status = std::make_shared<view::TextLine>();
+		happiness_status->set_font(view::FontFace::Literata)
+					.set_text("Happiness: " + std::to_string(happiness))
+					.set_font_size(17)
+					.set_position(glm::vec2(10.f, 5.f))
+					.set_color(glm::u8vec4(255))
+					.disable_animation()
+					.set_visibility(true);
+		happiness_status->draw();
+		
+		respect_status = std::make_shared<view::TextLine>();
+		respect_status->set_font(view::FontFace::Literata)
+					.set_text("Respect: " + std::to_string(respect))
+					.set_font_size(17)
+					.set_position(glm::vec2(170.5f, 5.f))
+					.set_color(glm::u8vec4(255))
+					.disable_animation()
+					.set_visibility(true);
+		respect_status->draw();
 	}
 
 	if (loading_page_shown) {
@@ -366,24 +390,44 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 		glDisable(GL_DEPTH_TEST);
 		{
 			for (int i = 0; i < 3; ++i) {
-				slot_info[i] = std::make_shared<view::TextBox>();
 				std::vector<std::pair<glm::u8vec4, std::string> > contents;
+				glm::vec4 color(255);
 				GameSaveLoad::mtx.lock();
 				if (GameSaveLoad::slots[i].story_name != "Empty") {
-					contents.emplace_back(glm::vec4(255), "Story: " + GameSaveLoad::slots[i].story_name);
-					contents.emplace_back(glm::vec4(255), "Time: " + GameSaveLoad::slots[i].save_time);
+					
+					slot_info[i] = std::make_shared<view::TextLine>();
+					slot_info[i]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Story: " + GameSaveLoad::slots[i].story_name)
+								.set_font_size(20)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f - 15.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i]->draw();
+
+					slot_info[i+1] = std::make_shared<view::TextLine>();
+					slot_info[i+1]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Time: " + GameSaveLoad::slots[i].save_time)
+								.set_font_size(20)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f + 15.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i+1]->draw();
+
 				} else {
-					contents.emplace_back(glm::vec4(255), "Empty");
+					slot_info[i] = std::make_shared<view::TextLine>();
+					slot_info[i]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Empty")
+								.set_font_size(30)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i]->draw();
 				}
 				GameSaveLoad::mtx.unlock();
 				
-				slot_info[i]->set_font_face(view::FontFace::BUILT_BD)
-							.set_contents(contents)
-							.set_font_size(22)
-							.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
-							.disable_animation()
-							.show();
-				slot_info[i]->draw();
 			}
 		}
 	}

@@ -119,31 +119,8 @@ Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 IntroMode::IntroMode() {
 	music_loop = Sound::loop_3D(*intro_background_sample, 1.0f, glm::vec3(0, 0, 0));
 	GameSaveLoad::read();
-	headline_bg = std::make_shared<view::TextLine>();
-	headline_bg->set_text("Wing-Person")
-		.set_position(125, 150)
-		.set_color(glm::u8vec4(255))
-		.set_font(view::FontFace::BUILT_BD)
-		.set_font_size(106)
-		.disable_animation()
-		.set_visibility(true);
-
-	headline = std::make_shared<view::TextLine>();
-	headline->set_text("Wing-Person")
-		.set_position(135, 152)
-		.set_color(glm::u8vec4(52, 172, 244, 255))
-		.set_font(view::FontFace::BUILT_BD)
-		.set_font_size(102)
-		.disable_animation()
-		.set_visibility(true);
 
 	prompt = std::make_shared<view::TextLine>();
-	prompt->set_text("Press enter to start...")
-		.set_position(250, 500)
-		.set_color(glm::u8vec4(255))
-		.set_font_size(32)
-		.disable_animation()
-		.set_visibility(true);
 }
 
 IntroMode::~IntroMode() {
@@ -154,12 +131,6 @@ void IntroMode::update(float elapsed) {
 	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDisable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
-	{
-		if (headline) { headline->update(elapsed); }
-		if (prompt) { prompt->update(elapsed); }
-	}
 	GL_ERRORS();
 }
 
@@ -193,25 +164,44 @@ void IntroMode::draw(glm::uvec2 const &drawable_size) {
 		glDisable(GL_DEPTH_TEST);
 		{
 			for (int i = 0; i < 3; ++i) {
-				slot_info[i] = std::make_shared<view::TextBox>();
 				std::vector<std::pair<glm::u8vec4, std::string> > contents;
 				glm::vec4 color(0, 97, 146, 255);
 				GameSaveLoad::mtx.lock();
 				if (GameSaveLoad::slots[i].story_name != "Empty") {
-					contents.emplace_back(color, "Story: " + GameSaveLoad::slots[i].story_name);
-					contents.emplace_back(color, "Time: " + GameSaveLoad::slots[i].save_time);
+					
+					slot_info[i] = std::make_shared<view::TextLine>();
+					slot_info[i]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Story: " + GameSaveLoad::slots[i].story_name)
+								.set_font_size(20)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f - 15.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i]->draw();
+
+					slot_info[i+1] = std::make_shared<view::TextLine>();
+					slot_info[i+1]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Time: " + GameSaveLoad::slots[i].save_time)
+								.set_font_size(20)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f + 15.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i+1]->draw();
+
 				} else {
-					contents.emplace_back(color, "Empty");
+					slot_info[i] = std::make_shared<view::TextLine>();
+					slot_info[i]->set_font(view::FontFace::BUILT_BD)
+								.set_text("Empty")
+								.set_font_size(30)
+								.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
+								.disable_animation()
+								.set_visibility(true)
+								.set_color(color);
+					slot_info[i]->draw();
 				}
 				GameSaveLoad::mtx.unlock();
 				
-				slot_info[i]->set_font_face(view::FontFace::BUILT_BD)
-							.set_contents(contents)
-							.set_font_size(30)
-							.set_position(glm::vec2(230.5f, 200.f + i * 135.f))
-							.disable_animation()
-							.show();
-				slot_info[i]->draw();
 			}
 		}
 	}
