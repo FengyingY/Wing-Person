@@ -180,7 +180,6 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 							Mode::set_current(std::make_shared<PuzzleMode>());
 						} else {
 							setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
-
 						}
 					}
 				} else {
@@ -241,7 +240,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 			std::cout << "loading!" << std::endl;
 		}
 		if (menu_selected) {
-			music_loop->stop();
+			Sound::stop_all_samples();
 			Mode::set_current(std::make_shared<IntroMode>());
 		}
 	}

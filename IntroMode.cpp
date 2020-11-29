@@ -1,6 +1,7 @@
 #include "IntroMode.hpp"
 #include "SDL_events.h"
 #include "SDL_keycode.h"
+#include "Sound.hpp"
 #include "StoryMode.hpp"
 #include "View.hpp"
 #include "gl_errors.hpp"
@@ -38,7 +39,7 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
 		if (start_selected) {
-			music_loop->stop();
+			Sound::stop_all_samples();
 			Mode::set_current(std::make_shared<StoryMode>());
 		}
 		if (load_selected) {
