@@ -161,6 +161,28 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 void PuzzleMode::update(float elapsed) {
 	total_time += elapsed;
 
+	if (is_timeup)
+	{
+		return;
+	}
+	
+	// update puzzle time and countdown
+	if (puzzle_time >= MaxPuzzleTime)
+	{
+		// puzzle failed. Perform negative action
+		is_timeup = true;
+
+		std::string branch_name = "Story16";
+		Mode::set_current(std::make_shared<StoryMode>(branch_name));
+		return;
+	}
+	else
+	{
+		puzzle_time += elapsed;
+	}
+	
+	
+
 	for (unsigned int i = 0; i < players.size(); i++) {
 
 		// Calculate inputs and movement for each player

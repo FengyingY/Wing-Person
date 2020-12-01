@@ -35,9 +35,8 @@ struct PuzzleMode : Mode
 	PlatformTile *end;
 	float total_time = 0.0f;
 
-	struct LevelData
-	{
-		
-	};
+	const float MaxPuzzleTime = 30.0f;	// in seconds
+	float puzzle_time = 0.0f;
+	bool is_timeup = false;
   
 };
