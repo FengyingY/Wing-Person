@@ -32,6 +32,8 @@ struct PuzzleMode : Mode
 	
 	std::vector < PlatformTile *> collectibles;
 
+	std::vector < PlatformTile *> objects;
+
 	PlatformTile *end;
 	float total_time = 0.0f;
 

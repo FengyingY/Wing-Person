@@ -30,6 +30,7 @@ Load < std::map<std::string, PlatformTile::Texture*> > sprites(LoadTagEarly, [](
 	images.emplace_back("puzzle_sprites/platform.png");
 	images.emplace_back("puzzle_sprites/collectible.png");
 	images.emplace_back("puzzle_sprites/End.png");
+	images.emplace_back("puzzle_sprites/box.png");
 
 	try
 	{
@@ -113,6 +114,13 @@ PuzzleMode::PuzzleMode() {
 						PlatformTile::Texture(sprites->at("puzzle_sprites/collectible.png")->size, sprites->at("puzzle_sprites/collectible.png")->data)
 					);
 					collectibles.emplace_back(platform);
+
+					platform = new PlatformTile(
+						glm::vec2(((x - 1) * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(sprites->at("puzzle_sprites/box.png")->size, sprites->at("puzzle_sprites/box.png")->data)
+					);
+					objects.emplace_back(platform);
 				}
 				else if(level_data->at(y*25 + x) == 76){
 					end = new PlatformTile(
@@ -329,6 +337,12 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	{
 		collectible->draw(drawable_size);
 	}
+
+	for (auto &&object : objects)
+	{
+		object->draw(drawable_size);
+	}
+	
 
 	end->draw(drawable_size);
 	
