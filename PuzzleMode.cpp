@@ -251,6 +251,14 @@ void PuzzleMode::update(float elapsed) {
 
 	if (is_timeup)
 	{
+		try {
+			std::string branch_name = "Story16";
+			Mode::set_current(std::make_shared<StoryMode>(branch_name));
+		}
+		catch (int e) {
+			std::cout << "Caught exception " << e << " when trying to switch to story mode" << std::endl;
+		}
+
 		return;
 	}
 	
@@ -260,8 +268,8 @@ void PuzzleMode::update(float elapsed) {
 		// puzzle failed. Perform negative action
 		is_timeup = true;
 
-		std::string branch_name = "Story16";
-		Mode::set_current(std::make_shared<StoryMode>(branch_name));
+		//std::string branch_name = "Story16";
+		//Mode::set_current(std::make_shared<StoryMode>(branch_name));
 	}
 	else
 	{
@@ -392,10 +400,10 @@ void PuzzleMode::update(float elapsed) {
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					std::string branch_name = "Story16";
-					Mode::set_current(std::make_shared<StoryMode>(branch_name));
-					//puzzle_time = MaxPuzzleTime;
-					is_timeup = true;
+					//std::string branch_name = "Story16";
+					//Mode::set_current(std::make_shared<StoryMode>(branch_name));
+					puzzle_time = MaxPuzzleTime;
+					//is_timeup = true;
 				}
 		}
 		
