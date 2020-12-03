@@ -169,6 +169,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 
 				case TileType::Object:
 					objects.emplace_back(level_tile);
+					object_collision_shapes.emplace_back(level_tile->collision_shape);
 					break;
 				
 				default:
@@ -185,8 +186,16 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(200, 85), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
+	add_player(glm::vec2(300, 460), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
 	add_player(glm::vec2(600, 85), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
+
+	for (int i = 0; i < objects.size(); i++) {
+		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {
+			objects[i]->position.y += 5.0f;
+			glm::vec2 move_up = glm::vec2(0.0f, 5.0f);
+			object_collision_shapes[i] = Shapes::Rectangle(object_collision_shapes[i].center + move_up, object_collision_shapes[i].width, object_collision_shapes[i].height, false);
+		}
+	}
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -326,24 +335,24 @@ void PuzzleMode::update(float elapsed) {
 			players[i]->falling = true;
 		}
 
-		//quick fix to deal with collision box center not updating properly; not at all optimized code
+		//quick fix to deal with collision box center not updating properly; not at all optimized code:
 		int other_player_index = (i + 1) % players.size();
 		glm::vec2 center = players[other_player_index]->collision_box.center;
 		float width = players[other_player_index]->collision_box.width;
 		float height = players[other_player_index]->collision_box.height;
 
-		//add the other player to the list of things the current player can collide with
+		//add the other player to the list of things the current player can collide with:
 		platform_collision_shapes.emplace_back(Shapes::Rectangle(center, width, height, false));
 
 		//check for collisions before moving due to input:
-		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity, platform_collision_shapes)) {
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity, platform_collision_shapes, object_collision_shapes)) {
 			players[i]->position += players[i]->velocity;
 			players[i]->collision_box.center += players[i]->velocity;
 		}
 
 		//check for collisions before moving due to gravity:
 		glm::vec2 gravity = glm::vec2(0, -players[i]->gravityspeed * elapsed);
-		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes)) {
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes, object_collision_shapes)) {
 			players[i]->position += gravity;
 			players[i]->collision_box.center += gravity;
 			if (!players[i]->jump->held() || players[i]->input_jump_time >= Player::max_jump_time)
@@ -362,7 +371,7 @@ void PuzzleMode::update(float elapsed) {
 			}
 		}
 
-		//remove the other player to the list of things the current player can collide with
+		//remove the other player to the list of things the current player can collide with:
 		platform_collision_shapes.pop_back();
 
 		// collectibles collection check | Not using collision. Just checking for distance
@@ -383,15 +392,88 @@ void PuzzleMode::update(float elapsed) {
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					//std::string branch_name = "Story16";
-					//Mode::set_current(std::make_shared<StoryMode>(branch_name));
-					puzzle_time = MaxPuzzleTime;
+					std::string branch_name = "Story16";
+					Mode::set_current(std::make_shared<StoryMode>(branch_name));
+					//puzzle_time = MaxPuzzleTime;
+					is_timeup = true;
 				}
 		}
 		
-
 		input_manager.tick();
 	}
+
+	//add the players to the list of things that objects can collide with:
+	platform_collision_shapes.emplace_back(Shapes::Rectangle(players[0]->collision_box.center, players[0]->collision_box.width, players[0]->collision_box.height, false));
+	platform_collision_shapes.emplace_back(Shapes::Rectangle(players[1]->collision_box.center, players[1]->collision_box.width, players[1]->collision_box.height, false));
+
+	//move objects:
+	int num_objects = (int)object_collision_shapes.size();
+	for (int i = 0; i < num_objects; i++) {
+		//the possible "velocity" of the object, as long as this would not cause collisions
+		glm::vec2 object_velocity = glm::vec2(0.0f, 0.0f);
+		
+		//get the square distance from the object to each player:
+		float dist_red = std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[0]->position.x, 2) + std::pow(objects[num_objects - 1]->position.y - players[0]->position.y, 2));
+		float dist_blue = std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[1]->position.x, 2) + std::pow(objects[num_objects - 1]->position.y - players[1]->position.y, 2));
+
+		//if the red player is close enough, consider it a collision:
+		if (dist_red <= (objects[num_objects - 1]->size.x + players[0]->size.x) / 2.0f + 1.0f &&
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[0]->position.y - (players[0]->size.y / 2.0f)) {
+			//if the red player is to the left, move the object right:
+			if (objects[num_objects - 1]->position.x - players[0]->position.x > 0) {
+				object_velocity.x += Player::movespeed * elapsed;
+			}
+			//if the red player is to the right, move the object left:
+			else if (objects[num_objects - 1]->position.x - players[0]->position.x < 0) {
+				object_velocity.x -= Player::movespeed * elapsed;
+			}
+		}
+
+		//if the blue player is close enough, consider it a collision:
+		if (dist_blue <= (objects[num_objects - 1]->size.x + players[1]->size.x) / 2.0f + 1.0f &&
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[1]->position.y - (players[0]->size.y / 2.0f)) {
+			//if the blue player is to the left, move the object right:
+			if (objects[num_objects - 1]->position.x - players[1]->position.x > 0) {
+				object_velocity.x += Player::movespeed * elapsed;
+			}
+			//if the blue player is to the right, move the object left:
+			else if (objects[num_objects - 1]->position.x - players[1]->position.x < 0) {
+				object_velocity.x -= Player::movespeed * elapsed;
+			}
+		}
+
+		//temporarily grab and remove onto the last object sprite in objects:
+		PlatformTile* temp_sprite = objects.back();
+		objects.pop_back();
+
+		//temporarily grab and remove onto the last object shape in object_collision_shapes:
+		Shapes::Rectangle temp_shape = object_collision_shapes.back();
+		object_collision_shapes.pop_back();
+		glm::vec2 temp_shape_center = temp_shape.center;
+
+		//check for collisions before moving due to velocity:
+		if (!Collisions::player_rectangles_collision(temp_shape, temp_shape_center + object_velocity, platform_collision_shapes, object_collision_shapes)) {
+			temp_sprite->position += object_velocity;
+			temp_shape_center += object_velocity;
+		}
+		
+		//from here down is gravity:
+		glm::vec2 gravity = glm::vec2(0, -60.0f * elapsed);
+
+		//check for collisions before moving due to gravity:
+		if (!Collisions::player_rectangles_collision(temp_shape, temp_shape_center + gravity, platform_collision_shapes, object_collision_shapes)) {
+			temp_sprite->position += gravity;
+			temp_shape_center += gravity;
+		}
+
+		//add back in the temporarily removed sprites and shapes
+		objects.emplace(objects.begin(), temp_sprite);
+		object_collision_shapes.emplace(object_collision_shapes.begin(), Shapes::Rectangle(temp_shape_center, temp_shape.width, temp_shape.height, false));
+	}
+
+	//remove the players from the list of things to collide with; necessary because players use the same list:
+	platform_collision_shapes.pop_back();
+	platform_collision_shapes.pop_back();
 }
 
 void PuzzleMode::draw(glm::uvec2 const &drawable_size) {

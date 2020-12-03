@@ -30,12 +30,14 @@ struct PuzzleMode : Mode
 
 	//----- game state ------
 	std::vector < Player *> players;
+	
 	std::vector < PlatformTile *> platforms;
 	std::vector < Shapes::Rectangle > platform_collision_shapes;
 	
 	std::vector < PlatformTile *> collectibles;
 
 	std::vector < PlatformTile *> objects;
+	std::vector < Shapes::Rectangle > object_collision_shapes;
 
 	PlatformTile *end = nullptr;
 	float total_time = 0.0f;

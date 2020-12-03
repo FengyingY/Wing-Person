@@ -639,6 +639,14 @@ bool Collisions::player_rectangles_collision(Shapes::Rectangle player, glm::vec2
 	return false;
 }
 
+//allows for a second vector to compare against for collisions:
+bool Collisions::player_rectangles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Rectangle > rectangles1, std::vector < Shapes::Rectangle > rectangles2) {
+	//check for collisions:
+	if (player_rectangles_collision(player, new_pos, rectangles1))
+		return true;
+	return player_rectangles_collision(player, new_pos, rectangles2);
+}
+
 //check if one player (assumed to be a rectangle) with a new position collides with any triangle in the list:
 bool Collisions::player_triangles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Triangle > triangles) {
 	//create new rectangle for new position:
