@@ -40,7 +40,7 @@ struct PuzzleMode : Mode
 	PlatformTile *end = nullptr;
 	float total_time = 0.0f;
 
-	const float MaxPuzzleTime = 30.0f;	// in seconds
+	const float MaxPuzzleTime = 300.0f;	// in seconds
 	float puzzle_time = 0.0f;
 	bool is_timeup = false;
   
