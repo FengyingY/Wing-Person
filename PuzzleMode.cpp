@@ -2,52 +2,87 @@
 
 #include "Collisions.hpp"
 #include "PackLevelData.hpp"
+#include "TileMap.hpp"
 #include "data_path.hpp"
 #include "read_write_chunk.hpp"
 
 #include "StoryMode.hpp"
-// #include "View.hpp"
 
 #include <fstream>
 #include <map>
 
-const float ScreenWidth = 800.0f;
+// const float ScreenWidth = 800.0f;
 const float ScreenHeight = 600.0f;
 
-Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uint32_t> * {
-	std::vector<uint32_t> *ret = new std::vector< uint32_t >();
+Load< TileMap > tile_map(LoadTagEarly, []() -> TileMap * {
+	TileMap *ret = new TileMap();
+
+	std::vector< TileChunk > ids;
+	std::vector< char > paths;
+	std::vector< uint32_t > data;
+	
+	std::cout << "Read tile map" << "\n";
 
 	std::ifstream dat_file(data_path("level-data.dat"), std::ios::binary);
-	read_chunk(dat_file, "lvdt", ret);
+	
+	read_chunk(dat_file, "tsid", &ids);
+	read_chunk(dat_file, "tsip", &paths);
+	read_chunk(dat_file, "lvdt", &data);
+
+	std::string imgstr(paths.begin(), paths.end());
+	size_t cursor_pos = 0;
+	for (auto &&id : ids)
+	{
+		Tile t;
+		t.img_name = imgstr.substr(cursor_pos, id.path_length);
+		cursor_pos += id.path_length;
+		t.tile_type = id.tile_type;
+
+		ret->tiles.emplace(id.tile_id, t);
+	}
+
+	uint32_t num_levels = data[0];
+	assert(num_levels > 0 && "No levels packed!");
+	
+	size_t tile_count = 0, level_count = 0;
+	Level lvl;
+	for (std::vector<uint32_t>::iterator it = ++data.begin(); it != data.end(); ++it)
+	{
+		lvl.data.emplace_back(*it);
+		if (tile_count == 18 * 25)
+		{
+			ret->levels.emplace_back(lvl);
+			lvl.data.clear();
+			tile_count = 0;
+		}
+		tile_count++;
+	}
+
+	std::cout << "Done reading tile map" << "\n";
 
 	return ret;
 });
 
-Load < std::map<std::string, PlatformTile::Texture*> > sprites(LoadTagEarly, []() -> std::map<std::string, PlatformTile::Texture *> * {
-	std::map<std::string, PlatformTile::Texture*> *ret = new std::map<std::string, PlatformTile::Texture *>();
-
-	std::vector< std::string > images;
-	images.emplace_back("puzzle_sprites/platform.png");
-	images.emplace_back("puzzle_sprites/collectible.png");
-	images.emplace_back("puzzle_sprites/End.png");
-	images.emplace_back("puzzle_sprites/box.png");
-
+Load< std::map< uint32_t, PlatformTile::Texture* > > sprites(LoadTagLate, []() -> std::map< uint32_t, PlatformTile::Texture* > * {
+	std::map< uint32_t, PlatformTile::Texture* > *ret = new std::map< uint32_t, PlatformTile::Texture* >();
+	
+	std::cout << "Load puzzle sprites" << "\n";
 	try
 	{
 		PlatformTile::Texture *newTex = nullptr;
-		for (auto &&img : images)
+		for (auto &&img : tile_map->tiles)
 		{
 			newTex = new PlatformTile::Texture();
-			load_png(data_path(img), &newTex->size, &newTex->data, LowerLeftOrigin);
-			ret->emplace(img, newTex);
+			load_png(data_path("puzzle_sprites/" + img.second.img_name), &newTex->size, &newTex->data, LowerLeftOrigin);
+			ret->emplace(img.first, newTex);
 		}
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << "PuzzleMode::Sprites load failed. " << e.what() << '\n';
 	}
-	
-	
+	std::cout << "Puzzle sprites loaded" << "\n";
+
 	return ret;
 });
 
@@ -93,56 +128,61 @@ Load< void > load_sprites(LoadTagEarly, []() -> void {
 	}
 });
 
-
-PuzzleMode::PuzzleMode() {
+PuzzleMode::PuzzleMode(uint32_t level) {
 	// Read level data and create platforms
-	{
+	std::cout << "\nInit level data" << "\n";
+	try {
+		Level cur_level = tile_map->levels[level];
 		float tile_size = 32.0f;
-		PlatformTile *platform;
-		for (size_t y = 0; y < 18; y++)	// TODO: Read Tile map layer data and set height & width accordingly
+		PlatformTile *level_tile;
+		for (size_t y = 0; y < 18; y++)	// Height and width are constant. #TODO: Use globally declared constants
 		{
 			for (size_t x = 0; x < 25; x++)
 			{
-				if (level_data->at(y*25 + x) == 0){
+				if (cur_level.data.at(y*25 + x) == 0){
 					continue;
 				}
 
-				if (level_data->at(y*25 + x) == 36){	// HACK: collectible
-					platform = new PlatformTile(
-						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
-						glm::vec2(tile_size, tile_size),
-						PlatformTile::Texture(sprites->at("puzzle_sprites/collectible.png")->size, sprites->at("puzzle_sprites/collectible.png")->data)
-					);
-					collectibles.emplace_back(platform);
+				uint32_t tile_id = parse_tiledata(cur_level.data[y*25 + x]);	// parse this and get the true tile ID
 
-					platform = new PlatformTile(
-						glm::vec2(((x - 1) * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
-						glm::vec2(tile_size, tile_size),
-						PlatformTile::Texture(sprites->at("puzzle_sprites/box.png")->size, sprites->at("puzzle_sprites/box.png")->data)
-					);
-					objects.emplace_back(platform);
-				}
-				else if(level_data->at(y*25 + x) == 76){
-					end = new PlatformTile(
-						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
-						glm::vec2(tile_size, tile_size),
-						PlatformTile::Texture(sprites->at("puzzle_sprites/End.png")->size, sprites->at("puzzle_sprites/End.png")->data)
-					);
-				}
-				else
+				uint32_t tile_type = (tile_map->tiles).at(tile_id).tile_type;
+				level_tile = new PlatformTile(
+					glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+					glm::vec2(tile_size, tile_size),
+					PlatformTile::Texture(sprites->at(tile_id)->size, sprites->at(tile_id)->data)
+				);
+				
+				switch (tile_type)
 				{
-					// TODO : Assign proper texture to tile based on tilemap data
-					platform = new PlatformTile(
-						glm::vec2((x * tile_size) + (tile_size * 0.5f),	ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
-						glm::vec2(tile_size, tile_size),
-						PlatformTile::Texture(sprites->at("puzzle_sprites/platform.png")->size, sprites->at("puzzle_sprites/platform.png")->data)
-					);
-					platforms.emplace_back(platform);
-					platform_collision_shapes.emplace_back(platform->collision_shape);
+				case TileType::Platform:
+					platforms.emplace_back(level_tile);
+					platform_collision_shapes.emplace_back(level_tile->collision_shape);
+					break;
+
+				case TileType::Collectible:
+					collectibles.emplace_back(level_tile);
+					break;
+
+				case TileType::End:
+					end = level_tile;
+					break;
+
+				case TileType::Object:
+					objects.emplace_back(level_tile);
+					break;
+				
+				default:
+					break;
 				}
 			}
 		}
+		assert(end != nullptr && "Level does not contain end point! FATALITY!");
 	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 
 	// #HACK : spawn 2 default players
 	add_player(glm::vec2(200, 85), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
@@ -151,9 +191,39 @@ PuzzleMode::PuzzleMode() {
 
 PuzzleMode::~PuzzleMode() {}
 
+uint32_t PuzzleMode::parse_tiledata(uint32_t &tile_data) {
+	// based on Tiled editor's data format - https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data
+
+	// Bits on the far end of the 32-bit global tile ID are used for tile flags
+	const uint32_t FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+	const uint32_t FLIPPED_VERTICALLY_FLAG   = 0x40000000;
+	const uint32_t FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
+
+	uint32_t global_tile_id = tile_data;
+
+	// Read out the flags
+	bool flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
+	bool flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
+	bool flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
+	(void) flipped_vertically;
+	(void) flipped_horizontally;
+	(void) flipped_diagonally;
+
+	// rest of it is the GID
+
+	// Clear the flags
+	global_tile_id &= ~(FLIPPED_HORIZONTALLY_FLAG |
+						FLIPPED_VERTICALLY_FLAG |
+						FLIPPED_DIAGONALLY_FLAG);
+	
+	// resolve the tileset for the gid : global_tile_id - tileset->first_gid
+	return global_tile_id - 1; // 1 is the first_gid since we're using only one tileset
+}
+
 void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
 	std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites) {
 	
+	std::cout << "\nAdding player" << "\n";
 	Input* left = input_manager.register_key(leftkey);
 	Input* right = input_manager.register_key(rightkey);
 	Input* jump = input_manager.register_key(jumpkey);
@@ -167,6 +237,7 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
+	
 	total_time += elapsed;
 
 	if (is_timeup)
@@ -182,7 +253,6 @@ void PuzzleMode::update(float elapsed) {
 
 		std::string branch_name = "Story16";
 		Mode::set_current(std::make_shared<StoryMode>(branch_name));
-		return;
 	}
 	else
 	{
@@ -347,10 +417,10 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	end->draw(drawable_size);
 	
 
-  for (auto&& player : players) {
-    
-    player->draw(drawable_size);
-  }
-//   std::cout << std::endl;
+	for (auto&& player : players) {
+		
+		player->draw(drawable_size);
+	}
+
 	GL_ERRORS();
 }

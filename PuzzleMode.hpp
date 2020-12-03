@@ -12,8 +12,11 @@
 
 struct PuzzleMode : Mode
 {
-	PuzzleMode();
+	PuzzleMode(){};
+	PuzzleMode(uint32_t level);
 	virtual ~PuzzleMode();
+
+	uint32_t parse_tiledata(uint32_t &tile_data);
 
 	void add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
 		std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites);
@@ -34,7 +37,7 @@ struct PuzzleMode : Mode
 
 	std::vector < PlatformTile *> objects;
 
-	PlatformTile *end;
+	PlatformTile *end = nullptr;
 	float total_time = 0.0f;
 
 	const float MaxPuzzleTime = 30.0f;	// in seconds
