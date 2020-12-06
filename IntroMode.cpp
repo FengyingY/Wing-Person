@@ -107,13 +107,13 @@ Load< Sound::Sample > intro_background_sample(LoadTagDefault, []() -> Sound::Sam
 
 Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading;
 Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
-	menu_background = new Sprite(data_path("HomeScreenBackground.png"), "background");
-	menu_button = new Sprite(data_path("MenuButton.png"), "button");
-	menu_button_select = new Sprite(data_path("MenuButtonPressed.png"), "button_select");
-	menu_title = new Sprite(data_path("Wing-Person.png"), "title");
-	menu_subtitle = new Sprite(data_path("Subtitle.png"), "subtitle");
-	menu_button_text = new Sprite(data_path("buttons_text.png"), "buttons_text");
-	loading = new Sprite(data_path("Loading_slots.png"), "loading");
+	menu_background = new Sprite(data_path("menu/HomeScreenBackground.png"), "background");
+	menu_button = new Sprite(data_path("menu/MenuButton.png"), "button");
+	menu_button_select = new Sprite(data_path("menu/MenuButtonPressed.png"), "button_select");
+	menu_title = new Sprite(data_path("menu/Wing-Person.png"), "title");
+	menu_subtitle = new Sprite(data_path("menu/Subtitle.png"), "subtitle");
+	menu_button_text = new Sprite(data_path("menu/buttons_text.png"), "buttons_text");
+	loading = new Sprite(data_path("menu/Loading_slots.png"), "loading");
 });
 
 IntroMode::IntroMode() {
