@@ -1,6 +1,6 @@
 #include "PlatformTile.hpp"
 
-PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(glm::vec2(10.0f, 10.0f)) {
+PlatformTile::PlatformTile() : position(glm::vec2(0.0f, 0.0f)), size(PlatformTile::default_size) {
 	collision_shape = Shapes::Rectangle(glm::vec2(position.x, position.y), (float)size.x, (float)size.y, true);
 	// parse the tile data
 	setup_opengl(texture);	// will be null. careful

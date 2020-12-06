@@ -282,7 +282,6 @@ void PuzzleMode::update(float elapsed) {
 
 		// Calculate inputs and movement for each player
 		players[i]->velocity.x = 0;
-		players[i]->velocity.y = 0;
 
 		size_t idle_sprites_size = players[i]->idle_sprites.size();
 		size_t run_sprites_size = players[i]->run_sprites.size();
@@ -290,14 +289,14 @@ void PuzzleMode::update(float elapsed) {
 			players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
 
 		if (players[i]->left->held()) {
-			players[i]->velocity.x -= Player::movespeed * elapsed;
+			players[i]->velocity.x = -Player::movespeed;
 			players[i]->direction = -1.0f;
 			if (!players[i]->falling)
 				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
 		}
 
 		if (players[i]->right->held()) {
-			players[i]->velocity.x += Player::movespeed * elapsed;
+			players[i]->velocity.x = Player::movespeed;
 			players[i]->direction = 1.0f;
 			if (!players[i]->falling) {
 				if (players[i]->left->held())
@@ -307,40 +306,49 @@ void PuzzleMode::update(float elapsed) {
 			}
 		}
 
+
 		// Process jumping
-		if (players[i]->jump->held() && !players[i]->falling) {
+		if (players[i]->jump->held() && players[i]->input_jump_time < Player::max_jump_time && players[i]->landed) {
+      std::cout << "test1" << std::endl;
 			players[i]->jump_input = true;
 			players[i]->curr_sprite = players[i]->jump_sprite;
-			if (players[i]->input_jump_time < Player::max_jump_time) {
-				players[i]->input_jump_time += elapsed;
-				if (players[i]->input_jump_time >= Player::max_jump_time) {
-					players[i]->input_jump_time = Player::max_jump_time;
-				}
-			}
+			players[i]->falling = true;
+
+      players[i]->input_jump_time += elapsed + 0.0001f;
+      if (players[i]->input_jump_time >= Player::max_jump_time) {
+        players[i]->input_jump_time = Player::max_jump_time;
+      }
 		}
+    std::cout << players[i]->falling << " - " << players[i]->input_jump_time << " - " << players[i]->cur_jump_time << std::endl;
 
 		if (players[i]->jump->just_released()) {
+      std::cout << "test42" << std::endl;
 			players[i]->jump_input = false;
-			players[i]->falling = true;
+      players[i]->landed = false;
 			if (players[i]->input_jump_time < Player::min_jump_time) {
 				players[i]->input_jump_time = Player::min_jump_time;
 			}
 		}
 
 		if (players[i]->cur_jump_time < players[i]->input_jump_time) {
+      std::cout << "test3" << std::endl;
 			players[i]->cur_jump_time += elapsed;
-			players[i]->velocity.y += Player::jumpspeed * elapsed;
+			players[i]->velocity.y = Player::jumpspeed;
 
+    std::cout << players[i]->falling << " - " << players[i]->input_jump_time << " - " << players[i]->cur_jump_time << std::endl;
 			if (players[i]->cur_jump_time >= players[i]->input_jump_time) {
+      std::cout << "test3.5" << std::endl;
 				players[i]->jump_clear = true;
+        players[i]->landed = false;
 			}
 		}
 
-		if (!players[i]->jump->held() && players[i]->jump_clear) {
+		if (players[i]->jump_clear) {
+      std::cout << "test4" << std::endl;
 			players[i]->cur_jump_time = 0.0f;
 			players[i]->input_jump_time = 0.0f;
 			players[i]->jump_clear = false;
-			players[i]->falling = true;
+			players[i]->falling = false;
 		}
 
 		//quick fix to deal with collision box center not updating properly; not at all optimized code:
@@ -352,21 +360,24 @@ void PuzzleMode::update(float elapsed) {
 		//add the other player to the list of things the current player can collide with:
 		platform_collision_shapes.emplace_back(Shapes::Rectangle(center, width, height, false));
 
+
 		//check for collisions before moving due to input:
-		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity, platform_collision_shapes, object_collision_shapes)) {
-			players[i]->position += players[i]->velocity;
-			players[i]->collision_box.center += players[i]->velocity;
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity * elapsed, platform_collision_shapes)) {
+			players[i]->position += players[i]->velocity * elapsed;
+			players[i]->collision_box.center += players[i]->velocity * elapsed;
 		}
 
-		//check for collisions before moving due to gravity:
-		glm::vec2 gravity = glm::vec2(0, -players[i]->gravityspeed * elapsed);
-		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + gravity, platform_collision_shapes, object_collision_shapes)) {
-			players[i]->position += gravity;
-			players[i]->collision_box.center += gravity;
-			if (!players[i]->jump->held() || players[i]->input_jump_time >= Player::max_jump_time)
+		//check for collisions and jumping before moving due to gravity:
+		glm::vec2 grav_change = glm::vec2(0, Player::fall_acceleration * elapsed);
+		if ((!players[i]->falling)) {
+			if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + grav_change, platform_collision_shapes)) {
 				players[i]->curr_sprite = players[i]->fall_sprite;
-		} else {
-			players[i]->falling = false;
+				players[i]->position += grav_change;
+				players[i]->collision_box.center += grav_change;
+				players[i]->velocity.y += Player::fall_acceleration * elapsed;
+			} else {
+			players[i]->landed = true;
+			players[i]->velocity.y = 0.0f;
 			if (!(players[i]->left->held() || players[i]->right->held()) ||
 				(players[i]->left->held() && players[i]->right->held()))
 				players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
@@ -378,6 +389,9 @@ void PuzzleMode::update(float elapsed) {
 				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
 			}
 		}
+     }
+
+
 
 		//remove the other player to the list of things the current player can collide with:
 		platform_collision_shapes.pop_back();

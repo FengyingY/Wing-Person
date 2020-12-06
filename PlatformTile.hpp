@@ -11,6 +11,9 @@
 
 struct PlatformTile
 {
+  // constants
+  static constexpr glm::vec2 default_size = glm::vec2(32.0f, 32.0f);
+
 	// loaded texture references
 	struct Texture {
 		Texture(){};

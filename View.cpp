@@ -95,7 +95,8 @@ GlyphTextureCache *GlyphTextureCache::get_instance() {
 GlyphTextureCache::GlyphTextureCache() {
 	FT_Error error = FT_Init_FreeType(&ft_library_);
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
-	for (FontFace f : {FontFace::IBMPlexMono, FontFace::ComputerModernRegular, FontFace::Literata}) {
+	for (FontFace f : {FontFace::IBMPlexMono, FontFace::ComputerModernRegular, FontFace::Literata, 
+		 FontFace::BUILT_BD, FontFace::BUILT_RG}) {
 		const std::string font_path = data_path(get_font_filename(f));
 		FT_Face face = nullptr;
 		error = FT_New_Face(ft_library_, font_path.c_str(), 0, &face);
@@ -119,6 +120,8 @@ std::string GlyphTextureCache::get_font_filename(FontFace font_face) {
 		case FontFace::IBMPlexMono : return "IBMPlexMono-Bold.ttf";
 		case FontFace::ComputerModernRegular : return "cmunorm.ttf";
 		case FontFace::Literata : return "LiterataMedium-J68n.ttf";
+		case FontFace::BUILT_BD : return "built_titling_bd.ttf";
+		case FontFace::BUILT_RG : return "built_titling_rg.ttf";
 		default: throw std::runtime_error("unreachable code");
 	}
 }
