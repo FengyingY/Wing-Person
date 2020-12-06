@@ -97,7 +97,7 @@ GlyphTextureCache::GlyphTextureCache() {
 	if (error != 0) { throw std::runtime_error("Error in initializing FreeType library"); }
 	for (FontFace f : {FontFace::IBMPlexMono, FontFace::ComputerModernRegular, FontFace::Literata, 
 		 FontFace::BUILT_BD, FontFace::BUILT_RG}) {
-		const std::string font_path = data_path(get_font_filename(f));
+		const std::string font_path = data_path("font/" + get_font_filename(f));
 		FT_Face face = nullptr;
 		error = FT_New_Face(ft_library_, font_path.c_str(), 0, &face);
 		if (error != 0) { throw std::runtime_error("Error initializing font face"); }

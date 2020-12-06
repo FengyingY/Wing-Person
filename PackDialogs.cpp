@@ -80,6 +80,24 @@ int main(int argc, char **argv) {
         tmp = file[dialog_name]["background"];
         texts.append(tmp);
         new_dialog.background_length = tmp.length();
+
+        if (file[dialog_name].contains("background_music")) {
+            tmp = "";
+            tmp = file[dialog_name]["background_music"];
+            texts.append(tmp);
+            new_dialog.background_music_length = tmp.length();
+        } else {
+            new_dialog.background_music_length = 0;
+        }
+
+        if (file[dialog_name].contains("sound")) {
+            tmp = "";
+            tmp = file[dialog_name]["sound"];
+            texts.append(tmp);
+            new_dialog.sound_length = tmp.length();
+        } else {
+            new_dialog.sound_length = 0;
+        }
         
         dialogs.push_back(new_dialog);
     }
