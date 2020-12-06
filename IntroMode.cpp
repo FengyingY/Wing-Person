@@ -125,7 +125,7 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 
 				if (slot_idx < 3) {
 					std::shared_ptr< Sound::PlayingSample > sound = Sound::play(*load_sound_sample);
-					unsigned long usec = 4 * 1e5L;
+					unsigned long usec = 4L * 1e5L;
 					std::this_thread::sleep_for(std::chrono::microseconds(usec));
 					GameSaveLoad::mtx.lock();
 					GameStatus s = GameSaveLoad::slots[slot_idx];
