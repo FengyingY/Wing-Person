@@ -34,7 +34,7 @@ struct dirent *epdf;
 namespace fs = std::filesystem;
 #endif
 
-void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
+void split_string(std::string &s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
 	size_t start = 0;
 	size_t end = s.find(delimiter);
@@ -75,9 +75,14 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		split_string(choices, "\n", choice_target_pairs);
 
 		for (std::string choice_target : choice_target_pairs) {
-			size_t pos = choice_target.find(":");
-			dlg.option_lines.push_back(choice_target.substr(0, pos));
-			dlg.next_branch_names.push_back(choice_target.substr(pos+1, choice_target.length() - pos));
+			std::vector<std::string> choices_attr;
+			choice_target += ":";
+			split_string(choice_target, ":", choices_attr);
+			dlg.option_lines.push_back(choices_attr[0]);
+			dlg.next_branch_names.push_back(choices_attr[1]);
+			if (choices_attr.size() > 2) {
+				dlg.option_line_preference.push_back(choices_attr[2]);
+			}
 		}
 
 		start += d.choice_length;
@@ -149,6 +154,13 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	GameSaveLoad::read();
 }
 
+// can update the affinity of the character and send it back to story mode
+StoryMode::StoryMode(std::string branch_name, Character character) : story(*test_story) {
+	story = *test_story;
+	setCurrentBranch(story.dialog.at(branch_name));
+	this->character = character;
+	GameSaveLoad::read();
+}
 
 StoryMode::~StoryMode() {
 	GameSaveLoad::write();
@@ -177,17 +189,38 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					if (main_dialog->agree()) {
 						std::optional<int> next_branch = main_dialog->Enter();
 						if (next_branch.has_value()) {
-							std::string next_branch_name = current.next_branch_names.at(next_branch.value());
+							size_t next_idx = next_branch.value();
+							std::string next_branch_name = current.next_branch_names.at(next_idx);
+
+							// select character
+							if (current.dlg_name == CHARACTER_SELECT_BRANCH) {
+								if (next_idx == P_INDEX) {
+									character.preference = "P";
+									character.hate = "R";
+									character.name = current.option_lines.at(next_idx);
+								} else if (next_idx == R_INDEX) {
+									character.preference = "R";
+									character.hate = "P";
+									character.name = current.option_lines.at(next_idx);
+								}
+							}
+							
+							// jump to the puzzle mode
 							if (next_branch_name == "PuzzleMode") {
-								// jump to the puzzle mode
-								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
 								Mode::set_current(std::make_shared<PuzzleMode>());
 							} else { 
 								// agreed with a valid option
-								// DUMMY STATUS TEXT UPDATE, TODO CHANGE THE STATUS ACCORDING TO THE STORY
-								happiness += rand() % 5;
-								respect += rand() % 5;
-								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
+								// update affinity
+								if (current.option_line_preference.size() > next_idx) {
+									std::string option_preference = current.option_line_preference.at(next_idx);
+									if (option_preference == character.preference) {
+										character.affinity += 1;
+									} else if (option_preference == character.hate) {
+										character.affinity -= 1;
+									}
+								}
+								// jump to next branch
+								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_idx)));
 							}
 						}
 					} else {
@@ -244,14 +277,10 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
 		if (!loading_page_shown) {
 			if (save_selected) {
-				// TODO save the current status
-				std::cout << "saved!" << std::endl;
 				loading_page_shown = true;
 				return true;
 			}
 			if (load_selected) {
-				// TODO load from selected slot
-				std::cout << "loading!" << std::endl;
 				loading_page_shown = true;
 				return true;
 			}
@@ -282,7 +311,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 				
 				if (slot_idx < 3) {
 					if (save_selected) {
-						GameSaveLoad::save(current.dlg_name, slot_idx);
+						GameSaveLoad::save(current.dlg_name, character, slot_idx);
 						return true;
 					}
 					if (load_selected) {
@@ -294,11 +323,8 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 							load_selected = false;
 							setCurrentBranch(story.dialog.at(branch_name));
 							return true;
-						} else {
-							std::cout << "Can't find branch: " << branch_name << std::endl;
 						}
 					}
-					std::cout << "Neither save or load selected" << std::endl;
 				}
 			}
 
@@ -337,7 +363,6 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	// textbox
-	// story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
 	story_sprites["ui"]->draw(center, drawable_size, 0.5f, 1.0f);
 
 	// buttons
@@ -365,7 +390,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 		happiness_status = std::make_shared<view::TextLine>();
 		happiness_status->set_font(view::FontFace::Literata)
-					.set_text("Happiness: " + std::to_string(happiness))
+					.set_text(character.name)
 					.set_font_size(17)
 					.set_position(glm::vec2(10.f, 5.f))
 					.set_color(glm::u8vec4(255))
@@ -375,7 +400,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 		
 		respect_status = std::make_shared<view::TextLine>();
 		respect_status->set_font(view::FontFace::Literata)
-					.set_text("Respect: " + std::to_string(respect))
+					.set_text(character.affinity_string())
 					.set_font_size(17)
 					.set_position(glm::vec2(170.5f, 5.f))
 					.set_color(glm::u8vec4(255))
@@ -397,7 +422,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 					
 					slot_info[i] = std::make_shared<view::TextLine>();
 					slot_info[i]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Story: " + GameSaveLoad::slots[i].story_name)
+								.set_text(GameSaveLoad::slots[i].info_line1())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f - 15.f))
 								.disable_animation()
@@ -407,7 +432,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 					slot_info[i+1] = std::make_shared<view::TextLine>();
 					slot_info[i+1]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Time: " + GameSaveLoad::slots[i].save_time)
+								.set_text(GameSaveLoad::slots[i].info_line2())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f + 15.f))
 								.disable_animation()

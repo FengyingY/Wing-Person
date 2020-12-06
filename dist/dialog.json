@@ -57,7 +57,7 @@
   },
   "Story7": {
     "text": [ "And before you disagree with me...", "Remember that we have to discuss all our choices until we agree!", "Such is the way of guardian dating angels!" ],
-    "choices": [ "Mornings are great:Story8a", "Mornings aren't great:Story8b" ],
+    "choices": [ "Mornings are great:Story8a:P", "Mornings aren't great:Story8b:R" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom1"

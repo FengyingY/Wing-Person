@@ -171,7 +171,7 @@ void IntroMode::draw(glm::uvec2 const &drawable_size) {
 					
 					slot_info[i] = std::make_shared<view::TextLine>();
 					slot_info[i]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Story: " + GameSaveLoad::slots[i].story_name)
+								.set_text(GameSaveLoad::slots[i].info_line1())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f - 15.f))
 								.disable_animation()
@@ -181,7 +181,7 @@ void IntroMode::draw(glm::uvec2 const &drawable_size) {
 
 					slot_info[i+1] = std::make_shared<view::TextLine>();
 					slot_info[i+1]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Time: " + GameSaveLoad::slots[i].save_time)
+								.set_text(GameSaveLoad::slots[i].info_line2())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f + 15.f))
 								.disable_animation()

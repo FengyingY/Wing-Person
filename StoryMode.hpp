@@ -6,13 +6,14 @@
 #include "Sprite.hpp"
 #include "PackDialogs.hpp"
 #include "GameLoadSave.hpp"
+#include "Character.hpp"
 
 #include <glm/glm.hpp>
 
 #include <map>
+#include <string>
 #include <vector>
 #include <deque>
-
 
 struct Story {
 
@@ -23,6 +24,7 @@ struct Story {
 		// options, ending will have zero length options
 		std::vector<std::string> option_lines;
 		std::vector<std::string> next_branch_names;
+		std::vector<std::string> option_line_preference;
 
 		std::string character_name;	// character's name, nullable
 		std::vector<std::string> sprites_name; // name of the sprites to be shown in this dialog
@@ -37,6 +39,7 @@ struct Story {
 struct StoryMode : Mode {
 	StoryMode();
 	StoryMode(std::string branch_name);
+	StoryMode(std::string branch_name, Character character);
 	virtual ~StoryMode();
 
 	//functions called by main loop:
@@ -45,7 +48,7 @@ struct StoryMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	//----- game state -----
-	int happiness = 50, respect = 50;	// DUMMIES FOR AFFINITY SYSTEM
+	Character character;
 
 	// Story control
 	Story story;

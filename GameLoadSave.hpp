@@ -1,5 +1,7 @@
 #pragma once
+#ifdef _WIN32
 #pragma warning(disable : 4996)
+#endif
 
 #include <fstream>
 #include <sstream>
@@ -10,19 +12,29 @@
 #include <mutex>
 
 #include "data_path.hpp"
+#include "Character.hpp"
+
+#define PLAYER_SLOT_COUNT 3
+#define DELIMITER "###"
 
 struct GameStatus {
-    std::string story_name;
-    std::string save_time;
+    std::string story_name = "";
+    Character character;
+    std::string save_time = "";
 
-    std::string info() {
-        return story_name + "\n" + save_time;
+    // always show 2 lines per slot on the UI
+    std::string info_line1() {
+        return story_name + ", " + character.name + ", " + character.affinity_string();
+    }
+
+    std::string info_line2() {
+        return "Saved Time: " + save_time;
     }
 };
 namespace {
 struct GameSaveLoad {
 
-    static GameStatus slots[3];
+    static GameStatus slots[PLAYER_SLOT_COUNT];
     static std::mutex mtx;
 
     GameSaveLoad() {
@@ -38,12 +50,38 @@ struct GameSaveLoad {
         std::ifstream infile(data_path("saved_games"));
         std::string line;
         while (std::getline(infile, line)) {
-            if (count == 3) break;
-            size_t pos = line.find(' ');
-            slots[count].story_name = line.substr(0, pos);
-            slots[count].save_time = line.substr(pos+1, line.length() - pos - 1);
+            if (count == PLAYER_SLOT_COUNT) break;
+
+            line += DELIMITER;
+            std::vector<std::string>vec;
+            size_t start = 0;
+            size_t end = line.find(DELIMITER);
+            while (end != std::string::npos) {
+                vec.push_back(line.substr(start, end-start));
+                start = end + std::string(DELIMITER).length();
+                end = line.find(DELIMITER, start);
+            }
+            if (end != std::string::npos)
+                vec.push_back(line.substr(start, end));
+
+            if (vec.size() < 6) {
+                slots[count].story_name = "Empty";
+            } else {
+                slots[count].story_name = vec[0];
+                slots[count].character.name = vec[1];
+                slots[count].character.preference = vec[2];
+                slots[count].character.hate = vec[3];
+                slots[count].character.affinity = std::stoi(vec[4]);
+                slots[count].save_time = vec[5];
+            }
+
             count++;
         }
+
+        for (; count < PLAYER_SLOT_COUNT; count++) {
+            slots[count].story_name = "Empty";
+        }
+
         infile.close();
         mtx.unlock();
 
@@ -58,24 +96,40 @@ struct GameSaveLoad {
 
         // write current status to file
         mtx.lock();
-        std::ofstream ofs(data_path("saved_games"), std::ofstream::trunc);
+        std::ofstream ofs(data_path("saved_games"), std::ofstream::trunc);  // overwrite
         for (GameStatus s : slots) {
-            ofs << s.story_name << " " << s.save_time << "\n";
+            ofs << s.story_name << DELIMITER 
+                << s.character.name << DELIMITER
+                << s.character.preference << DELIMITER
+                << s.character.hate << DELIMITER
+                << s.character.affinity << DELIMITER
+                << s.save_time << "\n";
         }
         ofs.close();
         mtx.unlock();
 
     }
 
-    static void save(std::string name, size_t slot_idx) {
+    static void save(std::string name, Character character, size_t slot_idx) {
         // Ref: https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
         if (slot_idx < 3) {
             mtx.lock();
+
+            // story info
             slots[slot_idx].story_name = name;
+
+            // character info
+            slots[slot_idx].character.name = character.name;
+            slots[slot_idx].character.preference = character.preference;
+            slots[slot_idx].character.hate = character.hate;
+            slots[slot_idx].character.affinity = character.affinity;
+
+            // time
             auto time = std::chrono::system_clock::now();
             std::time_t save_timestamp = std::chrono::system_clock::to_time_t(time);
             slots[slot_idx].save_time = std::ctime(&save_timestamp);
-            slots[slot_idx].save_time = slots[slot_idx].save_time.substr(0, slots[slot_idx].save_time.length()-1);
+            slots[slot_idx].save_time = slots[slot_idx].save_time.substr(0, slots[slot_idx].save_time.length()-1);  // remove the newline at the end
+
             mtx.unlock();
         }
     }
@@ -83,12 +137,12 @@ struct GameSaveLoad {
     static void print_status() {
         mtx.lock();
         for (int i = 0; i < 3; ++i) {
-            std::cout << slots[i].story_name << " " << slots[i].save_time << std::endl;
+            std::cout << slots[i].info_line1() << "\t" << slots[i].info_line2() << std::endl;
         }
         mtx.unlock();
     }
 };
 
-GameStatus GameSaveLoad::slots[3] = {GameStatus(), GameStatus(), GameStatus()};
+GameStatus GameSaveLoad::slots[PLAYER_SLOT_COUNT] = {GameStatus(), GameStatus(), GameStatus()};
 std::mutex GameSaveLoad::mtx = std::mutex();
 }
