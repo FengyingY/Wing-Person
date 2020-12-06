@@ -10,6 +10,7 @@
 #include <chrono>
 #include <ctime>
 #include <mutex>
+#include <vector>
 
 #include "data_path.hpp"
 #include "Character.hpp"
@@ -21,6 +22,8 @@ struct GameStatus {
     std::string story_name = "";
     Character character;
     std::string save_time = "";
+
+    std::string background_music = "";
 
     // always show 2 lines per slot on the UI
     std::string info_line1() {
@@ -68,13 +71,13 @@ struct GameSaveLoad {
                 slots[count].story_name = "Empty";
             } else {
                 slots[count].story_name = vec[0];
-                slots[count].character.name = vec[1];
-                slots[count].character.preference = vec[2];
-                slots[count].character.hate = vec[3];
-                slots[count].character.affinity = std::stoi(vec[4]);
-                slots[count].save_time = vec[5];
+                slots[count].background_music = vec[1];
+                slots[count].character.name = vec[2];
+                slots[count].character.preference = vec[3];
+                slots[count].character.hate = vec[4];
+                slots[count].character.affinity = std::stoi(vec[5]);
+                slots[count].save_time = vec[6];
             }
-
             count++;
         }
 
@@ -99,6 +102,7 @@ struct GameSaveLoad {
         std::ofstream ofs(data_path("saved_games"), std::ofstream::trunc);  // overwrite
         for (GameStatus s : slots) {
             ofs << s.story_name << DELIMITER 
+                << s.background_music << DELIMITER
                 << s.character.name << DELIMITER
                 << s.character.preference << DELIMITER
                 << s.character.hate << DELIMITER
@@ -110,13 +114,14 @@ struct GameSaveLoad {
 
     }
 
-    static void save(std::string name, Character character, size_t slot_idx) {
+    static void save(std::string dlg_name, std::string background_music, Character character, size_t slot_idx) {
         // Ref: https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
         if (slot_idx < 3) {
             mtx.lock();
 
             // story info
-            slots[slot_idx].story_name = name;
+            slots[slot_idx].story_name = dlg_name;
+            slots[slot_idx].background_music = background_music;
 
             // character info
             slots[slot_idx].character.name = character.name;

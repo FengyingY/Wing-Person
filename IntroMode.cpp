@@ -7,6 +7,42 @@
 #include "gl_errors.hpp"
 #include "Sprite.hpp"
 
+#include <unistd.h>
+
+Load< Sound::Sample > intro_background_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("menu/CR2_Jealousy_Lite_Loop.wav"));
+});
+
+Load< Sound::Sample > button_sound_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("menu/CGM3_Cute_Chirpy_Button_03_2.wav"));
+});
+
+Load< Sound::Sample > load_sound_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("menu/CGM3_Save_Load_02_2.wav"));
+});
+
+Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading;
+Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
+	menu_background = new Sprite(data_path("menu/HomeScreenBackground.png"), "background");
+	menu_button = new Sprite(data_path("menu/MenuButton.png"), "button");
+	menu_button_select = new Sprite(data_path("menu/MenuButtonPressed.png"), "button_select");
+	menu_title = new Sprite(data_path("menu/Wing-Person.png"), "title");
+	menu_subtitle = new Sprite(data_path("menu/Subtitle.png"), "subtitle");
+	menu_button_text = new Sprite(data_path("menu/buttons_text.png"), "buttons_text");
+	loading = new Sprite(data_path("menu/Loading_slots.png"), "loading");
+});
+
+IntroMode::IntroMode() {
+	music_loop = Sound::loop(*intro_background_sample);
+	GameSaveLoad::read();
+
+	prompt = std::make_shared<view::TextLine>();
+}
+
+IntroMode::~IntroMode() {
+}
+
+
 bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size) {
 	if ( evt.type == SDL_MOUSEMOTION ) {
 		int x, y;
@@ -14,18 +50,27 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 		if (!loading_page_shown) {
 			if (237 <= x && x <= 562) {
 				if (346 <= y && y <= 393) {
+					if (!start_selected) {
+						Sound::play(*button_sound_sample);
+					}
 					start_selected = true;
 					load_selected = false;
 					tutorial_selected = false;
 					return true;
 				}
 				if (426 <= y && y <= 473) {
+					if (!load_selected) {
+						Sound::play(*button_sound_sample);
+					}
 					start_selected = false;
 					load_selected = true;
 					tutorial_selected = false;
 					return true;
 				}
 				if (506 <= y && y <= 553) {
+					if (!tutorial_selected) {
+						Sound::play(*button_sound_sample);
+					}
 					start_selected = false;
 					load_selected = false;
 					tutorial_selected = true;
@@ -78,13 +123,18 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 				}
 
 				if (slot_idx < 3) {
+					std::shared_ptr< Sound::PlayingSample > sound = Sound::play(*load_sound_sample);
+					usleep(4 * 1e5);
 					GameSaveLoad::mtx.lock();
-					std::string branch_name = GameSaveLoad::slots[slot_idx].story_name;
+					GameStatus s = GameSaveLoad::slots[slot_idx];
+					std::string branch_name = s.story_name;
+					Character character = s.character;
+					std::string background_music = s.background_music;
 					GameSaveLoad::mtx.unlock();
 					if (branch_name != "Empty") {
 						Sound::stop_all_samples();
 						GameSaveLoad::write();
-						Mode::set_current(std::make_shared<StoryMode>(branch_name));
+						Mode::set_current(std::make_shared<StoryMode>(branch_name, character, background_music));
 						return true;
 					}
 				}
@@ -99,31 +149,6 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 		}
 	}
 	return false;
-}
-
-Load< Sound::Sample > intro_background_sample(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("dusty-floor.opus"));
-});
-
-Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading;
-Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
-	menu_background = new Sprite(data_path("menu/HomeScreenBackground.png"), "background");
-	menu_button = new Sprite(data_path("menu/MenuButton.png"), "button");
-	menu_button_select = new Sprite(data_path("menu/MenuButtonPressed.png"), "button_select");
-	menu_title = new Sprite(data_path("menu/Wing-Person.png"), "title");
-	menu_subtitle = new Sprite(data_path("menu/Subtitle.png"), "subtitle");
-	menu_button_text = new Sprite(data_path("menu/buttons_text.png"), "buttons_text");
-	loading = new Sprite(data_path("menu/Loading_slots.png"), "loading");
-});
-
-IntroMode::IntroMode() {
-	music_loop = Sound::loop_3D(*intro_background_sample, 1.0f, glm::vec3(0, 0, 0));
-	GameSaveLoad::read();
-
-	prompt = std::make_shared<view::TextLine>();
-}
-
-IntroMode::~IntroMode() {
 }
 
 void IntroMode::update(float elapsed) {

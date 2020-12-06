@@ -15,6 +15,9 @@
 #include <vector>
 #include <deque>
 
+#define STORY_SPRITE_DIR "story_sprites"
+#define STORY_MUSIC_DIR "story_music"
+
 struct Story {
 
 	struct Dialog {
@@ -29,6 +32,8 @@ struct Story {
 		std::string character_name;	// character's name, nullable
 		std::vector<std::string> sprites_name; // name of the sprites to be shown in this dialog
 		std::string background;		// name of the background sprite
+		std::string background_music;	// file name of the background music
+		std::string sound;	// file name of the sound effect
 	};
 
 	// all the dialogs, key is the name of the dialog
@@ -38,8 +43,8 @@ struct Story {
 
 struct StoryMode : Mode {
 	StoryMode();
-	StoryMode(std::string branch_name);
-	StoryMode(std::string branch_name, Character character);
+	StoryMode(std::string branch_name);	 // deprecated
+	StoryMode(std::string branch_name, Character character, std::string background_music);
 	virtual ~StoryMode();
 
 	//functions called by main loop:
@@ -66,7 +71,13 @@ struct StoryMode : Mode {
 	bool option = false;
 
 	// music 
-	std::shared_ptr< Sound::PlayingSample > music_loop;
+	std::string background_music = "";					// current background music file name
+	std::shared_ptr< Sound::PlayingSample > music_loop;	// background music
+	std::shared_ptr< Sound::PlayingSample > sound;		// play once
+	
+	// UI sound
+	std::shared_ptr< Sound::PlayingSample > button_sound;
+	std::shared_ptr< Sound::PlayingSample > save_load_sound;
 
 private:
 	void setCurrentBranch(const Story::Dialog &new_branch);

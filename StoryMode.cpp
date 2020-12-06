@@ -95,6 +95,12 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 
 		start += d.sprite_length;
 		dlg.background = t.substr(start, d.background_length);
+
+		start += d.background_length;
+		dlg.background_music = t.substr(start, d.background_music_length);
+
+		start += d.background_music_length;
+		dlg.sound = t.substr(start, d.sound_length);
 		
 		ret->dialog[name] = dlg;
     }
@@ -103,13 +109,33 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 	disagree_dlg.dlg_name = "disagree";
 	disagree_dlg.lines.push_back("Too bad, please discuss and make an agreement.");
 	disagree_dlg.option_lines.push_back("back");
+	disagree_dlg.sound = "TD_Negative_Sting_02_02.wav";
 	ret->dialog["disagree"] = disagree_dlg;
 
 	return ret;
 });
 
-Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("dusty-floor.opus"));
+// music
+std::map<std::string, Sound::Sample *> music_map;
+Load < void > load_music(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path(STORY_MUSIC_DIR);
+	dpdf = opendir(path.c_str());
+	if (dpdf != NULL) {
+		while ((epdf = readdir(dpdf))) {
+			std::string file_name = epdf->d_name;
+			if (file_name != "." && file_name != "..") {
+				music_map[file_name] = new Sound::Sample(path + "/" + file_name);
+			}
+		}
+	}
+	#else
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	for (const auto & entry : fs::directory_iterator(data_path(STORY_MUSIC_DIR))) {
+		std::string file_name = entry.path().filename().string();
+		music_map[file_name] = new Sound::Sample(path + "/" + file_name);
+	}
+	#endif
 });
 
 // images
@@ -117,7 +143,7 @@ std::map<std::string, Sprite*> story_sprites;
 // load all of the sprite under folder 'dist/story_sprites'
 Load< void > load_sprite(LoadTagDefault, []() -> void {
 	#if defined(__linux__)
-	std::string path = data_path("story_sprites");
+	std::string path = data_path(STORY_SPRITE_DIR);
 	dpdf = opendir(path.c_str());
 	if (dpdf != NULL) {
 		while ((epdf = readdir(dpdf))) {
@@ -130,7 +156,7 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 	}
 	#else
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
+	for (const auto & entry : fs::directory_iterator(data_path(STORY_SPRITE_DIR))) {
 		std::string file_name = entry.path().filename().string();
 		// sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
 		std::string sprite_name = file_name.substr(0, file_name.find("."));
@@ -142,8 +168,6 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 
 StoryMode::StoryMode() : story(*test_story) {
 	setCurrentBranch(story.dialog.at("Opening"));
-
-	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));	
 	GameSaveLoad::read();
 }
 
@@ -155,10 +179,11 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 }
 
 // can update the affinity of the character and send it back to story mode
-StoryMode::StoryMode(std::string branch_name, Character character) : story(*test_story) {
-	story = *test_story;
+StoryMode::StoryMode(std::string branch_name, Character character, std::string background_music) : story(*test_story) {
 	setCurrentBranch(story.dialog.at(branch_name));
 	this->character = character;
+	this->background_music = background_music;
+	music_loop = Sound::loop(*music_map[background_music]);
 	GameSaveLoad::read();
 }
 
@@ -251,16 +276,25 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 		if (!loading_page_shown) {
 			if (y <= 30.f) {
 				if (620 <= x && x < 680) {
+					if (!save_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = true;
 					load_selected = false;
 					menu_selected = false;
 					return true;
 				} else if (680 <= x && x < 740) {
+					if (!load_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = false;
 					load_selected = true;
 					menu_selected = false;
 					return true;
 				} else if (740 <= x) {
+					if (!menu_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = false;
 					load_selected = false;
 					menu_selected = true;
@@ -311,7 +345,8 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 				
 				if (slot_idx < 3) {
 					if (save_selected) {
-						GameSaveLoad::save(current.dlg_name, character, slot_idx);
+						Sound::play(*music_map["CGM3_Save_Load_02_2.wav"]);
+						GameSaveLoad::save(current.dlg_name, background_music, character, slot_idx);
 						return true;
 					}
 					if (load_selected) {
@@ -319,6 +354,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 						std::string branch_name = GameSaveLoad::slots[slot_idx].story_name;
 						GameSaveLoad::mtx.unlock();
 						if ( story.dialog.find(branch_name) != story.dialog.end() ) {
+							Sound::play(*music_map["CGM3_Save_Load_02_2.wav"]);
 							loading_page_shown = false;
 							load_selected = false;
 							setCurrentBranch(story.dialog.at(branch_name));
@@ -462,6 +498,18 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 
 void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
+	// music
+	if (new_dialog.background_music != "" && background_music != new_dialog.background_music) {
+		// change the background music
+		Sound::stop_all_samples();
+		music_loop = Sound::loop(*music_map[new_dialog.background_music]);
+		background_music = new_dialog.background_music;
+	}
+	if (new_dialog.sound != "") {
+		// sound effect
+		Sound::play(*music_map[new_dialog.sound]);
+	}
+
 	current = new_dialog;
 	option = true;
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
@@ -484,4 +532,5 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 		prompts.emplace_back(color, to_show);
 	}
 	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);
+
 }
