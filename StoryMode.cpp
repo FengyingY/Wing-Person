@@ -133,7 +133,7 @@ Load < void > load_music(LoadTagDefault, []() -> void {
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 	for (const auto & entry : fs::directory_iterator(data_path(STORY_MUSIC_DIR))) {
 		std::string file_name = entry.path().filename().string();
-		music_map[file_name] = new Sound::Sample(STORY_MUSIC_DIR + "/" + file_name);
+		music_map[file_name] = new Sound::Sample(entry.path().string());
 	}
 	#endif
 });
