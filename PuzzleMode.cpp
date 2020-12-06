@@ -359,7 +359,7 @@ void PuzzleMode::update(float elapsed) {
 
 
 		//check for collisions before moving due to input:
-		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity * elapsed, platform_collision_shapes)) {
+		if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + players[i]->velocity * elapsed, platform_collision_shapes, object_collision_shapes)) {
 			players[i]->position += players[i]->velocity * elapsed;
 			players[i]->collision_box.center += players[i]->velocity * elapsed;
 		}
@@ -367,7 +367,7 @@ void PuzzleMode::update(float elapsed) {
 		//check for collisions and jumping before moving due to gravity:
 		glm::vec2 grav_change = glm::vec2(0, Player::fall_acceleration * elapsed);
 		if ((!players[i]->falling)) {
-			if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + grav_change, platform_collision_shapes)) {
+			if (!Collisions::player_rectangles_collision(players[i]->collision_box, players[i]->position + grav_change, platform_collision_shapes, object_collision_shapes)) {
 				players[i]->curr_sprite = players[i]->fall_sprite;
 				players[i]->position += grav_change;
 				players[i]->collision_box.center += grav_change;
