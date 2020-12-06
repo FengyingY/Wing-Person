@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 			if (tile_count == 18 * 25)
 			{
 				tile_count = 0;
-				std::cout << "\n Level " << ++level_count << "\n";
+				std::cout << "\nLevel " << ++level_count + 1 << "\n";
 			}
 			tile_count++;
 		}

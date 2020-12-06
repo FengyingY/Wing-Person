@@ -77,7 +77,7 @@ struct Player {
 
   // max jump height = jumpspeed * max_jump_time + (jumpspeed * jumpspeed) / (2 * fall_acceleration)
   // i.e. jumpspeed = (time + sqrt(time * time + time * max_height / (2 * accel))) * accel
-  static constexpr float jumpspeed = (- max_jump_time - custom_sqrt(max_jump_time * max_jump_time - (2 * max_jump_height / fall_acceleration))) * fall_acceleration;
+  static constexpr float jumpspeed = (- max_jump_time - (float)custom_sqrt(max_jump_time * max_jump_time - (2 * max_jump_height / fall_acceleration))) * fall_acceleration;
 
 
   float input_jump_time = 0.0f;

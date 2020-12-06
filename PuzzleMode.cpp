@@ -46,16 +46,19 @@ Load< TileMap > tile_map(LoadTagEarly, []() -> TileMap * {
 	
 	size_t tile_count = 0, level_count = 0;
 	Level lvl;
-	for (std::vector<uint32_t>::iterator it = ++data.begin(); it != data.end(); ++it)
+	std::vector<uint32_t>::iterator it = data.begin();
+	for (++it ; it != data.end(); ++it)
 	{
 		lvl.data.emplace_back(*it);
+		tile_count++;
+		
 		if (tile_count == 18 * 25)
 		{
+			std::cout << "Level inited: " << ++level_count << "\n";
 			ret->levels.emplace_back(lvl);
 			lvl.data.clear();
 			tile_count = 0;
 		}
-		tile_count++;
 	}
 
 	std::cout << "Done reading tile map" << "\n";
@@ -177,6 +180,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 				}
 			}
 		}
+		std::cout << "Init level data done.\n";
 		assert(end != nullptr && "Level does not contain end point! FATALITY!");
 	}
 	catch(const std::exception& e)
@@ -309,7 +313,6 @@ void PuzzleMode::update(float elapsed) {
 
 		// Process jumping
 		if (players[i]->jump->held() && players[i]->input_jump_time < Player::max_jump_time && players[i]->landed) {
-      std::cout << "test1" << std::endl;
 			players[i]->jump_input = true;
 			players[i]->curr_sprite = players[i]->jump_sprite;
 			players[i]->falling = true;
@@ -319,10 +322,8 @@ void PuzzleMode::update(float elapsed) {
         players[i]->input_jump_time = Player::max_jump_time;
       }
 		}
-    std::cout << players[i]->falling << " - " << players[i]->input_jump_time << " - " << players[i]->cur_jump_time << std::endl;
 
 		if (players[i]->jump->just_released()) {
-      std::cout << "test42" << std::endl;
 			players[i]->jump_input = false;
       players[i]->landed = false;
 			if (players[i]->input_jump_time < Player::min_jump_time) {
@@ -331,20 +332,16 @@ void PuzzleMode::update(float elapsed) {
 		}
 
 		if (players[i]->cur_jump_time < players[i]->input_jump_time) {
-      std::cout << "test3" << std::endl;
 			players[i]->cur_jump_time += elapsed;
 			players[i]->velocity.y = Player::jumpspeed;
 
-    std::cout << players[i]->falling << " - " << players[i]->input_jump_time << " - " << players[i]->cur_jump_time << std::endl;
 			if (players[i]->cur_jump_time >= players[i]->input_jump_time) {
-      std::cout << "test3.5" << std::endl;
 				players[i]->jump_clear = true;
         players[i]->landed = false;
 			}
 		}
 
 		if (players[i]->jump_clear) {
-      std::cout << "test4" << std::endl;
 			players[i]->cur_jump_time = 0.0f;
 			players[i]->input_jump_time = 0.0f;
 			players[i]->jump_clear = false;

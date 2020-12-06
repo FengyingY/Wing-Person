@@ -73,8 +73,10 @@ struct GameSaveLoad {
             slots[slot_idx].story_name = name;
             auto time = std::chrono::system_clock::now();
             std::time_t save_timestamp = std::chrono::system_clock::to_time_t(time);
-            slots[slot_idx].save_time = std::ctime(&save_timestamp);
-            slots[slot_idx].save_time = slots[slot_idx].save_time.substr(0, slots[slot_idx].save_time.length()-1);
+			char *time_cstr = "";
+            ctime_s(time_cstr, sizeof(time_cstr), &save_timestamp);
+			std::string time_str(time_cstr);
+            slots[slot_idx].save_time = time_str.substr(0, time_str.length()-1);
             mtx.unlock();
         }
     }
