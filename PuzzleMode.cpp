@@ -11,7 +11,7 @@
 #include <fstream>
 #include <map>
 
-const float ScreenWidth = 800.0f;
+// const float ScreenWidth = 800.0f;		// unused variable warning
 const float ScreenHeight = 600.0f;
 
 Load< std::vector<uint32_t> > level_data(LoadTagDefault, []() -> std::vector<uint32_t> * {

@@ -7,7 +7,8 @@
 #include "gl_errors.hpp"
 #include "Sprite.hpp"
 
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 
 Load< Sound::Sample > intro_background_sample(LoadTagDefault, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("menu/CR2_Jealousy_Lite_Loop.wav"));
@@ -124,7 +125,8 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 
 				if (slot_idx < 3) {
 					std::shared_ptr< Sound::PlayingSample > sound = Sound::play(*load_sound_sample);
-					usleep(4 * 1e5);
+					unsigned long usec = 4 * 1e5;
+					std::this_thread::sleep_for(std::chrono::microseconds(usec));
 					GameSaveLoad::mtx.lock();
 					GameStatus s = GameSaveLoad::slots[slot_idx];
 					std::string branch_name = s.story_name;
