@@ -39,6 +39,8 @@ struct PuzzleMode : Mode
 	std::vector < PlatformTile *> objects;
 	std::vector < Shapes::Rectangle > object_collision_shapes;
 
+	std::vector < PlatformTile *> bg_tiles;
+
 	PlatformTile *end = nullptr;
 	float total_time = 0.0f;
 

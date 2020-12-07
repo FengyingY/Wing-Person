@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <map>
+#include <random>
 
 // const float ScreenWidth = 800.0f;		// unused variable warning
 const float ScreenHeight = 600.0f;
@@ -89,6 +90,36 @@ Load< std::map< uint32_t, PlatformTile::Texture* > > sprites(LoadTagLate, []() -
 	return ret;
 });
 
+Load< std::vector< PlatformTile::Texture* > > bg_sprites(LoadTagLate, []() -> std::vector< PlatformTile::Texture* > * {
+	std::vector< PlatformTile::Texture* > *ret = new std::vector< PlatformTile::Texture* >();
+
+	std::cout << "Loading puzzle backgrounds\n";
+	try
+	{
+		std::vector< std::string > bg_tiles;
+		bg_tiles.emplace_back("Pink.png");
+		bg_tiles.emplace_back("Green.png");
+		bg_tiles.emplace_back("Brown.png");
+		bg_tiles.emplace_back("Purple.png");
+		bg_tiles.emplace_back("Blue.png");
+
+		PlatformTile::Texture *newTex = nullptr;
+		for (auto &&img : bg_tiles)
+		{
+			newTex = new PlatformTile::Texture();
+			load_png(data_path("puzzle_sprites/" + img), &newTex->size, &newTex->data, LowerLeftOrigin);
+			ret->emplace_back(newTex);
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
+
+	return ret;
+});
+
 std::vector< Sprite* > red_idle, red_run, blue_idle, blue_run;
 Sprite *red_jump, *red_fall, *blue_jump, *blue_fall;
 Load< void > load_sprites(LoadTagEarly, []() -> void {
@@ -132,8 +163,16 @@ Load< void > load_sprites(LoadTagEarly, []() -> void {
 });
 
 PuzzleMode::PuzzleMode(uint32_t level) {
+
+	// uniform int distribution from  https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+	std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> distrib(0, (int)bg_sprites->size() - 1);
+
+	// Select a random bg
+	int bg_index = distrib(gen);
 	// Read level data and create platforms
-	std::cout << "\nInit level data" << "\n";
+	std::cout << "\nInit level data with bg: " << bg_index << "\n";
 	try {
 		Level cur_level = tile_map->levels[level];
 		float tile_size = 32.0f;
@@ -143,6 +182,14 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 			for (size_t x = 0; x < 25; x++)
 			{
 				if (cur_level.data.at(y*25 + x) == 0){
+					// Draw a background
+					PlatformTile *bg_tile = new PlatformTile(
+						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(bg_sprites->at(bg_index)->size, bg_sprites->at(bg_index)->data)
+					);
+					bg_tiles.emplace_back(bg_tile);
+					
 					continue;
 				}
 
@@ -154,6 +201,17 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 					glm::vec2(tile_size, tile_size),
 					PlatformTile::Texture(sprites->at(tile_id)->size, sprites->at(tile_id)->data)
 				);
+
+				if (tile_type != TileType::Platform)
+				{
+					// Draw a background
+					PlatformTile *bg_tile = new PlatformTile(
+						glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)),
+						glm::vec2(tile_size, tile_size),
+						PlatformTile::Texture(bg_sprites->at(bg_index)->size, bg_sprites->at(bg_index)->data)
+					);
+					bg_tiles.emplace_back(bg_tile);
+				}
 				
 				switch (tile_type)
 				{
@@ -504,6 +562,11 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	GL_ERRORS();
+
+	for (auto &&bg_tile : bg_tiles)
+	{
+		bg_tile->draw(drawable_size);
+	}
 
 	for (auto &&platform : platforms)
 	{
