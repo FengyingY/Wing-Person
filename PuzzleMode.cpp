@@ -171,6 +171,11 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 					break;
 
 				case TileType::Object:
+					// just to ensure that the collision boxes don't overlap
+					level_tile->size = level_tile->size * 0.99f;
+					level_tile->collision_shape.width *= 0.99f;
+					level_tile->collision_shape.height *= 0.99f;
+
 					objects.emplace_back(level_tile);
 					object_collision_shapes.emplace_back(level_tile->collision_shape);
 					break;
@@ -190,8 +195,8 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(300, 460), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
-	add_player(glm::vec2(600, 85), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
+	add_player(glm::vec2(300, 90), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
+	add_player(glm::vec2(600, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
 	for (int i = 0; i < objects.size(); i++) {
 		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {
@@ -317,15 +322,15 @@ void PuzzleMode::update(float elapsed) {
 			players[i]->curr_sprite = players[i]->jump_sprite;
 			players[i]->falling = true;
 
-      players[i]->input_jump_time += elapsed + 0.0001f;
-      if (players[i]->input_jump_time >= Player::max_jump_time) {
-        players[i]->input_jump_time = Player::max_jump_time;
-      }
+			players[i]->input_jump_time += elapsed + 0.0001f;
+			if (players[i]->input_jump_time >= Player::max_jump_time) {
+				players[i]->input_jump_time = Player::max_jump_time;
+			}
 		}
 
 		if (players[i]->jump->just_released()) {
 			players[i]->jump_input = false;
-      players[i]->landed = false;
+      		players[i]->landed = false;
 			if (players[i]->input_jump_time < Player::min_jump_time) {
 				players[i]->input_jump_time = Player::min_jump_time;
 			}
@@ -432,8 +437,8 @@ void PuzzleMode::update(float elapsed) {
 		glm::vec2 object_velocity = glm::vec2(0.0f, 0.0f);
 		
 		//get the square distance from the object to each player:
-		float dist_red = std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[0]->position.x, 2) + std::pow(objects[num_objects - 1]->position.y - players[0]->position.y, 2));
-		float dist_blue = std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[1]->position.x, 2) + std::pow(objects[num_objects - 1]->position.y - players[1]->position.y, 2));
+		float dist_red = (float)std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[0]->position.x, 2.0f) + std::pow(objects[num_objects - 1]->position.y - players[0]->position.y, 2.0f));
+		float dist_blue = (float)std::sqrt(std::pow(objects[num_objects - 1]->position.x - players[1]->position.x, 2.0f) + std::pow(objects[num_objects - 1]->position.y - players[1]->position.y, 2.0f));
 
 		//if the red player is close enough, consider it a collision:
 		if (dist_red <= (objects[num_objects - 1]->size.x + players[0]->size.x) / 2.0f + 1.0f &&

@@ -67,7 +67,7 @@ struct Player {
   static constexpr float rel_max_jump_height = 3.2f;
 
   static constexpr float min_jump_time = 0.15f;
-  static constexpr float max_jump_time = 0.3f;
+  static constexpr float max_jump_time = 0.2f;
 
   // Calculated jumping/gravity constants
   static constexpr float fall_acceleration = rel_fall_acceleration * PlatformTile::default_size.y;

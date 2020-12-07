@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="1.4.3" name="tld_tileset" tilewidth="64" tileheight="64" tilecount="6" columns="0">
+<tileset version="1.4" tiledversion="1.4.3" name="tld_tileset" tilewidth="64" tileheight="64" tilecount="7" columns="0">
  <editorsettings>
   <export target="../level-data/pixelTiles.json" format="json"/>
  </editorsettings>
@@ -39,5 +39,11 @@
    <property name="tile_type" type="int" value="1"/>
   </properties>
   <image width="64" height="64" source="../dist/puzzle_sprites/Ground_fill.png"/>
+ </tile>
+ <tile id="7">
+  <properties>
+   <property name="tile_type" type="int" value="-1"/>
+  </properties>
+  <image width="64" height="64" source="../dist/puzzle_sprites/Purple.png"/>
  </tile>
 </tileset>
