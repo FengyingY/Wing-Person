@@ -34,7 +34,7 @@ struct dirent *epdf;
 namespace fs = std::filesystem;
 #endif
 
-void split_string(std::string s, std::string delimiter, std::vector<std::string>&vec) {
+void split_string(std::string &s, std::string delimiter, std::vector<std::string>&vec) {
 	// ref: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
 	size_t start = 0;
 	size_t end = s.find(delimiter);
@@ -75,9 +75,14 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		split_string(choices, "\n", choice_target_pairs);
 
 		for (std::string choice_target : choice_target_pairs) {
-			size_t pos = choice_target.find(":");
-			dlg.option_lines.push_back(choice_target.substr(0, pos));
-			dlg.next_branch_names.push_back(choice_target.substr(pos+1, choice_target.length() - pos));
+			std::vector<std::string> choices_attr;
+			choice_target += ":";
+			split_string(choice_target, ":", choices_attr);
+			dlg.option_lines.push_back(choices_attr[0]);
+			dlg.next_branch_names.push_back(choices_attr[1]);
+			if (choices_attr.size() > 2) {
+				dlg.option_line_preference.push_back(choices_attr[2]);
+			}
 		}
 
 		start += d.choice_length;
@@ -90,6 +95,12 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 
 		start += d.sprite_length;
 		dlg.background = t.substr(start, d.background_length);
+
+		start += d.background_length;
+		dlg.background_music = t.substr(start, d.background_music_length);
+
+		start += d.background_music_length;
+		dlg.sound = t.substr(start, d.sound_length);
 		
 		ret->dialog[name] = dlg;
     }
@@ -98,13 +109,33 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 	disagree_dlg.dlg_name = "disagree";
 	disagree_dlg.lines.push_back("Too bad, please discuss and make an agreement.");
 	disagree_dlg.option_lines.push_back("back");
+	disagree_dlg.sound = "TD_Negative_Sting_02_02.wav";
 	ret->dialog["disagree"] = disagree_dlg;
 
 	return ret;
 });
 
-Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("dusty-floor.opus"));
+// music
+std::map<std::string, Sound::Sample *> music_map;
+Load < void > load_music(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path(STORY_MUSIC_DIR);
+	dpdf = opendir(path.c_str());
+	if (dpdf != NULL) {
+		while ((epdf = readdir(dpdf))) {
+			std::string file_name = epdf->d_name;
+			if (file_name != "." && file_name != "..") {
+				music_map[file_name] = new Sound::Sample(path + "/" + file_name);
+			}
+		}
+	}
+	#else
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	for (const auto & entry : fs::directory_iterator(data_path(STORY_MUSIC_DIR))) {
+		std::string file_name = entry.path().filename().string();
+		music_map[file_name] = new Sound::Sample(entry.path().string());
+	}
+	#endif
 });
 
 // images
@@ -112,7 +143,7 @@ std::map<std::string, Sprite*> story_sprites;
 // load all of the sprite under folder 'dist/story_sprites'
 Load< void > load_sprite(LoadTagDefault, []() -> void {
 	#if defined(__linux__)
-	std::string path = data_path("story_sprites");
+	std::string path = data_path(STORY_SPRITE_DIR);
 	dpdf = opendir(path.c_str());
 	if (dpdf != NULL) {
 		while ((epdf = readdir(dpdf))) {
@@ -125,7 +156,7 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 	}
 	#else
 	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-	for (const auto & entry : fs::directory_iterator(data_path("story_sprites"))) {
+	for (const auto & entry : fs::directory_iterator(data_path(STORY_SPRITE_DIR))) {
 		std::string file_name = entry.path().filename().string();
 		// sprites.push_back(new Sprite(entry.path().string(), file_name.substr(0, file_name.find("."))));
 		std::string sprite_name = file_name.substr(0, file_name.find("."));
@@ -137,8 +168,6 @@ Load< void > load_sprite(LoadTagDefault, []() -> void {
 
 StoryMode::StoryMode() : story(*test_story) {
 	setCurrentBranch(story.dialog.at("Opening"));
-
-	music_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0, 0, 0));	
 	GameSaveLoad::read();
 }
 
@@ -149,6 +178,14 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	GameSaveLoad::read();
 }
 
+// can update the affinity of the character and send it back to story mode
+StoryMode::StoryMode(std::string branch_name, Character character, std::string background_music) : story(*test_story) {
+	setCurrentBranch(story.dialog.at(branch_name));
+	this->character = character;
+	this->background_music = background_music;
+	music_loop = Sound::loop(*music_map[background_music]);
+	GameSaveLoad::read();
+}
 
 StoryMode::~StoryMode() {
 	GameSaveLoad::write();
@@ -177,17 +214,40 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					if (main_dialog->agree()) {
 						std::optional<int> next_branch = main_dialog->Enter();
 						if (next_branch.has_value()) {
-							std::string next_branch_name = current.next_branch_names.at(next_branch.value());
+							size_t next_idx = next_branch.value();
+							std::string next_branch_name = current.next_branch_names.at(next_idx);
+
+							// select character
+							if (current.dlg_name == CHARACTER_SELECT_BRANCH) {
+								if (next_idx == P_INDEX) {
+									character.preference = "P";
+									character.hate = "R";
+									character.name = current.option_lines.at(next_idx);
+								} else if (next_idx == R_INDEX) {
+									character.preference = "R";
+									character.hate = "P";
+									character.name = current.option_lines.at(next_idx);
+								}
+							}
+							
+							// jump to the puzzle mode
 							if (next_branch_name == "PuzzleMode") {
 								// jump to the puzzle mode
 								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
 								Mode::set_current(std::make_shared<PuzzleMode>(1));
 							} else { 
 								// agreed with a valid option
-								// DUMMY STATUS TEXT UPDATE, TODO CHANGE THE STATUS ACCORDING TO THE STORY
-								happiness += rand() % 5;
-								respect += rand() % 5;
-								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_branch.value())));
+								// update affinity
+								if (current.option_line_preference.size() > next_idx) {
+									std::string option_preference = current.option_line_preference.at(next_idx);
+									if (option_preference == character.preference) {
+										character.affinity += 1;
+									} else if (option_preference == character.hate) {
+										character.affinity -= 1;
+									}
+								}
+								// jump to next branch
+								setCurrentBranch(story.dialog.at(current.next_branch_names.at(next_idx)));
 							}
 						}
 					} else {
@@ -218,16 +278,25 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 		if (!loading_page_shown) {
 			if (y <= 30.f) {
 				if (620 <= x && x < 680) {
+					if (!save_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = true;
 					load_selected = false;
 					menu_selected = false;
 					return true;
 				} else if (680 <= x && x < 740) {
+					if (!load_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = false;
 					load_selected = true;
 					menu_selected = false;
 					return true;
 				} else if (740 <= x) {
+					if (!menu_selected) {
+						Sound::play(*music_map["CGM3_Cute_Chirpy_Button_03_2.wav"], 0.7f);
+					}
 					save_selected = false;
 					load_selected = false;
 					menu_selected = true;
@@ -244,14 +313,10 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
 		if (!loading_page_shown) {
 			if (save_selected) {
-				// TODO save the current status
-				std::cout << "saved!" << std::endl;
 				loading_page_shown = true;
 				return true;
 			}
 			if (load_selected) {
-				// TODO load from selected slot
-				std::cout << "loading!" << std::endl;
 				loading_page_shown = true;
 				return true;
 			}
@@ -282,7 +347,8 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 				
 				if (slot_idx < 3) {
 					if (save_selected) {
-						GameSaveLoad::save(current.dlg_name, slot_idx);
+						Sound::play(*music_map["CGM3_Save_Load_02_2.wav"]);
+						GameSaveLoad::save(current.dlg_name, background_music, character, slot_idx);
 						return true;
 					}
 					if (load_selected) {
@@ -290,15 +356,13 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 						std::string branch_name = GameSaveLoad::slots[slot_idx].story_name;
 						GameSaveLoad::mtx.unlock();
 						if ( story.dialog.find(branch_name) != story.dialog.end() ) {
+							Sound::play(*music_map["CGM3_Save_Load_02_2.wav"]);
 							loading_page_shown = false;
 							load_selected = false;
 							setCurrentBranch(story.dialog.at(branch_name));
 							return true;
-						} else {
-							std::cout << "Can't find branch: " << branch_name << std::endl;
 						}
 					}
-					std::cout << "Neither save or load selected" << std::endl;
 				}
 			}
 
@@ -337,7 +401,6 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	// textbox
-	// story_sprites["textbox"]->draw(glm::vec2(center.x, center.y*0.25f), drawable_size, .21f, 1.0f);
 	story_sprites["ui"]->draw(center, drawable_size, 0.5f, 1.0f);
 
 	// buttons
@@ -365,7 +428,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 		happiness_status = std::make_shared<view::TextLine>();
 		happiness_status->set_font(view::FontFace::Literata)
-					.set_text("Happiness: " + std::to_string(happiness))
+					.set_text(character.name)
 					.set_font_size(17)
 					.set_position(glm::vec2(10.f, 5.f))
 					.set_color(glm::u8vec4(255))
@@ -375,7 +438,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 		
 		respect_status = std::make_shared<view::TextLine>();
 		respect_status->set_font(view::FontFace::Literata)
-					.set_text("Respect: " + std::to_string(respect))
+					.set_text(character.affinity_string())
 					.set_font_size(17)
 					.set_position(glm::vec2(170.5f, 5.f))
 					.set_color(glm::u8vec4(255))
@@ -397,7 +460,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 					
 					slot_info[i] = std::make_shared<view::TextLine>();
 					slot_info[i]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Story: " + GameSaveLoad::slots[i].story_name)
+								.set_text(GameSaveLoad::slots[i].info_line1())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f - 15.f))
 								.disable_animation()
@@ -407,7 +470,7 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 					slot_info[i+1] = std::make_shared<view::TextLine>();
 					slot_info[i+1]->set_font(view::FontFace::BUILT_BD)
-								.set_text("Time: " + GameSaveLoad::slots[i].save_time)
+								.set_text(GameSaveLoad::slots[i].info_line2())
 								.set_font_size(20)
 								.set_position(glm::vec2(230.5f, 200.f + i * 135.f + 15.f))
 								.disable_animation()
@@ -437,6 +500,18 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 
 void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
+	// music
+	if (new_dialog.background_music != "" && background_music != new_dialog.background_music) {
+		// change the background music
+		Sound::stop_all_samples();
+		music_loop = Sound::loop(*music_map[new_dialog.background_music]);
+		background_music = new_dialog.background_music;
+	}
+	if (new_dialog.sound != "") {
+		// sound effect
+		Sound::play(*music_map[new_dialog.sound]);
+	}
+
 	current = new_dialog;
 	option = true;
 	std::vector<std::pair<glm::u8vec4, std::string>> prompts;
@@ -459,4 +534,5 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 		prompts.emplace_back(color, to_show);
 	}
 	main_dialog = std::make_shared<view::Dialog>(prompts, current.option_lines);
+
 }

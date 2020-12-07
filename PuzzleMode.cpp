@@ -11,7 +11,7 @@
 #include <fstream>
 #include <map>
 
-// const float ScreenWidth = 800.0f;
+// const float ScreenWidth = 800.0f;		// unused variable warning
 const float ScreenHeight = 600.0f;
 
 Load< TileMap > tile_map(LoadTagEarly, []() -> TileMap * {

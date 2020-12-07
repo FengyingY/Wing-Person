@@ -4,7 +4,9 @@
     "choices": [ "Continue:Story0" ],
     "character": "Passion",
     "sprite": [ "Passion" ],
-    "background": ""
+    "background": "",
+    "background_music": "sax-and-ivory-toolkit__01m00s__June_2007__01.wav",
+    "sound": "LQ_Win_Sting_01_3.wav"
   },
   "Story0": {
     "text": [ "Ugh.. Passion..", "Can't you let me sleep in just this once!" ],
@@ -57,7 +59,7 @@
   },
   "Story7": {
     "text": [ "And before you disagree with me...", "Remember that we have to discuss all our choices until we agree!", "Such is the way of guardian dating angels!" ],
-    "choices": [ "Mornings are great:Story8a", "Mornings aren't great:Story8b" ],
+    "choices": [ "Mornings are great:Story8a:P", "Mornings aren't great:Story8b:R" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom1"
@@ -109,14 +111,17 @@
     "choices": [ "Continue:Story14" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
-    "background": "Modern-School1"
+    "background": "Modern-School1",
+    "background_music": "CGM_Level 2 - (no per.).wav",
+    "sound": "CSG_Simple_UI_03.wav"
   },
   "Story14": {
     "text": [ "And that cute girl too.", "Who should we convince them to talk to?" ],
     "choices": [ "The cute guy:Story15a", "The cute girl:Story15b" ],
     "character": "Passion",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
-    "background": "Modern-School1"
+    "background": "Modern-School1",
+    "sound": "CSG_Simple_UI_03.wav"
   },
   "Story15a": {
     "text": [ "Alright, the cute guy it is!", "Let's get this flirting on the way right! [Start Puzzle]" ],
