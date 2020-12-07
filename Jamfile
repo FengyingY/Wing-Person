@@ -17,6 +17,7 @@ if $(OS) = NT { #Windows
 		#disable a few warnings:
 		/wd4146 #-1U is still unsigned
 		/wd4297 #unforunately SDLmain is nothrow
+		/wd4244 #disabling conversion from 'double' to 'float', possible loss of data
 	;
 	LINKFLAGS = /nologo /SUBSYSTEM:CONSOLE /DEBUG:FASTLINK
 		/LIBPATH:"$(NEST_LIBS)/SDL2/lib"
