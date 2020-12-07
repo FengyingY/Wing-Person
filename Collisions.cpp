@@ -238,7 +238,7 @@ bool Collisions::circle_rectangle_collision(Shapes::Circle c, Shapes::Rectangle 
 
 	//check for collision:
 	for (glm::vec2 intersect : intersections) {
-		float intersect_dist = std::sqrt(std::pow(intersect.x - r.center.x, 2) + std::pow(intersect.y - r.center.y, 2));
+		float intersect_dist = std::sqrt(std::pow(intersect.x - r.center.x, 2.f) + std::pow(intersect.y - r.center.y, 2.f));
 		if (center_dist <= c.radius + intersect_dist)
 			return true;
 	}
