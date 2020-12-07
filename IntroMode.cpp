@@ -22,7 +22,7 @@ Load< Sound::Sample > load_sound_sample(LoadTagDefault, []() -> Sound::Sample co
 	return new Sound::Sample(data_path("menu/CGM3_Save_Load_02_2.wav"));
 });
 
-Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading;
+Sprite* menu_background, *menu_button, *menu_button_select, *menu_title, *menu_subtitle, *menu_button_text, *loading, *tutorial;
 Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 	menu_background = new Sprite(data_path("menu/HomeScreenBackground.png"), "background");
 	menu_button = new Sprite(data_path("menu/MenuButton.png"), "button");
@@ -31,6 +31,7 @@ Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 	menu_subtitle = new Sprite(data_path("menu/Subtitle.png"), "subtitle");
 	menu_button_text = new Sprite(data_path("menu/buttons_text.png"), "buttons_text");
 	loading = new Sprite(data_path("menu/Loading_slots.png"), "loading");
+	tutorial = new Sprite(data_path("menu/tutorial.png"), "loading");
 });
 
 IntroMode::IntroMode() {
@@ -48,7 +49,7 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 	if ( evt.type == SDL_MOUSEMOTION ) {
 		int x, y;
 		SDL_GetMouseState( &x, &y );
-		if (!loading_page_shown) {
+		if (!loading_page_shown & !tutorial_shown) {
 			if (237 <= x && x <= 562) {
 				if (346 <= y && y <= 393) {
 					if (!start_selected) {
@@ -86,6 +87,11 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 	}
 
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
+		if (tutorial_shown) {
+			tutorial_shown = false;
+			return true;
+		}
+
 		if (!loading_page_shown) {
 			if (start_selected) {
 				Sound::stop_all_samples();
@@ -96,11 +102,14 @@ bool IntroMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size
 			if (load_selected) {
 				GameSaveLoad::read();
 				loading_page_shown = true;
+				load_selected = false;
 				return true;
 			}
 			if (tutorial_selected) {
 				// TODO build tutorial mode
 				std::cout << "tutorial!" << std::endl;
+				tutorial_shown = true;
+				tutorial_selected = false;
 				return true;
 			}
 		} else {
@@ -164,6 +173,12 @@ void IntroMode::update(float elapsed) {
 void IntroMode::draw(glm::uvec2 const &drawable_size) {
 	glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
 	menu_background->draw(center, drawable_size, 0.3f, 0.9f);
+
+	if (tutorial_shown) {
+		tutorial->draw(center, drawable_size, 0.65f, 1.f);
+		return;
+	}
+
 	if (start_selected) {
 		menu_button_select->draw(glm::vec2(400.f, 230.f), drawable_size, 0.3f, 1.f);
 	} else {
