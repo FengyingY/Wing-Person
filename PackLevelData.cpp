@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 	std::vector< uint32_t > levels;
 	try
 	{
-		uint32_t prev_level_width, prev_level_height;
+		uint32_t prev_level_width = 0, prev_level_height = 0;
 		if (layers.begin() != layers.end())
 		{
 			// initializing size to match that of the first level
