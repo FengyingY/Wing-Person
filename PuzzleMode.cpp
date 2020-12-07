@@ -256,7 +256,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	add_player(glm::vec2(300, 90), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
 	add_player(glm::vec2(600, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
-	for (int i = 0; i < objects.size(); i++) {
+	for (size_t i = 0; i < objects.size(); i++) {
 		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {
 			objects[i]->position.y += 5.0f;
 			glm::vec2 move_up = glm::vec2(0.0f, 5.0f);
