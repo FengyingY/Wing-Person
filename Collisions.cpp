@@ -78,6 +78,7 @@ glm::vec2 Collisions::circle_circle_collision(Shapes::Circle c1, Shapes::Circle 
 
 		//get the adjusted distance vector between the centers:
 		glm::vec2 avg_diff = c1.center - c2.center;
+		float total_diff = std::abs(avg_diff.x) + std::abs(avg_diff.y);
 		if (total_diff != 0.0f) {
 			avg_diff.x = avg_diff.x / total_diff;
 			avg_diff.y = avg_diff.y / total_diff;
