@@ -75,27 +75,9 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 		split_string(choices, "\n", choice_target_pairs);
 
 		for (std::string choice_target : choice_target_pairs) {
-<<<<<<< Updated upstream
 			size_t pos = choice_target.find(":");
 			dlg.option_lines.push_back(choice_target.substr(0, pos));
 			dlg.next_branch_names.push_back(choice_target.substr(pos+1, choice_target.length() - pos));
-=======
-			std::vector<std::string> choices_attr;
-			choice_target += ":";
-			split_string(choice_target, ":", choices_attr);
-
-			if (choices_attr.size() < 2) {
-				// end
-				dlg.option_lines.push_back(choices_attr[0]);
-				dlg.next_branch_names.push_back(name);
-			} else {
-				dlg.option_lines.push_back(choices_attr[0]);
-				dlg.next_branch_names.push_back(choices_attr[1]);
-			}
-			if (choices_attr.size() > 2) {
-				dlg.option_line_preference.push_back(choices_attr[2]);
-			}
->>>>>>> Stashed changes
 		}
 
 		start += d.choice_length;

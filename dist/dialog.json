@@ -182,7 +182,7 @@
     "background": "Modern-School1"
   },
   "Wes3": {
-    "text": [ "I think we should tell them to flirt like crazy!", "They should walk up to her and say 'Did my heart love till now? Forswear it, sight!", "'For I neï¿½er saw true beauty till this night.'" ],
+    "text": [ "I think we should tell them to flirt like crazy!", "They should walk up to her and say 'Did my heart love till now? Forswear it, sight!", "'For I ne’er saw true beauty till this night.'" ],
     "choices": [ "Continue:Wes4" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
@@ -252,7 +252,7 @@
     "background": "Modern-School1"
   },
   "Lu3": {
-    "text": [ "I think we should tell them to flirt like crazy!", "They should walk up to him and say 'Did my heart love till now? Forswear it, sight!", "'For I neï¿½er saw true beauty till this night.'" ],
+    "text": [ "I think we should tell them to flirt like crazy!", "They should walk up to him and say 'Did my heart love till now? Forswear it, sight!", "'For I ne’er saw true beauty till this night.'" ],
     "choices": [ "Continue:Lu4" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
@@ -302,7 +302,7 @@
   },
   "WesP0": {
     "text": [ "Alright, fine, we'll try it your way.", "But don't blame me if they come on too strong!" ],
-    "choices": [ "Did my heart love till now? Forswear it, sight! For I neï¿½er saw true beauty till this night.:WesP1" ],
+    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne’er saw true beauty till this night.:WesP1" ],
     "character": "Respect",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
@@ -554,7 +554,7 @@
   },
   "LuP0": {
     "text": [ "Alright, fine, we'll try it your way.", "Just try not to come on too strong, okay?" ],
-    "choices": [ "Did my heart love till now? Forswear it, sight! For I neï¿½er saw true beauty till this night.:PuzzleMode5" ],
+    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne’er saw true beauty till this night.:PuzzleMode5" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
