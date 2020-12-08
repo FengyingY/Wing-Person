@@ -227,6 +227,10 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 				return true;
 			}
 			else if (keyCode == SDLK_RETURN) {
+				if (ended) {
+					Mode::set_current(std::make_shared<IntroMode>());
+					return true;
+				}
 				if (main_dialog->finished()) {
 					if (main_dialog->agree()) {
 						std::optional<int> next_branch = main_dialog->Enter();
@@ -395,6 +399,11 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 	// glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
 	glm::vec2 center(400.f, 300.f);
+
+	if (ended) {
+		story_sprites["End"]->draw(center, drawable_size, 0.63f, 1.0f);
+		return;
+	}
 	
 	// background
 	if (current.background.length() > 0)
@@ -506,6 +515,11 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 
 void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
+	if (current.dlg_name == new_dialog.dlg_name) {
+		ended = true;
+		return;
+	}
+
 	// music
 	if (new_dialog.background_music != "" && background_music != new_dialog.background_music) {
 		// change the background music
