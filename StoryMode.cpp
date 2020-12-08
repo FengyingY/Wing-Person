@@ -231,10 +231,13 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 							}
 							
 							// jump to the puzzle mode
-							if (next_branch_name == "PuzzleMode") {
+							if (next_branch_name.find("PuzzleMode") != std::string::npos) {
+								int puzzle_num = 2;
+								if (next_branch_name.length() > 10)
+									puzzle_num = next_branch_name[10] - '0';
 								// jump to the puzzle mode
 								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-								Mode::set_current(std::make_shared<PuzzleMode>(1));
+								Mode::set_current(std::make_shared<PuzzleMode>(puzzle_num));
 							} else { 
 								// agreed with a valid option
 								// update affinity
