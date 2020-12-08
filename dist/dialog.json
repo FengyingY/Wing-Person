@@ -696,7 +696,7 @@
   "LuR2": {
     "text": [ "My name is Lu!" ],
     "choices": [ "The conversation continues for some time...:LuR3" ],
-    "character": "Wes",
+    "character": "Lu",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
@@ -835,7 +835,7 @@
   },
   "WesPP4": {
     "text": [ "Hmm, what's that noise?", "Oh, it looks like they got a text from Wes." ],
-    "choices": [ "Later that night...:WesPP5" ],
+    "choices": [ "Continue:WesPP5" ],
     "character": "Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom2"
@@ -961,7 +961,7 @@
   },
   "LuRP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1:P" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:LuRP1:P" ],
     "character": "Passion",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -989,7 +989,7 @@
   },
   "LuPR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuPR1:R" ],
+    "choices": [ "Hey Lu! What a boring class, am I right?:LuPR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -1017,7 +1017,7 @@
   },
   "LuRR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuRR1:R" ],
+    "choices": [ "Hey Lu! What a boring class, am I right?:LuRR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -1038,14 +1038,14 @@
   },
   "LuRR3": {
     "text": [ "Honestly, I'm surprised how well it went!", "Lu seems super into them!", "We even got his number!" ],
-    "choices": [ "Later that night...:LRR4" ],
+    "choices": [ "Later that night...:LuRR4" ],
     "character": "Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRR4": {
     "text": [ "Hmm, what's that noise?", "Oh, it looks like they got a text from Lu." ],
-    "choices": [ "Later that night...:LRR5" ],
+    "choices": [ "Continue:LuRR5" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom2"
