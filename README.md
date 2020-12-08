@@ -13,8 +13,8 @@ How To Play:
 ![Screen Shot](dist/menu/tutorial.png)
 
 Sources:
-Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
 
+- Tile editing tool: Tiled Editor (https://www.mapeditor.org/)
 - Virtual novel characters: http://www.jewel-s.jp/download/, https://sutemo.itch.io/female-character, https://sutemo.itch.io/male-character-sprite-for-visual-novel
 - Virtual novel background: https://konett.itch.io/modern-visual-novel-backgrounds
 - Set of 3 wings: https://www.vecteezy.com/vector-art/302320-three-set-of-black-wings
@@ -24,4 +24,5 @@ Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
 - Music by W.O.W Sound [https://wowsound.com.sg]
 - SFX by W.O.W Sound [https://wowsound.com.sg]
 - Puzzle SFX by Hanna-Barbera SoundFX Library [https://www.sound-ideas.com/Product/409/hanna-barbera-sound-effects-library/] 
+
 This game was built with [NEST](NEST.md).
