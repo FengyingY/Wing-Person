@@ -828,14 +828,14 @@
   },
   "WesPP3": {
     "text": [ "I know, right! I should be in charge more often!", "Wes seems super into them!", "We even got her number!" ],
-    "choices": [ "Later that night...:WesPP4" ],
+    "choices": [ "Later that night:WesPP4" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Street1"
   },
   "WesPP4": {
     "text": [ "Hmm, what's that noise?", "Oh, it looks like they got a text from Wes." ],
-    "choices": [ "Later that night...:WesPP5" ],
+    "choices": [ "Continue:WesPP5" ],
     "character": "Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom2"
@@ -1038,14 +1038,14 @@
   },
   "LuRR3": {
     "text": [ "Honestly, I'm surprised how well it went!", "Lu seems super into them!", "We even got his number!" ],
-    "choices": [ "Later that night...:LRR4" ],
+    "choices": [ "Later that night:LRR4" ],
     "character": "Respect",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRR4": {
     "text": [ "Hmm, what's that noise?", "Oh, it looks like they got a text from Lu." ],
-    "choices": [ "Later that night...:LRR5" ],
+    "choices": [ "Continue:LRR5" ],
     "character": "Passion",
     "sprite": [ "Passion", "Respect" ],
     "background": "Modern-Dormroom2"
