@@ -1,6 +1,8 @@
 # Wing-Person
 
-Authors: Fengying Yang, Tyler Thompson, Pavan Paravasthu, and Jonathan Yan
+A game built using C++ for CMU's Fall 2020 CS 15-466/666 Computer Game Programming.
+
+Authors: Fengying Yang, Tyler Thompson, Pavan Paravasthu, and Jonathan Yan with base code from Jim McCann
 
 Design: This game's core theme is co-op dating sim puzzle game. To that we end, we created a dating sim with two Guardian Dating Angels each controlled by a player who must work together to get the main character of the story a date by making decisions through cooperative puzzles.
 
