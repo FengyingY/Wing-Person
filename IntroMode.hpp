@@ -18,5 +18,5 @@ private:
 	std::shared_ptr<view::TextLine> prompt;
 	std::shared_ptr<view::TextLine> slot_info[6];
 	std::shared_ptr< Sound::PlayingSample > music_loop;
-	bool start_selected = false, load_selected = false, tutorial_selected = false, loading_page_shown = false;
+	bool start_selected = false, load_selected = false, tutorial_selected = false, loading_page_shown = false, tutorial_shown = false;
 };
