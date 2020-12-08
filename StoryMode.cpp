@@ -78,8 +78,14 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 			std::vector<std::string> choices_attr;
 			choice_target += ":";
 			split_string(choice_target, ":", choices_attr);
-			dlg.option_lines.push_back(choices_attr[0]);
-			dlg.next_branch_names.push_back(choices_attr[1]);
+			if (choices_attr.size() < 2) {
+				// end
+				dlg.option_lines.push_back(choices_attr[0]);
+				dlg.next_branch_names.push_back(name);	// TODO : add end mode
+			} else {
+				dlg.option_lines.push_back(choices_attr[0]);
+				dlg.next_branch_names.push_back(choices_attr[1]);
+			}
 			if (choices_attr.size() > 2) {
 				dlg.option_line_preference.push_back(choices_attr[2]);
 			}
