@@ -7,13 +7,15 @@
 #include "PlatformTile.hpp"
 #include "Input.hpp"
 #include "Player.hpp"
+#include "Character.hpp"
 
 #include <vector>
 
 struct PuzzleMode : Mode
 {
 	PuzzleMode(){};
-	PuzzleMode(uint32_t level);
+	// PuzzleMode(uint32_t level);
+	PuzzleMode(uint32_t level, std::string story_bgm, Character story_character);
 	virtual ~PuzzleMode();
 
 	uint32_t parse_tiledata(uint32_t &tile_data);
@@ -47,5 +49,9 @@ struct PuzzleMode : Mode
 	const float MaxPuzzleTime = 300.0f;	// in seconds
 	float puzzle_time = 0.0f;
 	bool is_timeup = false;
-  
+
+	std::string branch_name;
+
+	std::string story_bgm;
+	Character story_character;
 };

@@ -66,7 +66,7 @@ struct StoryMode : Mode {
 	std::shared_ptr<view::Dialog> main_dialog = nullptr;
 	std::shared_ptr<view::TextLine> happiness_status = nullptr;
 	std::shared_ptr<view::TextLine> respect_status = nullptr;
-	bool menu_selected = false, load_selected = false, save_selected = false, loading_page_shown = false;
+	bool menu_selected = false, load_selected = false, save_selected = false, loading_page_shown = false, ended = false;
 	// current status, true = option mode, ignore timer, waiting for player's input; false = story mode, keep showing the next line
 	bool option = false;
 

@@ -42,7 +42,7 @@
  </tile>
  <tile id="7">
   <properties>
-   <property name="tile_type" type="int" value="-1"/>
+   <property name="tile_type" type="int" value="10"/>
   </properties>
   <image width="64" height="64" source="../dist/puzzle_sprites/Purple.png"/>
  </tile>

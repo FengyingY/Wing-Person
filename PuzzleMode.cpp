@@ -12,6 +12,17 @@
 #include <map>
 #include <random>
 
+#if defined(__linux__)
+#include <dirent.h>
+DIR *dpdf_p;
+struct dirent *epdf_p;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
+#define PUZZLE_SFX_DIR "puzzle_sounds"
+
 // const float ScreenWidth = 800.0f;		// unused variable warning
 const float ScreenHeight = 600.0f;
 
@@ -162,19 +173,59 @@ Load< void > load_sprites(LoadTagEarly, []() -> void {
 	}
 });
 
-PuzzleMode::PuzzleMode(uint32_t level) {
+std::map<std::string, Sound::Sample *> sound_map;
+Load < void > load_sounds(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path(PUZZLE_SFX_DIR);
+	dpdf_p = opendir(path.c_str());
+	if (dpdf_p != NULL) {
+		while ((epdf_p = readdir(dpdf_p))) {
+			std::string file_name = epdf_p->d_name;
+			if (file_name != "." && file_name != "..") {
+				sound_map[file_name] = new Sound::Sample(path + "/" + file_name);
+			}
+		}
+	}
+	#else
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	for (const auto & entry : fs::directory_iterator(data_path(PUZZLE_SFX_DIR))) {
+		std::string file_name = entry.path().filename().string();
+		sound_map[file_name] = new Sound::Sample(entry.path().string());
+	}
+	#endif
+});
+
+PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_character) {
 
 	// uniform int distribution from  https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
 	std::random_device rd;  //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, (int)bg_sprites->size() - 1);
 
+	// Prepare the branch_name string to know how to behave later
+	if (level == 0)
+		branch_name = "Start";
+	else if (level == 1)
+		branch_name = "Wes";
+	else if (level == 2)
+		branch_name = "Lu";
+	else if (level == 3)
+		branch_name = "WesP";
+	else if (level == 4)
+		branch_name = "WesR";
+	else if (level == 5)
+		branch_name = "LuP";
+	else if (level == 6)
+		branch_name = "LuR";
+
 	// Select a random bg
 	int bg_index = distrib(gen);
+	std::vector< glm::vec2 > spawn_points;
+
 	// Read level data and create platforms
 	std::cout << "\nInit level data with bg: " << bg_index << "\n";
 	try {
-		Level cur_level = tile_map->levels[level];
+		Level cur_level = tile_map->levels[std::min((int)(level + 1) / 2, (int)tile_map->levels.size() - 1)];
 		float tile_size = 32.0f;
 		PlatformTile *level_tile;
 		for (size_t y = 0; y < 18; y++)	// Height and width are constant. #TODO: Use globally declared constants
@@ -237,6 +288,10 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 					objects.emplace_back(level_tile);
 					object_collision_shapes.emplace_back(level_tile->collision_shape);
 					break;
+
+				case TileType::Player:
+					spawn_points.emplace_back(glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)));
+					break;
 				
 				default:
 					break;
@@ -245,6 +300,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 		}
 		std::cout << "Init level data done.\n";
 		assert(end != nullptr && "Level does not contain end point! FATALITY!");
+		assert(spawn_points.size() == 2 && "Spawn points not found!");
 	}
 	catch(const std::exception& e)
 	{
@@ -253,8 +309,8 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(300, 90), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
-	add_player(glm::vec2(600, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
+	add_player(spawn_points[0], SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
+	add_player(spawn_points[1], SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
 	for (size_t i = 0; i < objects.size(); i++) {
 		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {
@@ -263,6 +319,9 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 			object_collision_shapes[i] = Shapes::Rectangle(object_collision_shapes[i].center + move_up, object_collision_shapes[i].width, object_collision_shapes[i].height, false);
 		}
 	}
+
+	story_bgm = _story_bgm;
+	story_character = _story_character;
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -319,8 +378,7 @@ void PuzzleMode::update(float elapsed) {
 	if (is_timeup)
 	{
 		try {
-			std::string branch_name = "Story16";
-			Mode::set_current(std::make_shared<StoryMode>(branch_name));
+			Mode::set_current(std::make_shared<StoryMode>(branch_name, story_character, story_bgm));
 		}
 		catch (int e) {
 			std::cout << "Caught exception " << e << " when trying to switch to story mode" << std::endl;
@@ -334,9 +392,7 @@ void PuzzleMode::update(float elapsed) {
 	{
 		// puzzle failed. Perform negative action
 		is_timeup = true;
-
-		//std::string branch_name = "Story16";
-		//Mode::set_current(std::make_shared<StoryMode>(branch_name));
+		branch_name = "TimeOut0";
 	}
 	else
 	{
@@ -375,6 +431,11 @@ void PuzzleMode::update(float elapsed) {
 
 
 		// Process jumping
+		if (players[i]->jump->pressed() && players[i]->landed)
+		{
+			Sound::play(*sound_map["jump.wav"]);
+		}
+
 		if (players[i]->jump->held() && players[i]->input_jump_time < Player::max_jump_time && players[i]->landed) {
 			players[i]->jump_input = true;
 			players[i]->curr_sprite = players[i]->jump_sprite;
@@ -400,9 +461,10 @@ void PuzzleMode::update(float elapsed) {
 
 			if (players[i]->cur_jump_time >= players[i]->input_jump_time) {
 				players[i]->jump_clear = true;
-        players[i]->landed = false;
+        		players[i]->landed = false;
 			}
 		}
+		
 
 		if (players[i]->jump_clear) {
 			players[i]->cur_jump_time = 0.0f;
@@ -463,6 +525,7 @@ void PuzzleMode::update(float elapsed) {
 			{
 				float sqr_dist = (float)(pow(collectible->position.x - players[i]->position.x, 2) + pow(collectible->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(collectible->size.x * 0.5f, 2)){
+					Sound::play(*sound_map["collect.wav"]);
 					// removing an element from a vector - https://stackoverflow.com/a/3385251
 					collectibles.erase(std::remove(collectibles.begin(), collectibles.end(), collectible));
 					break;
@@ -473,12 +536,20 @@ void PuzzleMode::update(float elapsed) {
 		if (end != nullptr)
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
-				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					//std::string branch_name = "Story16";
-					//Mode::set_current(std::make_shared<StoryMode>(branch_name));
-					puzzle_time = MaxPuzzleTime;
-					//is_timeup = true;
+			if(sqr_dist < pow(end->size.x * 0.5f, 2)){
+				Sound::play(*sound_map["end.wav"]);
+				if (i == 0 && !is_timeup) {
+					if (branch_name == "Start")
+						branch_name = "Wes0";
+					else branch_name += "P0";
 				}
+				else if (!is_timeup) {
+					if (branch_name == "Start")
+						branch_name = "Lu0";
+					else branch_name += "R0";
+				}
+				is_timeup = true;
+			}
 		}
 		
 		input_manager.tick();

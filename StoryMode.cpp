@@ -78,8 +78,14 @@ Load<Story> test_story(LoadTagDefault, []() -> Story * {
 			std::vector<std::string> choices_attr;
 			choice_target += ":";
 			split_string(choice_target, ":", choices_attr);
-			dlg.option_lines.push_back(choices_attr[0]);
-			dlg.next_branch_names.push_back(choices_attr[1]);
+			if (choices_attr.size() < 2) {
+				// end
+				dlg.option_lines.push_back(choices_attr[0]);
+				dlg.next_branch_names.push_back(name);	// TODO : add end mode
+			} else {
+				dlg.option_lines.push_back(choices_attr[0]);
+				dlg.next_branch_names.push_back(choices_attr[1]);
+			}
 			if (choices_attr.size() > 2) {
 				dlg.option_line_preference.push_back(choices_attr[2]);
 			}
@@ -176,14 +182,37 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	story = *test_story;
 	setCurrentBranch(story.dialog.at(branch_name));
 	GameSaveLoad::read();
+
+	// select character
+	if (branch_name == PASSION_DLG_NAME) {
+		character.name = "Wes";
+		character.preference = "P";
+		character.hate = "R";
+	} else if (branch_name == RESPECT_DLG_NAME) {
+		character.name = "Lu";
+		character.preference = "R";
+		character.hate = "P";
+	}
 }
 
 // can update the affinity of the character and send it back to story mode
-StoryMode::StoryMode(std::string branch_name, Character character, std::string background_music) : story(*test_story) {
+StoryMode::StoryMode(std::string branch_name, Character _character, std::string _background_music) : story(*test_story) {
 	setCurrentBranch(story.dialog.at(branch_name));
-	this->character = character;
-	this->background_music = background_music;
+	this->character = _character;
+	this->background_music = _background_music;
 	music_loop = Sound::loop(*music_map[background_music]);
+
+	std::cout << branch_name << std::endl;
+	// select character
+	if (branch_name == PASSION_DLG_NAME) {
+		character.name = "Wes";
+		character.preference = "P";
+		character.hate = "R";
+	} else if (branch_name == RESPECT_DLG_NAME) {
+		character.name = "Lu";
+		character.preference = "R";
+		character.hate = "P";
+	}
 	GameSaveLoad::read();
 }
 
@@ -210,31 +239,25 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 				return true;
 			}
 			else if (keyCode == SDLK_RETURN) {
+				if (ended) {
+					Mode::set_current(std::make_shared<IntroMode>());
+					return true;
+				}
 				if (main_dialog->finished()) {
 					if (main_dialog->agree()) {
 						std::optional<int> next_branch = main_dialog->Enter();
 						if (next_branch.has_value()) {
 							size_t next_idx = next_branch.value();
 							std::string next_branch_name = current.next_branch_names.at(next_idx);
-
-							// select character
-							if (current.dlg_name == CHARACTER_SELECT_BRANCH) {
-								if (next_idx == P_INDEX) {
-									character.preference = "P";
-									character.hate = "R";
-									character.name = current.option_lines.at(next_idx);
-								} else if (next_idx == R_INDEX) {
-									character.preference = "R";
-									character.hate = "P";
-									character.name = current.option_lines.at(next_idx);
-								}
-							}
-							
 							// jump to the puzzle mode
-							if (next_branch_name == "PuzzleMode") {
+							if (next_branch_name.find("PuzzleMode") != std::string::npos) {
+								int puzzle_num = 2;
+								if (next_branch_name.length() > 10)
+									puzzle_num = next_branch_name[10] - '0';
 								// jump to the puzzle mode
 								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-								Mode::set_current(std::make_shared<PuzzleMode>(1));
+								Sound::stop_all_samples();
+								Mode::set_current(std::make_shared<PuzzleMode>(puzzle_num, background_music, character));
 							} else { 
 								// agreed with a valid option
 								// update affinity
@@ -389,6 +412,11 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 	// glm::vec2 center = glm::vec2(drawable_size.x * 0.5f, drawable_size.y * 0.5f);
 	glm::vec2 center(400.f, 300.f);
+
+	if (ended) {
+		story_sprites["End"]->draw(center, drawable_size, 0.63f, 1.0f);
+		return;
+	}
 	
 	// background
 	if (current.background.length() > 0)
@@ -500,6 +528,11 @@ void StoryMode::draw(glm::uvec2 const &drawable_size) {
 
 
 void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
+	if (current.dlg_name == new_dialog.dlg_name) {
+		ended = true;
+		return;
+	}
+
 	// music
 	if (new_dialog.background_music != "" && background_music != new_dialog.background_music) {
 		// change the background music

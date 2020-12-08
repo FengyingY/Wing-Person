@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
 
-#define CHARACTER_SELECT_BRANCH "Story14"       // the name of the dialog where player need to choose a character to date
-#define P_INDEX 0                               // assume that the first option is the one prefer passion
-#define R_INDEX 1                               // and the second prefer respect
+#define PASSION_DLG_NAME "Wes0"
+#define RESPECT_DLG_NAME "Lu0"
 
 #define STAGE0 0
 #define STAGE1 2
