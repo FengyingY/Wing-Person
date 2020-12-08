@@ -226,16 +226,16 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 		if (evt.type == SDL_KEYDOWN) {
 			SDL_Keycode keyCode = evt.key.keysym.sym;
 			if (keyCode == SDLK_UP) {
-				main_dialog->MoveUp();
-				return true;
-			} else if (keyCode == SDLK_DOWN) {
-				main_dialog->MoveDown();
-				return true;
-			} else if (keyCode == SDLK_w) {
 				main_dialog->MoveUp2();
 				return true;
-			} else if (keyCode == SDLK_s) {
+			} else if (keyCode == SDLK_DOWN) {
 				main_dialog->MoveDown2();
+				return true;
+			} else if (keyCode == SDLK_w) {
+				main_dialog->MoveUp();
+				return true;
+			} else if (keyCode == SDLK_s) {
+				main_dialog->MoveDown();
 				return true;
 			}
 			else if (keyCode == SDLK_RETURN) {
