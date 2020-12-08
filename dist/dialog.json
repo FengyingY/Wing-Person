@@ -696,7 +696,7 @@
   "LuR2": {
     "text": [ "My name is Lu!" ],
     "choices": [ "The conversation continues for some time...:LuR3" ],
-    "character": "Wes",
+    "character": "Lu",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
@@ -961,7 +961,7 @@
   },
   "LuRP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1:P" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:LuRP1:P" ],
     "character": "Passion",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -989,7 +989,7 @@
   },
   "LuPR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuPR1:R" ],
+    "choices": [ "Hey Lu! What a boring class, am I right?:LuPR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -1017,7 +1017,7 @@
   },
   "LuRR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuRR1:R" ],
+    "choices": [ "Hey Lu! What a boring class, am I right?:LuRR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
