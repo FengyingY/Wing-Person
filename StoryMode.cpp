@@ -196,11 +196,23 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 }
 
 // can update the affinity of the character and send it back to story mode
-StoryMode::StoryMode(std::string branch_name, Character character, std::string background_music) : story(*test_story) {
+StoryMode::StoryMode(std::string branch_name, Character _character, std::string _background_music) : story(*test_story) {
 	setCurrentBranch(story.dialog.at(branch_name));
-	this->character = character;
-	this->background_music = background_music;
+	this->character = _character;
+	this->background_music = _background_music;
 	music_loop = Sound::loop(*music_map[background_music]);
+
+	std::cout << branch_name << std::endl;
+	// select character
+	if (branch_name == PASSION_DLG_NAME) {
+		character.name = "Wes";
+		character.preference = "P";
+		character.hate = "R";
+	} else if (branch_name == RESPECT_DLG_NAME) {
+		character.name = "Lu";
+		character.preference = "R";
+		character.hate = "P";
+	}
 	GameSaveLoad::read();
 }
 
@@ -244,7 +256,8 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 									puzzle_num = next_branch_name[10] - '0';
 								// jump to the puzzle mode
 								// TODO using the introMode for testing, please change it to PuzzleMode at intergration
-								Mode::set_current(std::make_shared<PuzzleMode>(puzzle_num));
+								Sound::stop_all_samples();
+								Mode::set_current(std::make_shared<PuzzleMode>(puzzle_num, background_music, character));
 							} else { 
 								// agreed with a valid option
 								// update affinity

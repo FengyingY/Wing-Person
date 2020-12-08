@@ -195,7 +195,7 @@ Load < void > load_sounds(LoadTagDefault, []() -> void {
 	#endif
 });
 
-PuzzleMode::PuzzleMode(uint32_t level) {
+PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_character) {
 
 	// uniform int distribution from  https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
 	std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -319,6 +319,9 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 			object_collision_shapes[i] = Shapes::Rectangle(object_collision_shapes[i].center + move_up, object_collision_shapes[i].width, object_collision_shapes[i].height, false);
 		}
 	}
+
+	story_bgm = _story_bgm;
+	story_character = _story_character;
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -375,7 +378,7 @@ void PuzzleMode::update(float elapsed) {
 	if (is_timeup)
 	{
 		try {
-			Mode::set_current(std::make_shared<StoryMode>(branch_name));
+			Mode::set_current(std::make_shared<StoryMode>(branch_name, story_character, story_bgm));
 		}
 		catch (int e) {
 			std::cout << "Caught exception " << e << " when trying to switch to story mode" << std::endl;
