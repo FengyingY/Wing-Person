@@ -182,6 +182,17 @@ StoryMode::StoryMode(std::string branch_name) : story(*test_story) {
 	story = *test_story;
 	setCurrentBranch(story.dialog.at(branch_name));
 	GameSaveLoad::read();
+
+	// select character
+	if (branch_name == PASSION_DLG_NAME) {
+		character.name = "Wes";
+		character.preference = "P";
+		character.hate = "R";
+	} else if (branch_name == RESPECT_DLG_NAME) {
+		character.name = "Lu";
+		character.preference = "R";
+		character.hate = "P";
+	}
 }
 
 // can update the affinity of the character and send it back to story mode
@@ -222,20 +233,6 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 						if (next_branch.has_value()) {
 							size_t next_idx = next_branch.value();
 							std::string next_branch_name = current.next_branch_names.at(next_idx);
-
-							// select character
-							if (current.dlg_name == CHARACTER_SELECT_BRANCH) {
-								if (next_idx == P_INDEX) {
-									character.preference = "P";
-									character.hate = "R";
-									character.name = current.option_lines.at(next_idx);
-								} else if (next_idx == R_INDEX) {
-									character.preference = "R";
-									character.hate = "P";
-									character.name = current.option_lines.at(next_idx);
-								}
-							}
-							
 							// jump to the puzzle mode
 							if (next_branch_name.find("PuzzleMode") != std::string::npos) {
 								int puzzle_num = 2;
