@@ -25,4 +25,5 @@ Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
 - Fonts: https://www.dafont.com/built-titling.font, https://www.fontspace.com/literata-font-f32719, https://fonts.google.com/featured/Plex, https://cm-unicode.sourceforge.io/
 - Music by W.O.W Sound [https://wowsound.com.sg]
 - SFX by W.O.W Sound [https://wowsound.com.sg]
+- Puzzle SFX by Hanna-Barbera SoundFX Library [https://www.sound-ideas.com/Product/409/hanna-barbera-sound-effects-library/] 
 This game was built with [NEST](NEST.md).
