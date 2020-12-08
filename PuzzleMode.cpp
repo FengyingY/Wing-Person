@@ -133,9 +133,26 @@ Load< void > load_sprites(LoadTagEarly, []() -> void {
 
 PuzzleMode::PuzzleMode(uint32_t level) {
 	// Read level data and create platforms
-	std::cout << "\nInit level data" << "\n";
+	std::cout << "\nInit level " << level << " data" << "\n";
+
+	// Prepare the branch_name string to know how to behave later
+	if (level == 0)
+		branch_name = "Start";
+	else if (level == 1)
+		branch_name = "Wes";
+	else if (level == 2)
+		branch_name = "Lu";
+	else if (level == 3)
+		branch_name = "WesP";
+	else if (level == 4)
+		branch_name = "WesR";
+	else if (level == 5)
+		branch_name = "LuP";
+	else if (level == 6)
+		branch_name = "LuR";
+
 	try {
-		Level cur_level = tile_map->levels[level];
+		Level cur_level = tile_map->levels[std::min(((int)level + 1) / 2, 2)];
 		float tile_size = 32.0f;
 		PlatformTile *level_tile;
 		for (size_t y = 0; y < 18; y++)	// Height and width are constant. #TODO: Use globally declared constants
@@ -180,7 +197,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 				}
 			}
 		}
-		std::cout << "Init level data done.\n";
+		std::cout << "Init level " << level << " data done.\n";
 		assert(end != nullptr && "Level does not contain end point! FATALITY!");
 	}
 	catch(const std::exception& e)
@@ -256,7 +273,6 @@ void PuzzleMode::update(float elapsed) {
 	if (is_timeup)
 	{
 		try {
-			std::string branch_name = "Story16";
 			Mode::set_current(std::make_shared<StoryMode>(branch_name));
 		}
 		catch (int e) {
@@ -271,9 +287,7 @@ void PuzzleMode::update(float elapsed) {
 	{
 		// puzzle failed. Perform negative action
 		is_timeup = true;
-
-		//std::string branch_name = "Story16";
-		//Mode::set_current(std::make_shared<StoryMode>(branch_name));
+		branch_name = "TimeOut0";
 	}
 	else
 	{
@@ -388,8 +402,6 @@ void PuzzleMode::update(float elapsed) {
 		}
      }
 
-
-
 		//remove the other player to the list of things the current player can collide with:
 		platform_collision_shapes.pop_back();
 
@@ -411,10 +423,16 @@ void PuzzleMode::update(float elapsed) {
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					//std::string branch_name = "Story16";
-					//Mode::set_current(std::make_shared<StoryMode>(branch_name));
-					puzzle_time = MaxPuzzleTime;
-					//is_timeup = true;
+					if (i == 0 && !is_timeup) {
+						if (branch_name == "Start")
+							branch_name = "Wes0";
+						else branch_name += "P0";
+					} else if (!is_timeup) {
+						if (branch_name == "Start")
+							branch_name = "Lu0";
+						else branch_name += "R0";
+					}
+					is_timeup = true;
 				}
 		}
 		
