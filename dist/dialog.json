@@ -235,7 +235,7 @@
     "text": [ "Okay cool. Let's tell them to ask out the cute guy." ],
     "choices": [ "Continue:Lu1" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "Lu1": {
@@ -303,7 +303,7 @@
   },
   "WesP0": {
     "text": [ "Alright, fine, we'll try it your way.", "But don't blame me if they come on too strong!" ],
-    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne�er saw true beauty till this night.:WesP1" ],
+    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne�er saw true beauty till this night.:WesP1:P" ],
     "character": "Respect",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
@@ -429,7 +429,7 @@
   },
   "WesR0": {
     "text": [ "Ugh, fine. Let's do things your way.", "But don't come crying to me if she ends up bored!" ],
-    "choices": [ "Hi! I just wanted to say hello! My name is...:WesR1" ],
+    "choices": [ "Hi! I just wanted to say hello! My name is...:WesR1:R" ],
     "character": "Passion",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-School1"
@@ -555,72 +555,72 @@
   },
   "LuP0": {
     "text": [ "Alright, fine, we'll try it your way.", "Just try not to come on too strong, okay?" ],
-    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne�er saw true beauty till this night.:PuzzleMode5" ],
+    "choices": [ "Did my heart love till now? Forswear it, sight! For I ne�er saw true beauty till this night.:LuP1:P" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP1": {
     "text": [ "Ummm, wha- wha- what???", "Oh... you're trying to flirt." ],
     "choices": [ "Continue:LuP2" ],
     "character": "???",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP2": {
     "text": [ "My name is Lu.", "Nice to meet you, I suppose..." ],
     "choices": [ "The conversation continues for some time...:LuP3" ],
     "character": "Lu",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP3": {
     "text": [ "Oh man, this is going great!", "He seems super into them!", "I think? Okay, maybe that's just wishful thinking..." ],
     "choices": [ "Continue:LuP4" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP4": {
     "text": [ "Yeah, I'd hardly describe this as going great...", "I wouldn't push him again if I were you." ],
     "choices": [ "Continue:LuP5" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP5": {
     "text": [ "Oh, c'mon!", "Stop being such a stick in the mud!", "He just needs a little help getting out of his shell!" ],
     "choices": [ "Passion is right, at least this once.:LuP6a", "Passion needs to cool it before we blow it.:LuP6b" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP6a": {
     "text": [ "Fine... you're right.", "Just this once." ],
     "choices": [ "Continue:LuP7a" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP6b": {
     "text": [ "No! You need to cool it!", "He already seems super overwhelmed by all this flirting you told them to do!" ],
     "choices": [ "Continue:LuP7b" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP7a": {
     "text": [ "Wow, you admitted I'm right!", "Maybe this morning hasn't been all bad...", "Anyway, looks like the conversation is wrapping up." ],
     "choices": [ "Continue:LuP8" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP7b": {
     "text": [ "God, you're just as much of a stick in the mud as ever...", "Anyway, looks like the conversation is wrapping up." ],
     "choices": [ "Continue:LuP8" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuP8": {
@@ -681,72 +681,72 @@
   },
   "LuR0": {
     "text": [ "Ugh, fine. Let's do things your way.", "But don't come crying to me if he ends up bored!" ],
-    "choices": [ "Hi! I just wanted to say hello! My name is...:LuR1" ],
+    "choices": [ "Hi! I just wanted to say hello! My name is...:LuR1:R" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR1": {
     "text": [ "Oh, hello! I didn't see you walk up!", "It's good to meet you!" ],
     "choices": [ "Continue:LuR2" ],
     "character": "???",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR2": {
     "text": [ "My name is Lu!" ],
     "choices": [ "The conversation continues for some time...:LuR3" ],
     "character": "Wes",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR3": {
     "text": [ "Oh no, this conversation is so normal...", "I'm super bored!" ],
     "choices": [ "Continue:LuR4" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR4": {
     "text": [ "What do you mean, this conversation has been going great!", "Just because you're bored doesn't mean he is." ],
     "choices": [ "Continue:LuR5" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR5": {
     "text": [ "Oh, c'mon!", "He's clearly bored!", "Just admit I was right this one time!" ],
     "choices": [ "Passion was right, at least this once.:LuR6a", "Passion is wrong! He's not bored just because she is!.:LuR6b" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR6a": {
     "text": [ "Fine... you were right.", "Just this once." ],
     "choices": [ "Continue:LuR7a" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR6b": {
     "text": [ "No! He's not bored! You are!" ],
     "choices": [ "Continue:LuR7b" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR7a": {
     "text": [ "Wow, you admitted I'm right!", "This has been a good morning...", "Anyway, looks like the conversation is wrapping up." ],
     "choices": [ "Continue:LuR8" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR7b": {
     "text": [ "God, you're just as much of a stick in the mud as ever...", "Anyway, looks like the conversation is wrapping up." ],
     "choices": [ "Continue:LuR8" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-School1"
   },
   "LuR8": {
@@ -807,7 +807,7 @@
   },
   "WesPP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesPP1" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesPP1:P" ],
     "character": "Passion",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -849,7 +849,7 @@
   },
   "WesRP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1 Wes" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1:P" ],
     "character": "Passion",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -877,7 +877,7 @@
   },
   "WesPR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:WesPR1" ],
+    "choices": [ "Hey Wes! What a boring class, am I right?:WesPR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -905,7 +905,7 @@
   },
   "WesRR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:WesRR1" ],
+    "choices": [ "Hey Wes! What a boring class, am I right?:WesRR1:R" ],
     "character": "Respect",
     "sprite": [ "Passion", "FemaleSpritebySutemo", "Respect" ],
     "background": "Modern-Street1"
@@ -933,16 +933,16 @@
   },
   "LuPP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:LuPP1" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:LuPP1:P" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuPP1": {
     "text": [ "Oh, ah, umm, wha-...", "I need to go!" ],
     "choices": [ "Continue:LuPP2" ],
     "character": "Lu",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuPP2": {
@@ -961,16 +961,16 @@
   },
   "LuRP0": {
     "text": [ "Yes, I win!", "Let's do things my way!" ],
-    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1" ],
+    "choices": [ "My lips, two blushing pilgrims, ready stand to smooth that rough class with a tender kiss.:WesRP1:P" ],
     "character": "Passion",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRP1": {
     "text": [ "Oh, ah, umm, wha-...", "Oh, it you. Can you just act normal like last time we talked?" ],
     "choices": [ "The conversation continues for some time...:LuRP2" ],
     "character": "Lu",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRP2": {
@@ -989,16 +989,16 @@
   },
   "LuPR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuPR1" ],
+    "choices": [ "Hey Wes! What a boring class, am I right?:LuPR1:R" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuPR1": {
     "text": [ "Yeah, it was pretty bori-", "Ahhh, it's you!", "Though you do seem to be acting more normal this time." ],
     "choices": [ "The conversation continues for some time...:LuPR2" ],
     "character": "Lu",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuPR2": {
@@ -1017,16 +1017,16 @@
   },
   "LuRR0": {
     "text": [ "Good work together in that puzzle Passion!", "But it looks like we're doing things my way." ],
-    "choices": [ "Hey Wes! What a boring class, am I right?:LuRR1" ],
+    "choices": [ "Hey Wes! What a boring class, am I right?:LuRR1:R" ],
     "character": "Respect",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRR1": {
     "text": [ "Yeah, it was pretty boring!", "It's good to see you again, by the way.", "Honestly, I was hoping I'd run into you again!" ],
     "choices": [ "The conversation continues for some time...:LuRR2" ],
     "character": "Lu",
-    "sprite": [ "Passion", "MaleSpritebySutemo", "Respect" ],
+    "sprite": [ "Passion", "MaleSpriteBySutemo", "Respect" ],
     "background": "Modern-Street1"
   },
   "LuRR2": {
