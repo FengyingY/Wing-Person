@@ -14,8 +14,8 @@
 
 #if defined(__linux__)
 #include <dirent.h>
-DIR *dpdf;
-struct dirent *epdf;
+DIR *dpdf_p;
+struct dirent *epdf_p;
 #else
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -177,10 +177,10 @@ std::map<std::string, Sound::Sample *> sound_map;
 Load < void > load_sounds(LoadTagDefault, []() -> void {
 	#if defined(__linux__)
 	std::string path = data_path(PUZZLE_SFX_DIR);
-	dpdf = opendir(path.c_str());
-	if (dpdf != NULL) {
-		while ((epdf = readdir(dpdf))) {
-			std::string file_name = epdf->d_name;
+	dpdf_p = opendir(path.c_str());
+	if (dpdf_p != NULL) {
+		while ((epdf_p = readdir(dpdf_p))) {
+			std::string file_name = epdf_p->d_name;
 			if (file_name != "." && file_name != "..") {
 				sound_map[file_name] = new Sound::Sample(path + "/" + file_name);
 			}
