@@ -47,5 +47,6 @@ struct PuzzleMode : Mode
 	const float MaxPuzzleTime = 300.0f;	// in seconds
 	float puzzle_time = 0.0f;
 	bool is_timeup = false;
-  
+
+	std::string branch_name;
 };
