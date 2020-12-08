@@ -12,6 +12,17 @@
 #include <map>
 #include <random>
 
+#if defined(__linux__)
+#include <dirent.h>
+DIR *dpdf;
+struct dirent *epdf;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
+#define PUZZLE_SFX_DIR "puzzle_sounds"
+
 // const float ScreenWidth = 800.0f;		// unused variable warning
 const float ScreenHeight = 600.0f;
 
@@ -162,6 +173,28 @@ Load< void > load_sprites(LoadTagEarly, []() -> void {
 	}
 });
 
+std::map<std::string, Sound::Sample *> sound_map;
+Load < void > load_sounds(LoadTagDefault, []() -> void {
+	#if defined(__linux__)
+	std::string path = data_path(PUZZLE_SFX_DIR);
+	dpdf = opendir(path.c_str());
+	if (dpdf != NULL) {
+		while ((epdf = readdir(dpdf))) {
+			std::string file_name = epdf->d_name;
+			if (file_name != "." && file_name != "..") {
+				sound_map[file_name] = new Sound::Sample(path + "/" + file_name);
+			}
+		}
+	}
+	#else
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	for (const auto & entry : fs::directory_iterator(data_path(PUZZLE_SFX_DIR))) {
+		std::string file_name = entry.path().filename().string();
+		sound_map[file_name] = new Sound::Sample(entry.path().string());
+	}
+	#endif
+});
+
 PuzzleMode::PuzzleMode(uint32_t level) {
 
 	// uniform int distribution from  https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
@@ -254,7 +287,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 
 	// #HACK : spawn 2 default players
 	add_player(glm::vec2(300, 90), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
-	add_player(glm::vec2(600, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
+	add_player(glm::vec2(550, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
 	for (size_t i = 0; i < objects.size(); i++) {
 		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {
@@ -375,6 +408,11 @@ void PuzzleMode::update(float elapsed) {
 
 
 		// Process jumping
+		if (players[i]->jump->pressed() && players[i]->landed)
+		{
+			Sound::play(*sound_map["jump.wav"]);
+		}
+
 		if (players[i]->jump->held() && players[i]->input_jump_time < Player::max_jump_time && players[i]->landed) {
 			players[i]->jump_input = true;
 			players[i]->curr_sprite = players[i]->jump_sprite;
@@ -400,9 +438,10 @@ void PuzzleMode::update(float elapsed) {
 
 			if (players[i]->cur_jump_time >= players[i]->input_jump_time) {
 				players[i]->jump_clear = true;
-        players[i]->landed = false;
+        		players[i]->landed = false;
 			}
 		}
+		
 
 		if (players[i]->jump_clear) {
 			players[i]->cur_jump_time = 0.0f;
@@ -463,6 +502,7 @@ void PuzzleMode::update(float elapsed) {
 			{
 				float sqr_dist = (float)(pow(collectible->position.x - players[i]->position.x, 2) + pow(collectible->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(collectible->size.x * 0.5f, 2)){
+					Sound::play(*sound_map["collect.wav"]);
 					// removing an element from a vector - https://stackoverflow.com/a/3385251
 					collectibles.erase(std::remove(collectibles.begin(), collectibles.end(), collectible));
 					break;
@@ -474,6 +514,7 @@ void PuzzleMode::update(float elapsed) {
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
 				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
+					Sound::play(*sound_map["end.wav"]);
 					//std::string branch_name = "Story16";
 					//Mode::set_current(std::make_shared<StoryMode>(branch_name));
 					puzzle_time = MaxPuzzleTime;
