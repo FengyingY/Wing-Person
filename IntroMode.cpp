@@ -35,6 +35,7 @@ Load<void>load_menu_sprites(LoadTagDefault, []() -> void {
 });
 
 IntroMode::IntroMode() {
+	Sound::stop_all_samples();
 	music_loop = Sound::loop(*intro_background_sample);
 	GameSaveLoad::read();
 

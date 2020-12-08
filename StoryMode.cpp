@@ -276,7 +276,7 @@ bool StoryMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size
 					} else {
 						// disagree
 						story.dialog["disagree"].background = current.background;
-						story.dialog["disagree"].character_name = current.character_name;
+						story.dialog["disagree"].character_name = "System";
 						if (story.dialog["disagree"].next_branch_names.empty()) {
 							story.dialog["disagree"].next_branch_names.push_back(current.dlg_name);
 						} else {
