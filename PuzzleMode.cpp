@@ -223,7 +223,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	// Read level data and create platforms
 	std::cout << "\nInit level data with bg: " << bg_index << "\n";
 	try {
-		Level cur_level = tile_map->levels[level];
+		Level cur_level = tile_map->levels[std::min((int)(level + 1) / 2, (int)tile_map->levels.size() - 1)];
 		float tile_size = 32.0f;
 		PlatformTile *level_tile;
 		for (size_t y = 0; y < 18; y++)	// Height and width are constant. #TODO: Use globally declared constants
@@ -526,20 +526,20 @@ void PuzzleMode::update(float elapsed) {
 		if (end != nullptr)
 		{
 			float sqr_dist = (float)(pow(end->position.x - players[i]->position.x, 2) + pow(end->position.y - players[i]->position.y, 2));
-				if(sqr_dist < pow(end->size.x * 0.5f, 2)){
-					Sound::play(*sound_map["end.wav"]);
-					if (i == 0 && !is_timeup) {
-						if (branch_name == "Start")
-							branch_name = "Wes0";
-						else branch_name += "P0";
-					}
-					else if (!is_timeup) {
-						if (branch_name == "Start")
-							branch_name = "Lu0";
-						else branch_name += "R0";
-					}
-					is_timeup = true;
+			if(sqr_dist < pow(end->size.x * 0.5f, 2)){
+				Sound::play(*sound_map["end.wav"]);
+				if (i == 0 && !is_timeup) {
+					if (branch_name == "Start")
+						branch_name = "Wes0";
+					else branch_name += "P0";
 				}
+				else if (!is_timeup) {
+					if (branch_name == "Start")
+						branch_name = "Lu0";
+					else branch_name += "R0";
+				}
+				is_timeup = true;
+			}
 		}
 		
 		input_manager.tick();
