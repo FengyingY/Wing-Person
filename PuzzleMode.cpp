@@ -230,9 +230,9 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 
 				case TileType::Object:
 					// just to ensure that the collision boxes don't overlap
-					level_tile->size = level_tile->size * 0.9f;
-					level_tile->collision_shape.width *= 0.9f;
-					level_tile->collision_shape.height *= 0.9f;
+					level_tile->size = level_tile->size * 0.99f;
+					level_tile->collision_shape.width *= 0.99f;
+					level_tile->collision_shape.height *= 0.99f;
 
 					objects.emplace_back(level_tile);
 					object_collision_shapes.emplace_back(level_tile->collision_shape);
