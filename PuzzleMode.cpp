@@ -220,6 +220,8 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 
 	// Select a random bg
 	int bg_index = distrib(gen);
+	std::vector< glm::vec2 > spawn_points;
+
 	// Read level data and create platforms
 	std::cout << "\nInit level data with bg: " << bg_index << "\n";
 	try {
@@ -286,6 +288,10 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 					objects.emplace_back(level_tile);
 					object_collision_shapes.emplace_back(level_tile->collision_shape);
 					break;
+
+				case TileType::Player:
+					spawn_points.emplace_back(glm::vec2((x * tile_size) + (tile_size * 0.5f), ScreenHeight - (y * tile_size) - (tile_size * 0.5f)));
+					break;
 				
 				default:
 					break;
@@ -294,6 +300,7 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 		}
 		std::cout << "Init level data done.\n";
 		assert(end != nullptr && "Level does not contain end point! FATALITY!");
+		assert(spawn_points.size() == 2 && "Spawn points not found!");
 	}
 	catch(const std::exception& e)
 	{
@@ -302,8 +309,8 @@ PuzzleMode::PuzzleMode(uint32_t level) {
 	
 
 	// #HACK : spawn 2 default players
-	add_player(glm::vec2(300, 90), SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
-	add_player(glm::vec2(550, 90), SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
+	add_player(spawn_points[0], SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
+	add_player(spawn_points[1], SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
 	for (size_t i = 0; i < objects.size(); i++) {
 		if (Collisions::player_rectangles_collision(object_collision_shapes[i], platform_collision_shapes).size() != 0) {

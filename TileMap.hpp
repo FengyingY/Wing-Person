@@ -9,6 +9,7 @@ struct Level
 
 struct TileType
 {
+	static const uint32_t Player = 10;
 	static const uint32_t Platform = 1;
 	static const uint32_t Collectible = 2;
 	static const uint32_t End = 3;
