@@ -1,10 +1,8 @@
 # Wingperson
 
-Author: (TODO: your name)
+Authors: Fengying Yang, Tyler Thompson, Pavan Paravasthu, and Jonathan Yan
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
-
-Text Drawing: (TODO: how does the text drawing in this game work? Is text precomputed? Rendered at runtime? What files or utilities are involved?)
+Design: This game's core theme is co-op dating sim puzzle game. To that we end, we created a dating sim with two Guardian Dating Angels each controlled by a player who must work together to get the main character of the story a date by making decisions through cooperative puzzles.
 
 Screen Shot:
 
@@ -12,7 +10,7 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+![Screen Shot](dist/menu/tutorial.png)
 
 Sources:
 Tile editing tool : Tiled Editor (https://www.mapeditor.org/)
