@@ -1,4 +1,4 @@
-# Wingperson
+# Wing-Person
 
 Authors: Fengying Yang, Tyler Thompson, Pavan Paravasthu, and Jonathan Yan
 
