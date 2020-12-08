@@ -25,7 +25,8 @@
     "choices": [ "Continue:Story0" ],
     "character": "Passion",
     "sprite": [ "Passion" ],
-    "background": ""
+    "background": "",
+    "background_music": "sax-and-ivory-toolkit__01m00s__June_2007__01.wav"
   },
   "Story0": {
     "text": [ "Ugh.. Passion..", "Can't you let me sleep in just this once!" ],
