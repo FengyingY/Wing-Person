@@ -31,3 +31,4 @@ level-data/pack-level.pdb
 level-data/pack-level.ilk
 level-data/pack-level.exe
 .vscode/c_cpp_properties.json
+dist/saved_games
