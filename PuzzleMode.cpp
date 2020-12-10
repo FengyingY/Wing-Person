@@ -307,8 +307,6 @@ PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_
 		std::cerr << e.what() << '\n';
 	}
 	
-
-	// #HACK : spawn 2 default players
 	add_player(spawn_points[0], SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
 	add_player(spawn_points[1], SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
@@ -322,6 +320,10 @@ PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_
 
 	story_bgm = _story_bgm;
 	story_character = _story_character;
+
+	// init UI
+	time_left = std::make_shared<view::TextLine>();
+	update_time_left();
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -358,7 +360,7 @@ uint32_t PuzzleMode::parse_tiledata(uint32_t &tile_data) {
 void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
 	std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites) {
 	
-	std::cout << "\nAdding player" << "\n";
+	std::cout << "\nAdding player. Pos : " << position.x << ", " << position.y << "\n";
 	Input* left = input_manager.register_key(leftkey);
 	Input* right = input_manager.register_key(rightkey);
 	Input* jump = input_manager.register_key(jumpkey);
@@ -373,7 +375,15 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 
 void PuzzleMode::update(float elapsed) {
 	
+	if (start_delay < 0.2f)	// pausing all physics checks for a short delay on start
+	{
+		start_delay += elapsed;
+		return;
+	}
+
 	total_time += elapsed;
+
+	update_time_left();
 
 	if (is_timeup)
 	{
@@ -402,6 +412,8 @@ void PuzzleMode::update(float elapsed) {
 	
 
 	for (unsigned int i = 0; i < players.size(); i++) {
+
+		players[i]->update(elapsed);
 
 		// Calculate inputs and movement for each player
 		players[i]->velocity.x = 0;
@@ -498,20 +510,19 @@ void PuzzleMode::update(float elapsed) {
 				players[i]->collision_box.center += grav_change;
 				players[i]->velocity.y += Player::fall_acceleration * elapsed;
 			} else {
-			players[i]->landed = true;
-			players[i]->velocity.y = 0.0f;
-			if (!(players[i]->left->held() || players[i]->right->held()) ||
-				(players[i]->left->held() && players[i]->right->held()))
-				players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
-			else if (players[i]->left->held()) {
-				players[i]->direction = -1.0f;
-				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
-			} else if (players[i]->right->held()) {
-				players[i]->direction = 1.0f;
-				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				players[i]->landed = true;
+				players[i]->velocity.y = 0.0f;
+				if (!(players[i]->left->held() || players[i]->right->held()) || (players[i]->left->held() && players[i]->right->held()))
+					players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
+				else if (players[i]->left->held()) {
+					players[i]->direction = -1.0f;
+					players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				} else if (players[i]->right->held()) {
+					players[i]->direction = 1.0f;
+					players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				}
 			}
-		}
-     }
+		 }
 
 
 
@@ -571,7 +582,7 @@ void PuzzleMode::update(float elapsed) {
 
 		//if the red player is close enough, consider it a collision:
 		if (dist_red <= (objects[num_objects - 1]->size.x + players[0]->size.x) / 2.0f + 1.0f &&
-			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[0]->position.y - (players[0]->size.y / 2.0f)) {
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) > players[0]->position.y - players[0]->size.y) {
 			//if the red player is to the left, move the object right:
 			if (objects[num_objects - 1]->position.x - players[0]->position.x > 0) {
 				object_velocity.x += Player::movespeed * elapsed;
@@ -584,7 +595,7 @@ void PuzzleMode::update(float elapsed) {
 
 		//if the blue player is close enough, consider it a collision:
 		if (dist_blue <= (objects[num_objects - 1]->size.x + players[1]->size.x) / 2.0f + 1.0f &&
-			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[1]->position.y - (players[0]->size.y / 2.0f)) {
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) > players[1]->position.y - players[0]->size.y) {
 			//if the blue player is to the left, move the object right:
 			if (objects[num_objects - 1]->position.x - players[1]->position.x > 0) {
 				object_velocity.x += Player::movespeed * elapsed;
@@ -663,5 +674,24 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 		player->draw(drawable_size);
 	}
 
+	// text
+	glDisable(GL_DEPTH_TEST);
+	time_left->draw();
+
 	GL_ERRORS();
+}
+
+void PuzzleMode::update_time_left() {
+	time_str = "Time left : ";
+	time_str.append(std::to_string((int)(MaxPuzzleTime-puzzle_time)))
+		.append("/")
+		.append(std::to_string((int)MaxPuzzleTime));
+	
+	time_left->set_font(view::FontFace::IBMPlexMono)
+		.set_text(time_str)
+		.set_font_size(28)
+		.set_position(glm::vec2(0.f, ScreenHeight-28.f))
+		.set_color(glm::u8vec4(255,255,255,255))
+		.disable_animation()
+		.set_visibility(true);
 }

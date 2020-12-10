@@ -582,9 +582,12 @@ std::vector< Shapes::Rectangle > Collisions::player_rectangles_collision(Shapes:
 	//create a vector for the collisions:
 	std::vector< Shapes::Rectangle > hit_rectangles;
 
+	//for some reason this function only works if I add this line; not sure why:
+	Shapes::Rectangle player_copy = Shapes::Rectangle(player.center, player.width, player.height, false);
+
 	//check for collisions:
 	for (Shapes::Rectangle rectangle : rectangles) {
-		if (rectangle_rectangle_collision(player, rectangle))
+		if (rectangle_rectangle_collision(player_copy, rectangle))
 			hit_rectangles.emplace_back(rectangle);
 	}
 
@@ -637,6 +640,20 @@ bool Collisions::player_rectangles_collision(Shapes::Rectangle player, glm::vec2
 
 	//no collisions found:
 	return false;
+}
+
+//allows for a second vector to compare against for collisions:
+std::vector< Shapes::Rectangle > Collisions::player_rectangles_collision(Shapes::Rectangle player, std::vector < Shapes::Rectangle > rectangles1, std::vector < Shapes::Rectangle > rectangles2) {
+	//check for collisions:
+	std::vector< Shapes::Rectangle > collisions;
+	std::vector< Shapes::Rectangle > temp;
+	temp = player_rectangles_collision(player, rectangles1);
+	for (unsigned int i = 0; i < temp.size(); i++)
+		collisions.emplace_back(temp[i]);
+	temp = player_rectangles_collision(player, rectangles2);
+	for (unsigned int i = 0; i < temp.size(); i++)
+		collisions.emplace_back(temp[i]);
+	return collisions;
 }
 
 //allows for a second vector to compare against for collisions:

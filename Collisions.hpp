@@ -42,6 +42,7 @@ namespace Collisions {
 	bool player_triangles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Triangle > triangles);
 
 	//allows for a second vector to compare against for collisions:
+	std::vector< Shapes::Rectangle > player_rectangles_collision(Shapes::Rectangle player, std::vector < Shapes::Rectangle > rectangles1, std::vector < Shapes::Rectangle > rectangles2);
 	bool player_rectangles_collision(Shapes::Rectangle player, glm::vec2 new_pos, std::vector < Shapes::Rectangle > rectangles1, std::vector < Shapes::Rectangle > rectangles2);
 
 	//check if lines intersect (useful for collision detection between 2D shapes):
