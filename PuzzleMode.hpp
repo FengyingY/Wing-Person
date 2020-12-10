@@ -54,4 +54,7 @@ struct PuzzleMode : Mode
 
 	std::string story_bgm;
 	Character story_character;
+
+
+	float start_delay = 0.f;
 };

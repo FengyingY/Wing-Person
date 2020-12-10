@@ -8,11 +8,8 @@ Player::Player(glm::vec2 position_, Input* left_, Input* right_, Input* jump_, s
 }
 
 Player::~Player() {
-	glDeleteBuffers(1, &vertex_buffer);
-	vertex_buffer = 0;
-
-	glDeleteVertexArrays(1, &vertex_buffer_for_color_texture_program);
-	vertex_buffer_for_color_texture_program = 0;
+	
+}
 
 	glDeleteTextures(1, &png_tex);
 	png_tex = 0;

@@ -307,8 +307,6 @@ PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_
 		std::cerr << e.what() << '\n';
 	}
 	
-
-	// #HACK : spawn 2 default players
 	add_player(spawn_points[0], SDLK_a, SDLK_d, SDLK_w, red_idle, red_jump, red_fall, red_run);
 	add_player(spawn_points[1], SDLK_LEFT, SDLK_RIGHT, SDLK_UP, blue_idle, blue_jump, blue_fall, blue_run);
 
@@ -372,8 +370,13 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
-	
 	total_time += elapsed;
+
+	if (start_delay < 0.2f)	// pausing all physics checks for a short delay on start
+	{
+		start_delay += elapsed;
+		return;
+	}
 
 	if (is_timeup)
 	{
