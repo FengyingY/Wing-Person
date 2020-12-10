@@ -54,7 +54,7 @@ struct Player {
   Input* jump;
 
   // Constants
-  static constexpr glm::vec2 size = glm::vec2(30.0f, 30.0f);
+  static constexpr glm::vec2 size = glm::vec2(28.0f, 28.0f);
 
   static constexpr float rel_movespeed = 4.0f;
   static constexpr float movespeed = rel_movespeed * PlatformTile::default_size.x;

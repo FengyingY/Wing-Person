@@ -510,20 +510,19 @@ void PuzzleMode::update(float elapsed) {
 				players[i]->collision_box.center += grav_change;
 				players[i]->velocity.y += Player::fall_acceleration * elapsed;
 			} else {
-			players[i]->landed = true;
-			players[i]->velocity.y = 0.0f;
-			if (!(players[i]->left->held() || players[i]->right->held()) ||
-				(players[i]->left->held() && players[i]->right->held()))
-				players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
-			else if (players[i]->left->held()) {
-				players[i]->direction = -1.0f;
-				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
-			} else if (players[i]->right->held()) {
-				players[i]->direction = 1.0f;
-				players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				players[i]->landed = true;
+				players[i]->velocity.y = 0.0f;
+				if (!(players[i]->left->held() || players[i]->right->held()) || (players[i]->left->held() && players[i]->right->held()))
+					players[i]->curr_sprite = players[i]->idle_sprites[(int)(idle_sprites_size * total_time) % idle_sprites_size];
+				else if (players[i]->left->held()) {
+					players[i]->direction = -1.0f;
+					players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				} else if (players[i]->right->held()) {
+					players[i]->direction = 1.0f;
+					players[i]->curr_sprite = players[i]->run_sprites[(int)(run_sprites_size * total_time) % run_sprites_size];
+				}
 			}
-		}
-     }
+		 }
 
 
 
@@ -583,7 +582,7 @@ void PuzzleMode::update(float elapsed) {
 
 		//if the red player is close enough, consider it a collision:
 		if (dist_red <= (objects[num_objects - 1]->size.x + players[0]->size.x) / 2.0f + 1.0f &&
-			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[0]->position.y - (players[0]->size.y / 2.0f)) {
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) > players[0]->position.y - players[0]->size.y) {
 			//if the red player is to the left, move the object right:
 			if (objects[num_objects - 1]->position.x - players[0]->position.x > 0) {
 				object_velocity.x += Player::movespeed * elapsed;
@@ -596,7 +595,7 @@ void PuzzleMode::update(float elapsed) {
 
 		//if the blue player is close enough, consider it a collision:
 		if (dist_blue <= (objects[num_objects - 1]->size.x + players[1]->size.x) / 2.0f + 1.0f &&
-			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) >= players[1]->position.y - (players[0]->size.y / 2.0f)) {
+			objects[num_objects - 1]->position.y + (objects[num_objects - 1]->size.y / 2.0f) > players[1]->position.y - players[0]->size.y) {
 			//if the blue player is to the left, move the object right:
 			if (objects[num_objects - 1]->position.x - players[1]->position.x > 0) {
 				object_velocity.x += Player::movespeed * elapsed;
