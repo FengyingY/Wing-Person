@@ -40,8 +40,6 @@ struct Player {
   Player(glm::vec2 position, Input* left, Input* right, Input* jump, std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites);
   ~Player();
 
-	void setup_opengl();
-
 	//functions called by main loop:
 	void draw(glm::uvec2 const &drawable_size);
 

@@ -358,7 +358,7 @@ uint32_t PuzzleMode::parse_tiledata(uint32_t &tile_data) {
 void PuzzleMode::add_player(glm::vec2 position, SDL_Keycode leftkey, SDL_Keycode rightkey, SDL_Keycode jumpkey,
 	std::vector< Sprite* > idle_sprites, Sprite* jump_sprite, Sprite* fall_sprite, std::vector< Sprite* > run_sprites) {
 	
-	std::cout << "\nAdding player" << "\n";
+	std::cout << "\nAdding player. Pos : " << position.x << ", " << position.y << "\n";
 	Input* left = input_manager.register_key(leftkey);
 	Input* right = input_manager.register_key(rightkey);
 	Input* jump = input_manager.register_key(jumpkey);
