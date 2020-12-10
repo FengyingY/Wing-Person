@@ -586,7 +586,6 @@ std::vector< Shapes::Rectangle > Collisions::player_rectangles_collision(Shapes:
 	Shapes::Rectangle player_copy = Shapes::Rectangle(player.center, player.width, player.height, false);
 
 	//check for collisions:
-	int i = 1;
 	for (Shapes::Rectangle rectangle : rectangles) {
 		if (rectangle_rectangle_collision(player_copy, rectangle))
 			hit_rectangles.emplace_back(rectangle);
@@ -649,10 +648,10 @@ std::vector< Shapes::Rectangle > Collisions::player_rectangles_collision(Shapes:
 	std::vector< Shapes::Rectangle > collisions;
 	std::vector< Shapes::Rectangle > temp;
 	temp = player_rectangles_collision(player, rectangles1);
-	for (int i = 0; i < temp.size(); i++)
+	for (unsigned int i = 0; i < temp.size(); i++)
 		collisions.emplace_back(temp[i]);
 	temp = player_rectangles_collision(player, rectangles2);
-	for (int i = 0; i < temp.size(); i++)
+	for (unsigned int i = 0; i < temp.size(); i++)
 		collisions.emplace_back(temp[i]);
 	return collisions;
 }
