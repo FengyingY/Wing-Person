@@ -320,6 +320,10 @@ PuzzleMode::PuzzleMode(uint32_t level, std::string _story_bgm, Character _story_
 
 	story_bgm = _story_bgm;
 	story_character = _story_character;
+
+	// init UI
+	time_left = std::make_shared<view::TextLine>();
+	update_time_left();
 }
 
 PuzzleMode::~PuzzleMode() {}
@@ -370,13 +374,16 @@ bool PuzzleMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 }
 
 void PuzzleMode::update(float elapsed) {
-	total_time += elapsed;
-
+	
 	if (start_delay < 0.2f)	// pausing all physics checks for a short delay on start
 	{
 		start_delay += elapsed;
 		return;
 	}
+
+	total_time += elapsed;
+
+	update_time_left();
 
 	if (is_timeup)
 	{
@@ -666,5 +673,24 @@ void PuzzleMode::draw(glm::uvec2 const &drawable_size) {
 		player->draw(drawable_size);
 	}
 
+	// text
+	glDisable(GL_DEPTH_TEST);
+	time_left->draw();
+
 	GL_ERRORS();
+}
+
+void PuzzleMode::update_time_left() {
+	time_str = "Time left : ";
+	time_str.append(std::to_string((int)(MaxPuzzleTime-puzzle_time)))
+		.append("/")
+		.append(std::to_string((int)MaxPuzzleTime));
+	
+	time_left->set_font(view::FontFace::IBMPlexMono)
+		.set_text(time_str)
+		.set_font_size(28)
+		.set_position(glm::vec2(0.f, ScreenHeight-28.f))
+		.set_color(glm::u8vec4(255,255,255,255))
+		.disable_animation()
+		.set_visibility(true);
 }

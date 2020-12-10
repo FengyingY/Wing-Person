@@ -11,10 +11,6 @@ Player::~Player() {
 	
 }
 
-	glDeleteTextures(1, &png_tex);
-	png_tex = 0;
-}
-
 void Player::draw(glm::uvec2 const &drawable_size) {
 	
 	curr_sprite->draw(position, drawable_size, 0.6f, direction);

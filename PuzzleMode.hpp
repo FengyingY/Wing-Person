@@ -8,6 +8,7 @@
 #include "Input.hpp"
 #include "Player.hpp"
 #include "Character.hpp"
+#include "View.hpp"
 
 #include <vector>
 
@@ -55,6 +56,11 @@ struct PuzzleMode : Mode
 	std::string story_bgm;
 	Character story_character;
 
+	// UI
+	std::shared_ptr<view::TextLine> time_left = nullptr;
+	std::string time_str = "";
+
+	void update_time_left();
 
 	float start_delay = 0.f;
 };
