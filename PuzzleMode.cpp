@@ -413,6 +413,8 @@ void PuzzleMode::update(float elapsed) {
 
 	for (unsigned int i = 0; i < players.size(); i++) {
 
+		players[i]->update(elapsed);
+
 		// Calculate inputs and movement for each player
 		players[i]->velocity.x = 0;
 

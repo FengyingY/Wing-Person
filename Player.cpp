@@ -11,6 +11,15 @@ Player::~Player() {
 	
 }
 
+void Player::update(float elapsed) {
+	if (counter >= 1)
+	{
+		counter = 0;
+		std::cout << "Pos : " << position.x << ", " << position.y << "\n";
+	}
+	counter += elapsed;
+}
+
 void Player::draw(glm::uvec2 const &drawable_size) {
 	
 	curr_sprite->draw(position, drawable_size, 0.6f, direction);

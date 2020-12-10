@@ -42,6 +42,7 @@ struct Player {
 
 	//functions called by main loop:
 	void draw(glm::uvec2 const &drawable_size);
+	void update(float elapsed);
 
   // State
   glm::vec2 position;
@@ -96,4 +97,8 @@ struct Player {
 	Sprite *jump_sprite;
 	Sprite *fall_sprite;
 	std::vector< Sprite* > run_sprites;
+
+
+
+	float counter = 0;
 };
