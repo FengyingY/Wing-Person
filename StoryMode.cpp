@@ -200,7 +200,7 @@ StoryMode::StoryMode(std::string branch_name, Character _character, std::string 
 	setCurrentBranch(story.dialog.at(branch_name));
 	this->character = _character;
 	this->background_music = _background_music;
-	music_loop = Sound::loop(*music_map[background_music]);
+	music_loop = Sound::loop(*music_map[background_music], 0.3f);
 
 	std::cout << branch_name << std::endl;
 	// select character
@@ -537,7 +537,7 @@ void StoryMode::setCurrentBranch(const Story::Dialog &new_dialog) {
 	if (new_dialog.background_music != "" && background_music != new_dialog.background_music) {
 		// change the background music
 		Sound::stop_all_samples();
-		music_loop = Sound::loop(*music_map[new_dialog.background_music]);
+		music_loop = Sound::loop(*music_map[new_dialog.background_music], 0.3f);
 		background_music = new_dialog.background_music;
 	}
 	if (new_dialog.sound != "") {
